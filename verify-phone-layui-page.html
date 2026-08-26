@@ -4,6 +4,11 @@
         那些 layui 自己會產生）
      B. 頁面自己的 <script>（絕對不要放進 layer 的 content 裡，
         用 innerHTML 插入的 script 不會執行）
+
+     ★ 位置很重要：兩段都貼在 </body> 的前一行，也就是頁面最外層。
+       不可以貼在 <form> 裡面（form 不能巢狀，內層 form 會被丟掉），
+       也不可以貼在 <table> / <tr> / <td> 裡面（表格裡的 div、p、input
+       會被瀏覽器搬到表格外面，內容就散掉了）。
      ============================================================ -->
 
 <!-- ===== A. 彈窗內容 ===== -->
@@ -97,15 +102,23 @@
   var verifyIndex = null;   // layui 這一層的 index，關閉時要用
   var timer = null;
 
-  // 開窗：內容從 #verifyBox 取，標題和叉叉交給 layui
+  // 開窗：直接把 #verifyBox 這個元素搬進 layer（不要用 innerHTML 複製字串，
+  // 那會讓內容被瀏覽器重新解析一次，巢狀結構可能被拆掉）
   function openVerify() {
     verifyIndex = layer.open({
       type: 1,
       title: '驗證手機號碼',
       area: '30rem',
-      shadeClose: true,                                   // 點遮罩也能關
-      content: document.getElementById('verifyBox').innerHTML,
-      end: function () { stopTimer(); verifyIndex = null; } // 關掉時清乾淨
+      shadeClose: true,                    // 點遮罩也能關
+      content: $('#verifyBox'),            // 傳元素本身
+      success: function () {
+        $('#verifyBox').show();            // layui 不會自動拿掉 display:none
+      },
+      end: function () {                   // 關閉時把元素收回 body 藏好，下次還能再用
+        stopTimer();
+        $('#verifyBox').hide().appendTo('body');
+        verifyIndex = null;
+      }
     });
   }
 
