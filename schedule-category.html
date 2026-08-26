@@ -1,0 +1,57 @@
+<style>
+  /* 分類標題 */
+  .csList .cs-cate {
+    margin: 12px 0 6px;
+    padding: 0 4px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2b4a6f;
+  }
+  .csList .cs-cate:first-child { margin-top: 0; }
+
+  /* 分類之間的橫線 */
+  .csList .cs-divider {
+    margin: 14px 0 0;
+    border: 0;
+    border-top: 1px solid #dfe3e8;
+  }
+
+  /* 沒有資料時的提示 */
+  .csList .cs-empty {
+    margin: 6px 0;
+    padding: 0 4px;
+    font-size: 13px;
+    color: #9aa3ae;
+  }
+</style>
+
+<div class="csList" style="display: block; opacity: 1;">
+    <div class="nowScheduleDate">
+        <span>8月26日</span>
+    </div>
+
+    <div class="todayReserve" style="height: 426px;">
+
+        <!-- ===== 面試 ===== -->
+        <p class="cs-cate">面試</p>
+        <ul>
+            <li class="clickPastdue cpFaceto" data-ano="554499" data-mode="2"><i class="fas fa-comments"></i><span class="cstime">01:05</span><span>測試蔡育琳</span></li>
+            <li class="clickInvite ciFaceto" data-ano="558373" data-mode="0"><i class="fas fa-comments"></i><span class="cstime">02:10</span><span>莊邦妮</span></li>
+            <li class="clickInvite ciFaceto" data-ano="554579" data-mode="0"><i class="fas fa-comments"></i><span class="cstime">06:00</span><span>彭喻瑋</span></li>
+            <li class="clickInvite ciFaceto" data-ano="564449" data-mode="0"><i class="fas fa-comments"></i><span class="cstime">17:00</span><span>系統測試劉珮玲</span></li>
+        </ul>
+
+        <hr class="cs-divider">
+
+        <!-- ===== 到職確認 ===== -->
+        <p class="cs-cate">到職確認</p>
+        <ul>
+            <!-- 有資料時，li 的寫法跟上面完全一樣 -->
+            <li class="clickInvite ciFaceto" data-ano="000000" data-mode="0"><i class="fas fa-comments"></i><span class="cstime">10:30</span><span>範例姓名</span></li>
+        </ul>
+
+        <!-- 沒有資料時改用這行取代上面的 ul -->
+        <!-- <p class="cs-empty">今日無到職確認行程</p> -->
+
+    </div>
+</div>
