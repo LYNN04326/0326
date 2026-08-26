@@ -1,0 +1,174 @@
+<style>
+  .vp-wrap, .vp-wrap * { box-sizing: border-box; }
+  .vp-wrap { padding: 22px 26px 26px; font-size: 14px; color: #333; }
+  .vp-notice { margin: 0 0 22px; text-align: center; color: #2f78d4; }
+  .vp-label { margin: 0 0 10px; }
+  .vp-row { display: flex; gap: 8px; width: 100%; margin-bottom: 12px; }
+  .vp-in {
+    flex: 1 1 auto; min-width: 0; width: 100%; height: 38px; padding: 0 12px;
+    border: 1px solid #ccc; border-radius: 3px; font-size: 14px; color: #333; outline: none;
+  }
+  .vp-in::placeholder { color: #b3b3b3; }
+  .vp-in:focus { border-color: #2f78d4; }
+  .vp-b {
+    flex: 0 0 auto; height: 38px; padding: 0 18px; border-radius: 3px;
+    font-size: 14px; cursor: pointer; white-space: nowrap;
+  }
+  .vp-b1 { border: 1px solid #2f6fd0; background: #3b7ddd; color: #fff; }
+  .vp-b1:hover { background: #2f6fd0; }
+  .vp-b1:disabled { background: #a9c4ea; border-color: #a9c4ea; cursor: not-allowed; }
+  .vp-b2 { border: 1px solid #2f78d4; background: #fff; color: #2f78d4; }
+  .vp-b2:hover { background: #f0f6ff; }
+  .vp-err { min-height: 18px; margin: 0 0 4px; font-size: 13px; color: #d9534f; }
+  .vp-foot { display: flex; justify-content: center; gap: 12px; padding-top: 14px; }
+  .vp-foot .vp-b { min-width: 96px; }
+
+  /* 驗證碼標題列 + 倒數 */
+  .vp-code-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin: 18px 0 8px;
+  }
+  .vp-timer { font-size: 13px; color: #6b7480; }
+  .vp-timer b { color: #d9534f; font-weight: normal; }
+
+  /* 3 + 3 格子 */
+  .vp-cells { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .vp-cell {
+    flex: 1 1 0; min-width: 0; height: 48px; padding: 0;
+    border: 1px solid #ccc; border-radius: 3px; background: #fff;
+    text-align: center; font-size: 20px; color: #333; outline: none;
+  }
+  .vp-cell:focus { border-color: #2f78d4; border-width: 2px; }
+  .vp-dash { flex: 0 0 auto; color: #9aa3ae; font-size: 18px; }
+
+  @media (max-width: 400px) {
+    .vp-wrap { padding: 20px 16px 22px; }
+    .vp-b { padding: 0 12px; font-size: 13px; }
+    .vp-foot .vp-b { min-width: 88px; }
+    .vp-cell { height: 42px; font-size: 17px; }
+    .vp-code-head { flex-wrap: wrap; gap: 4px; }
+  }
+</style>
+
+<div class="vp-wrap">
+  <p class="vp-notice">為保障你的帳號安全，請協助完成驗證流程。</p>
+  <p class="vp-label">請輸入電話號碼取得驗證碼。</p>
+
+  <div class="vp-row">
+    <input type="tel" class="vp-in" id="vpPhone" placeholder="0912345678" maxlength="10" autocomplete="tel">
+    <button type="button" class="vp-b vp-b1" id="vpSend" onclick="
+      var p=document.getElementById('vpPhone'), e=document.getElementById('vpErr');
+      if(!/^09\d{8}$/.test(p.value.trim())){ e.textContent='請輸入正確的手機號碼格式（例：0912345678）。'; p.focus(); return; }
+      e.textContent='';
+      window.vpStart(180);
+      var first=document.querySelector('.vp-cell'); if(first){ first.focus(); }
+      /* TODO: 這裡呼叫後端寄送簡訊的 API */
+    ">取得驗證碼</button>
+  </div>
+
+  <!-- 驗證碼標題 + 倒數（開窗就開始跑） -->
+  <div class="vp-code-head">
+    <span>驗證碼</span>
+    <span class="vp-timer" id="vpTimer">驗證碼將於 <b>3:00</b> 後失效</span>
+  </div>
+
+  <div class="vp-cells">
+    <input class="vp-cell" maxlength="1" inputmode="numeric" autocomplete="one-time-code"
+      oninput="window.vpIn(this)" onkeydown="window.vpKey(this,event)" onpaste="window.vpPaste(this,event)">
+    <input class="vp-cell" maxlength="1" inputmode="numeric"
+      oninput="window.vpIn(this)" onkeydown="window.vpKey(this,event)" onpaste="window.vpPaste(this,event)">
+    <input class="vp-cell" maxlength="1" inputmode="numeric"
+      oninput="window.vpIn(this)" onkeydown="window.vpKey(this,event)" onpaste="window.vpPaste(this,event)">
+
+    <span class="vp-dash">-</span>
+
+    <input class="vp-cell" maxlength="1" inputmode="numeric"
+      oninput="window.vpIn(this)" onkeydown="window.vpKey(this,event)" onpaste="window.vpPaste(this,event)">
+    <input class="vp-cell" maxlength="1" inputmode="numeric"
+      oninput="window.vpIn(this)" onkeydown="window.vpKey(this,event)" onpaste="window.vpPaste(this,event)">
+    <input class="vp-cell" maxlength="1" inputmode="numeric"
+      oninput="window.vpIn(this)" onkeydown="window.vpKey(this,event)" onpaste="window.vpPaste(this,event)">
+  </div>
+
+  <p class="vp-err" id="vpErr"></p>
+
+  <div class="vp-foot">
+    <button type="button" class="vp-b vp-b2" onclick="layer.closeAll();">取消</button>
+    <button type="button" class="vp-b vp-b1" onclick="
+      var p=document.getElementById('vpPhone'), e=document.getElementById('vpErr');
+      if(!/^09\d{8}$/.test(p.value.trim())){ e.textContent='請輸入正確的手機號碼格式（例：0912345678）。'; p.focus(); return; }
+      var cells=document.querySelectorAll('.vp-cell'), code='';
+      for(var i=0;i<cells.length;i++){ code+=cells[i].value; }
+      if(code.length<cells.length){ e.textContent='請完整輸入驗證碼。'; cells[code.length].focus(); return; }
+      e.textContent='';
+      var full=code.slice(0,3)+'-'+code.slice(3);
+      /* TODO: 這裡呼叫後端驗證 API（full 就是 ABC-DEF 格式），成功後再關窗 */
+      var s=document.getElementById('mobileSpan'); if(s){ s.textContent=p.value.trim(); }
+      layer.closeAll();
+    ">確認驗證</button>
+  </div>
+
+  <!-- layui 用 innerHTML 插入內容，裡面的 <script> 不會執行，但 SVG 的 onload 會。
+       格子的跳格行為和倒數都靠這裡啟動，不要刪掉。 -->
+  <svg width="0" height="0" onload="
+    window.vpIn = function (el) {
+      el.value = el.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      if (!el.value) { return; }
+      var n = el.nextElementSibling;
+      while (n && !n.classList.contains('vp-cell')) { n = n.nextElementSibling; }
+      if (n) { n.focus(); }
+    };
+
+    window.vpKey = function (el, ev) {
+      if (ev.key !== 'Backspace' || el.value) { return; }
+      var p = el.previousElementSibling;
+      while (p && !p.classList.contains('vp-cell')) { p = p.previousElementSibling; }
+      if (p) { p.focus(); }
+    };
+
+    window.vpPaste = function (el, ev) {
+      ev.preventDefault();
+      var txt = (ev.clipboardData || window.clipboardData).getData('text');
+      txt = txt.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      var cur = el;
+      for (var i = 0; i < txt.length && cur; i++) {
+        cur.value = txt.charAt(i);
+        var n = cur.nextElementSibling;
+        while (n && !n.classList.contains('vp-cell')) { n = n.nextElementSibling; }
+        cur = n;
+        if (cur) { cur.focus(); }
+      }
+    };
+
+    window.vpStart = function (sec) {
+      if (window.vpTimerId) { clearInterval(window.vpTimerId); }
+
+      var left = sec;
+      var box  = document.getElementById('vpTimer');
+      var btn  = document.getElementById('vpSend');
+
+      function fmt(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+
+      function tick() {
+        if (!document.getElementById('vpTimer')) { clearInterval(window.vpTimerId); return; }
+        if (left <= 0) {
+          clearInterval(window.vpTimerId);
+          box.innerHTML = '驗證碼已失效，請重新取得';
+          btn.disabled = false;
+          btn.textContent = '重新取得驗證碼';
+          return;
+        }
+        box.innerHTML   = '驗證碼將於 <b>' + fmt(left) + '</b> 後失效';
+        btn.disabled    = true;
+        btn.textContent = '重新取得 (' + fmt(left) + ')';
+        left--;
+      }
+
+      tick();
+      window.vpTimerId = setInterval(tick, 1000);
+    };
+
+    /* 開窗就開始倒數 3 分鐘 */
+    window.vpStart(180);
+  "></svg>
+</div>
