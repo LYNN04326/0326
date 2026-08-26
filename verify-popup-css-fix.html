@@ -1,0 +1,142 @@
+<!-- ==========================================================================
+     驗證彈窗版面修正 — 只有 CSS，不動任何 HTML 和 JS
+     貼進頁面的 <style> 或你們的 css 檔即可。
+     沿用原本的 class / id：#emailValid、#emailValidationCode、
+     #getEmailValidBtn、#confirmValidation …… 全部照舊運作。
+     ========================================================================== -->
+
+<style>
+  /* ---------- 內容區 ---------- */
+  .layui-layer-content .modal-content.verification {
+    padding: 22px 26px 6px;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .layui-layer-content .modal-content.verification .text--apply {
+    margin: 0 0 20px;
+    text-align: center;
+    color: #2f78d4;
+  }
+
+  /* ---------- 兩列（目前電子信箱 / 驗證碼）排成一行 ---------- */
+  .layui-layer-content .modal-content.verification .text--0 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;          /* 蓋掉 .text--0 的 font-size: 0 */
+    margin-bottom: 12px;
+  }
+
+  /* 左側標籤：兩列等寬，右邊內容才會上下對齊 */
+  .layui-layer-content .modal-content.verification .md-info {
+    flex: 0 0 auto;
+    width: 6.5em;
+    color: #6b7480;
+    font-size: 14px;
+  }
+
+  /* 目前電子信箱的值 */
+  .layui-layer-content .modal-content.verification .text--16.md-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-left: 0;
+    font-size: 15px;
+    color: #2b2f36;
+    word-break: break-all;
+  }
+
+  /* 驗證碼前綴（disabled 的那格） */
+  .layui-layer-content .modal-content.verification .firstCode {
+    flex: 0 0 76px;
+    width: 76px;
+    height: 38px;
+    padding: 0 8px;
+    border: 1px solid #e3e6eb;
+    border-radius: 3px;
+    background: #f4f6f9;
+    color: #9aa3ae;
+    font-size: 15px;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  /* 驗證碼輸入框 */
+  .layui-layer-content .modal-content.verification #emailValidationCode {
+    flex: 1 1 auto;
+    min-width: 0;             /* 關鍵：可收縮，按鈕才不會被擠到下一行 */
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+  }
+
+  .layui-layer-content .modal-content.verification #emailValidationCode:focus {
+    border-color: #2f78d4;
+  }
+
+  /* 取得驗證碼按鈕 */
+  .layui-layer-content .modal-content.verification .verification-btn {
+    flex: 0 0 auto;
+    height: 38px;
+    padding: 0 16px;
+    white-space: nowrap;
+  }
+
+  /* ---------- 訊息 ---------- */
+  .layui-layer-content .modal-content.verification .error-txt {
+    margin: 6px 0 0;
+    padding-left: calc(6.5em + 8px);   /* 對齊右邊欄位 */
+    font-size: 13px;
+    color: #d9534f;
+  }
+
+  .layui-layer-content .modal-content.verification .error-txt:empty {
+    margin: 0;
+  }
+
+  /* ---------- 底部按鈕 ---------- */
+  .layui-layer-content .modal-btn-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding: 16px 26px 22px;
+    border-top: 1px solid #eef0f3;
+  }
+
+  .layui-layer-content .modal-btn-box .btn {
+    min-width: 96px;
+    margin-right: 0;          /* 蓋掉 mr-8，改用 gap 控制間距 */
+  }
+
+  /* ---------- 手機版：窄螢幕改成上下排 ---------- */
+  @media (max-width: 480px) {
+    .layui-layer.layui-layer-page {
+      width: 92vw !important;
+      left: 4vw !important;
+      margin-left: 0 !important;
+    }
+
+    .layui-layer-content .modal-content.verification { padding: 20px 16px 6px; }
+
+    .layui-layer-content .modal-content.verification .text--0 {
+      flex-wrap: wrap;
+    }
+
+    .layui-layer-content .modal-content.verification .md-info {
+      width: 100%;
+      margin-bottom: 6px;
+    }
+
+    .layui-layer-content .modal-content.verification .error-txt {
+      padding-left: 0;
+    }
+
+    .layui-layer-content .modal-btn-box { padding: 16px; }
+  }
+</style>
