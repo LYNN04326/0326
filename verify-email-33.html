@@ -23,14 +23,15 @@
   .ve-foot { display: flex; justify-content: center; gap: 12px; padding-top: 14px; }
   .ve-foot .ve-b { min-width: 96px; }
 
-  /* ---------- 驗證碼 3+3 格子 ---------- */
+  /* 驗證碼標題列 + 倒數 */
   .ve-code-head {
     display: flex; align-items: baseline; justify-content: space-between;
     margin: 18px 0 8px;
   }
-  .ve-timer { font-size: 13px; color: #8d97a5; }
+  .ve-timer { font-size: 13px; color: #6b7480; }
   .ve-timer b { color: #d9534f; font-weight: normal; }
 
+  /* 3 + 3 格子 */
   .ve-cells { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
   .ve-cell {
     flex: 1 1 0; min-width: 0; height: 48px; padding: 0;
@@ -55,57 +56,38 @@
 
   <div class="ve-row">
     <input type="email" class="ve-in" id="veMail" placeholder="example@mail.com" maxlength="60" autocomplete="email">
-    <button type="button" class="ve-b ve-b1" onclick="
-      var m=document.getElementById('veMail'), e=document.getElementById('veErr'), b=this;
+    <button type="button" class="ve-b ve-b1" id="veSend" onclick="
+      var m=document.getElementById('veMail'), e=document.getElementById('veErr');
       if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m.value.trim())){ e.textContent='請輸入正確的電子信箱格式（例：example@mail.com）。'; m.focus(); return; }
       e.textContent='';
-
-      var box=document.getElementById('veTimer');
-      var n=180; b.disabled=true;
-      function fmt(s){ return Math.floor(s/60)+':'+('0'+(s%60)).slice(-2); }
-      b.textContent='重新取得 ('+fmt(n)+')';
-      box.innerHTML='驗證碼將於 <b>'+fmt(n)+'</b> 後失效';
-      var t=setInterval(function(){ n--;
-        if(!document.getElementById('veTimer')){ clearInterval(t); return; }
-        if(n<=0){ clearInterval(t); b.disabled=false; b.textContent='重新取得驗證碼';
-                  box.innerHTML='驗證碼已失效，請重新取得'; }
-        else { b.textContent='重新取得 ('+fmt(n)+')';
-               box.innerHTML='驗證碼將於 <b>'+fmt(n)+'</b> 後失效'; }
-      },1000);
-
+      window.veStart(180);
       var first=document.querySelector('.ve-cell'); if(first){ first.focus(); }
       /* TODO: 這裡呼叫後端寄送驗證碼的 API */
     ">取得驗證碼</button>
   </div>
 
+  <!-- 驗證碼標題 + 倒數（倒數在右邊，開窗就開始跑） -->
   <div class="ve-code-head">
     <span>驗證碼</span>
-    <span class="ve-timer" id="veTimer">尚未取得驗證碼</span>
+    <span class="ve-timer" id="veTimer">驗證碼將於 <b>3:00</b> 後失效</span>
   </div>
 
   <div class="ve-cells">
     <input class="ve-cell" maxlength="1" autocomplete="one-time-code"
-      oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase(); if(this.value){ var n=this.nextElementSibling; while(n&&!n.classList.contains('ve-cell')){ n=n.nextElementSibling; } if(n){ n.focus(); } }"
-      onkeydown="if(event.key==='Backspace'&&!this.value){ var p=this.previousElementSibling; while(p&&!p.classList.contains('ve-cell')){ p=p.previousElementSibling; } if(p){ p.focus(); } }"
-      onpaste="event.preventDefault(); var txt=(event.clipboardData||window.clipboardData).getData('text').replace(/[^A-Za-z0-9]/g,'').toUpperCase(); var cur=this; for(var i=0;i<txt.length&&cur;i++){ cur.value=txt.charAt(i); var n=cur.nextElementSibling; while(n&&!n.classList.contains('ve-cell')){ n=n.nextElementSibling; } cur=n; if(cur){ cur.focus(); } }">
+      oninput="window.veIn(this)" onkeydown="window.veKey(this,event)" onpaste="window.vePaste(this,event)">
     <input class="ve-cell" maxlength="1"
-      oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase(); if(this.value){ var n=this.nextElementSibling; while(n&&!n.classList.contains('ve-cell')){ n=n.nextElementSibling; } if(n){ n.focus(); } }"
-      onkeydown="if(event.key==='Backspace'&&!this.value){ var p=this.previousElementSibling; while(p&&!p.classList.contains('ve-cell')){ p=p.previousElementSibling; } if(p){ p.focus(); } }">
+      oninput="window.veIn(this)" onkeydown="window.veKey(this,event)" onpaste="window.vePaste(this,event)">
     <input class="ve-cell" maxlength="1"
-      oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase(); if(this.value){ var n=this.nextElementSibling; while(n&&!n.classList.contains('ve-cell')){ n=n.nextElementSibling; } if(n){ n.focus(); } }"
-      onkeydown="if(event.key==='Backspace'&&!this.value){ var p=this.previousElementSibling; while(p&&!p.classList.contains('ve-cell')){ p=p.previousElementSibling; } if(p){ p.focus(); } }">
+      oninput="window.veIn(this)" onkeydown="window.veKey(this,event)" onpaste="window.vePaste(this,event)">
 
     <span class="ve-dash">-</span>
 
     <input class="ve-cell" maxlength="1"
-      oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase(); if(this.value){ var n=this.nextElementSibling; while(n&&!n.classList.contains('ve-cell')){ n=n.nextElementSibling; } if(n){ n.focus(); } }"
-      onkeydown="if(event.key==='Backspace'&&!this.value){ var p=this.previousElementSibling; while(p&&!p.classList.contains('ve-cell')){ p=p.previousElementSibling; } if(p){ p.focus(); } }">
+      oninput="window.veIn(this)" onkeydown="window.veKey(this,event)" onpaste="window.vePaste(this,event)">
     <input class="ve-cell" maxlength="1"
-      oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase(); if(this.value){ var n=this.nextElementSibling; while(n&&!n.classList.contains('ve-cell')){ n=n.nextElementSibling; } if(n){ n.focus(); } }"
-      onkeydown="if(event.key==='Backspace'&&!this.value){ var p=this.previousElementSibling; while(p&&!p.classList.contains('ve-cell')){ p=p.previousElementSibling; } if(p){ p.focus(); } }">
+      oninput="window.veIn(this)" onkeydown="window.veKey(this,event)" onpaste="window.vePaste(this,event)">
     <input class="ve-cell" maxlength="1"
-      oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,'').toUpperCase(); if(this.value){ var n=this.nextElementSibling; while(n&&!n.classList.contains('ve-cell')){ n=n.nextElementSibling; } if(n){ n.focus(); } }"
-      onkeydown="if(event.key==='Backspace'&&!this.value){ var p=this.previousElementSibling; while(p&&!p.classList.contains('ve-cell')){ p=p.previousElementSibling; } if(p){ p.focus(); } }">
+      oninput="window.veIn(this)" onkeydown="window.veKey(this,event)" onpaste="window.vePaste(this,event)">
   </div>
 
   <p class="ve-err" id="veErr"></p>
@@ -120,9 +102,73 @@
       if(code.length<cells.length){ e.textContent='請完整輸入驗證碼。'; cells[code.length].focus(); return; }
       e.textContent='';
       var full=code.slice(0,3)+'-'+code.slice(3);
-      /* TODO: 這裡呼叫後端驗證 API，成功後再關窗 */
+      /* TODO: 這裡呼叫後端驗證 API（full 就是 ABC-DEF 格式），成功後再關窗 */
       var s=document.getElementById('emailSpan'); if(s){ s.textContent=m.value.trim(); }
       layer.closeAll();
     ">確認驗證</button>
   </div>
+
+  <!-- layui 用 innerHTML 插入內容，裡面的 <script> 不會執行，但 SVG 的 onload 會。
+       格子的跳格行為和倒數都靠這裡啟動，不要刪掉。 -->
+  <svg width="0" height="0" onload="
+    window.veIn = function (el) {
+      el.value = el.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      if (!el.value) { return; }
+      var n = el.nextElementSibling;
+      while (n && !n.classList.contains('ve-cell')) { n = n.nextElementSibling; }
+      if (n) { n.focus(); }
+    };
+
+    window.veKey = function (el, ev) {
+      if (ev.key !== 'Backspace' || el.value) { return; }
+      var p = el.previousElementSibling;
+      while (p && !p.classList.contains('ve-cell')) { p = p.previousElementSibling; }
+      if (p) { p.focus(); }
+    };
+
+    window.vePaste = function (el, ev) {
+      ev.preventDefault();
+      var txt = (ev.clipboardData || window.clipboardData).getData('text');
+      txt = txt.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      var cur = el;
+      for (var i = 0; i < txt.length && cur; i++) {
+        cur.value = txt.charAt(i);
+        var n = cur.nextElementSibling;
+        while (n && !n.classList.contains('ve-cell')) { n = n.nextElementSibling; }
+        cur = n;
+        if (cur) { cur.focus(); }
+      }
+    };
+
+    window.veStart = function (sec) {
+      if (window.veTimerId) { clearInterval(window.veTimerId); }
+
+      var left = sec;
+      var box  = document.getElementById('veTimer');
+      var btn  = document.getElementById('veSend');
+
+      function fmt(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+
+      function tick() {
+        if (!document.getElementById('veTimer')) { clearInterval(window.veTimerId); return; }
+        if (left <= 0) {
+          clearInterval(window.veTimerId);
+          box.innerHTML = '驗證碼已失效，請重新取得';
+          btn.disabled = false;
+          btn.textContent = '重新取得驗證碼';
+          return;
+        }
+        box.innerHTML  = '驗證碼將於 <b>' + fmt(left) + '</b> 後失效';
+        btn.disabled   = true;
+        btn.textContent = '重新取得 (' + fmt(left) + ')';
+        left--;
+      }
+
+      tick();
+      window.veTimerId = setInterval(tick, 1000);
+    };
+
+    /* 開窗就開始倒數 3 分鐘 */
+    window.veStart(180);
+  "></svg>
 </div>
