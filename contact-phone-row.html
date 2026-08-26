@@ -1,44 +1,40 @@
-<!-- 聯絡電話那一列：把鉛筆刪掉，「我要驗證」改成按鈕外觀 -->
+<!-- 聯絡電話那一列：刪掉鉛筆，「[我要驗證]」改成「驗證電話號碼」按鈕 -->
+<!-- 改動只有 .edit_vaule 這一段，.edit_vaule_open 原封不動 -->
 
-<!-- ===== 原本大概長這樣（示意） =====
-<span>手機：</span>
-<a href="javascript:;" class="edit-pencil"><i class="fa fa-pencil"></i></a>
-<a href="javascript:;" id="btnVerify">[我要驗證]</a>
-====================================== -->
-
-
-<style>
-  /* 讓 <a> 或 <button> 都能套用的按鈕外觀 */
-  .btn-verify {
-    display: inline-block;
-    height: 30px;
-    line-height: 28px;
-    padding: 0 14px;
-    border: 1px solid #2f78d4;
-    border-radius: 3px;
-    background: #fff;
-    color: #2f78d4;
-    font-size: 13px;
-    text-decoration: none;   /* 用 <a> 時去掉底線 */
-    white-space: nowrap;
-    cursor: pointer;
-  }
-
-  .btn-verify:hover,
-  .btn-verify:focus { background: #f0f6ff; color: #2f78d4; text-decoration: none; }
-</style>
+<div class="profile-info-value text--15" id="valueCPhone">
+    <div class="edit_vaule">
+        <font class="text--grey">手機：</font>
+        <span id="mobileSpan" class="edit_vaule_input"></span>
+        <a id="wantMobileValid" href="javascript:void(0);" title="驗證電話號碼"
+           class="modal_mobile_want_verification btn btn--primary btn--xs ml-8">驗證電話號碼</a>
+    </div>
+    <div class="edit_vaule_open">
+        <input type="tel" id="valueCPhoneInp" value="" maxlength="20" placeholder="請輸入您的手機號碼" onblur="this.value = this.value.trim()">
+        <div class="btn-box">
+            <a href="javascript:void(0);" title="儲存" class="btn btn--primary btn--xs edit_save">儲存</a>
+            <a href="javascript:void(0);" title="取消" class="btn btn--xs edit_cancel">取消</a>
+        </div>
+    </div>
+</div>
 
 
-<!-- ===== 方案 A（建議）：沿用原本的 <a>，只換文字和樣式 =====
-     元素、id、class、原本的 onclick 都沒動，開窗綁定一定還在。
-     鉛筆那個 <a> 整段刪掉即可。 -->
-<span>手機：</span>
-<a href="javascript:;" id="btnVerify" class="btn-verify">驗證電話號碼</a>
+<!-- ================= 改了哪些地方 =================
 
+1. 刪掉鉛筆：
+   <i class="jb-df-edit-write edit_vaule_input-ctrl" aria-hidden="true"></i>
 
-<!-- ===== 方案 B：真的要換成 <button> 標籤 =====
-     務必把原本 <a> 上的 id / class / onclick / data-* 一起搬過來，
-     否則綁在舊選擇器上的開窗事件會失效。
-<span>手機：</span>
-<button type="button" id="btnVerify" class="btn-verify">驗證電話號碼</button>
-====================================== -->
+2. 驗證連結改成按鈕外觀：
+   舊：class="modal_mobile_want_verification link-h-underline ml-8">[我要驗證]</a>
+   新：class="modal_mobile_want_verification btn btn--primary btn--xs ml-8">驗證電話號碼</a>
+
+   - id="wantMobileValid" 與 modal_mobile_want_verification 都保留 → 開窗的 JS 照舊運作
+   - 拿掉 link-h-underline（連結底線樣式，做成按鈕就不需要）
+   - 保留 ml-8 維持左邊間距
+   - title 也一併改成「驗證電話號碼」
+
+3. 順手刪掉那行註解掉的舊 <a>（沒有作用）
+
+想要白底藍框的次要按鈕，把 btn--primary 拿掉即可：
+   class="modal_mobile_want_verification btn btn--xs ml-8"
+
+================================================= -->
