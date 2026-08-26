@@ -1,0 +1,44 @@
+<!-- 聯絡電話那一列：把鉛筆刪掉，「我要驗證」改成按鈕外觀 -->
+
+<!-- ===== 原本大概長這樣（示意） =====
+<span>手機：</span>
+<a href="javascript:;" class="edit-pencil"><i class="fa fa-pencil"></i></a>
+<a href="javascript:;" id="btnVerify">[我要驗證]</a>
+====================================== -->
+
+
+<style>
+  /* 讓 <a> 或 <button> 都能套用的按鈕外觀 */
+  .btn-verify {
+    display: inline-block;
+    height: 30px;
+    line-height: 28px;
+    padding: 0 14px;
+    border: 1px solid #2f78d4;
+    border-radius: 3px;
+    background: #fff;
+    color: #2f78d4;
+    font-size: 13px;
+    text-decoration: none;   /* 用 <a> 時去掉底線 */
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .btn-verify:hover,
+  .btn-verify:focus { background: #f0f6ff; color: #2f78d4; text-decoration: none; }
+</style>
+
+
+<!-- ===== 方案 A（建議）：沿用原本的 <a>，只換文字和樣式 =====
+     元素、id、class、原本的 onclick 都沒動，開窗綁定一定還在。
+     鉛筆那個 <a> 整段刪掉即可。 -->
+<span>手機：</span>
+<a href="javascript:;" id="btnVerify" class="btn-verify">驗證電話號碼</a>
+
+
+<!-- ===== 方案 B：真的要換成 <button> 標籤 =====
+     務必把原本 <a> 上的 id / class / onclick / data-* 一起搬過來，
+     否則綁在舊選擇器上的開窗事件會失效。
+<span>手機：</span>
+<button type="button" id="btnVerify" class="btn-verify">驗證電話號碼</button>
+====================================== -->
