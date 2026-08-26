@@ -89,6 +89,11 @@
 <!-- ===== B. 頁面自己的 script ===== -->
 <script>
 (function () {
+  // 你的頁面已經有開啟彈窗的程式碼 → 保持 false，只要把它的 content
+  // 改成 document.getElementById('verifyBox').innerHTML 即可。
+  // 若頁面沒有任何開窗程式碼，改成 true，由下面的 openVerify() 負責開窗。
+  var BIND_OPEN = false;
+
   var verifyIndex = null;   // layui 這一層的 index，關閉時要用
   var timer = null;
 
@@ -104,8 +109,15 @@
     });
   }
 
+  // 關窗：有自己開的就用 index 關；否則關掉目前最上層那個 layer
   function closeVerify() {
-    if (verifyIndex !== null) { layer.close(verifyIndex); }
+    if (verifyIndex !== null) {
+      layer.close(verifyIndex);
+      return;
+    }
+    var box = document.querySelector('#vpForm');
+    box = box && box.closest('.layui-layer');
+    if (box && box.id) { layer.close(box.id.replace('layui-layer', '')); }
   }
 
   function stopTimer() {
@@ -126,8 +138,8 @@
     var t = e.target;
     if (!t || !t.closest) { return; }
 
-    // 開窗（頁面上那顆「驗證電話號碼」）
-    if (t.closest('#wantMobileValid')) {
+    // 開窗（頁面上那顆「驗證電話號碼」）；頁面已有開窗程式碼時不啟用
+    if (BIND_OPEN && t.closest('#wantMobileValid')) {
       e.preventDefault();
       openVerify();
       return;
