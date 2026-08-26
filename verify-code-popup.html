@@ -1,0 +1,239 @@
+<!-- ==========================================================================
+     驗證電子信箱 — 彈窗內容（貼進 layer 的 content）
+     不含標題列和叉叉，layui 自己會產生。
+     所有互動都寫在 inline 屬性裡，不需要外部 script。
+     ========================================================================== -->
+
+<style>
+  .vc-wrap, .vc-wrap * { box-sizing: border-box; }
+  .vc-wrap {
+    padding: 24px 26px 0;
+    font-size: 14px;
+    color: #2b2f36;
+    font-family: "Microsoft JhengHei", "PingFang TC", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .vc-label { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+  .vc-label .t { color: #2b2f36; }
+  .vc-req { color: #e5484d; margin-left: 2px; }
+
+  /* 目前電子信箱：唯讀欄位 */
+  .vc-readonly { position: relative; margin-bottom: 22px; }
+  .vc-readonly input {
+    width: 100%;
+    height: 46px;
+    padding: 0 44px 0 14px;
+    border: 1px solid #e3e6eb;
+    border-radius: 8px;
+    background: #f4f6f9;
+    font-size: 15px;
+    color: #2b2f36;
+    outline: none;
+  }
+  .vc-lock {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: #b3bac5;
+    font-size: 15px;
+    pointer-events: none;
+  }
+
+  /* 右上角的倒數 / 重新取得 */
+  .vc-resend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #8d97a5;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: default;
+  }
+  .vc-resend.on { color: #2f78d4; cursor: pointer; text-decoration: underline; }
+
+  /* 驗證碼格子 */
+  .vc-cells { display: flex; gap: 8px; margin-bottom: 14px; }
+  .vc-cell {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 62px;
+    border: 1px solid #e3e6eb;
+    border-radius: 8px;
+    background: #fff;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 500;
+    color: #2b2f36;
+    outline: none;
+    padding: 0;
+  }
+  .vc-cell:focus { border-color: #2f78d4; border-width: 2px; }
+  .vc-fixed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f6f9;
+    color: #9aa3ae;
+  }
+
+  .vc-sent { margin: 0 0 8px; font-size: 13px; color: #2f78d4; }
+  .vc-expire { margin: 0 0 4px; font-size: 13px; color: #6b7480; }
+  .vc-expire b { color: #e5484d; font-weight: normal; }
+  .vc-err { min-height: 20px; margin: 0; font-size: 13px; color: #e5484d; }
+
+  /* 底部按鈕 */
+  .vc-foot {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 26px;
+    padding: 18px 26px;
+    border-top: 1px solid #eef0f3;
+    margin-left: -26px;
+    margin-right: -26px;
+  }
+  .vc-btn {
+    min-width: 110px;
+    height: 44px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  .vc-btn-ghost { border: 1px solid #2f78d4; background: #fff; color: #2f78d4; }
+  .vc-btn-ghost:hover { background: #f0f6ff; }
+  .vc-btn-main { border: 1px solid #1d6fd6; background: #1d7ae0; color: #fff; }
+  .vc-btn-main:hover { background: #1668c6; }
+
+  @media (max-width: 420px) {
+    .vc-wrap { padding: 20px 16px 0; }
+    .vc-foot { margin-left: -16px; margin-right: -16px; padding: 16px; }
+    .vc-cell { height: 52px; font-size: 20px; }
+    .vc-btn { min-width: 96px; }
+  }
+</style>
+
+<div class="vc-wrap">
+
+  <!-- 目前電子信箱 -->
+  <div class="vc-label"><span class="t">目前電子信箱<span class="vc-req">*</span></span></div>
+  <div class="vc-readonly">
+    <input type="email" id="vcMail" value="lydia7775263@gmail.com" readonly>
+    <span class="vc-lock">&#128274;</span>
+  </div>
+
+  <!-- 驗證碼 -->
+  <div class="vc-label">
+    <span class="t">驗證碼<span class="vc-req">*</span></span>
+    <button type="button" class="vc-resend" id="vcResend" onclick="
+      if (!this.classList.contains('on')) { return; }
+      this.classList.remove('on');
+      window.vcStart && window.vcStart(180);
+      /* TODO: 這裡呼叫後端重新寄送驗證碼的 API */
+    "><span id="vcResendText">3:00 後可重新取得</span></button>
+  </div>
+
+  <div class="vc-cells">
+    <!-- 前四格是系統給的前綴，唯讀 -->
+    <div class="vc-cell vc-fixed" id="vcP1">U</div>
+    <div class="vc-cell vc-fixed" id="vcP2">R</div>
+    <div class="vc-cell vc-fixed" id="vcP3">D</div>
+    <div class="vc-cell vc-fixed">-</div>
+
+    <!-- 後四格由使用者輸入 -->
+    <input class="vc-cell vc-in" maxlength="1" inputmode="text" autocomplete="one-time-code"
+      oninput="window.vcInput(this)" onkeydown="window.vcKey(this, event)" onpaste="window.vcPaste(this, event)">
+    <input class="vc-cell vc-in" maxlength="1" inputmode="text"
+      oninput="window.vcInput(this)" onkeydown="window.vcKey(this, event)" onpaste="window.vcPaste(this, event)">
+    <input class="vc-cell vc-in" maxlength="1" inputmode="text"
+      oninput="window.vcInput(this)" onkeydown="window.vcKey(this, event)" onpaste="window.vcPaste(this, event)">
+    <input class="vc-cell vc-in" maxlength="1" inputmode="text"
+      oninput="window.vcInput(this)" onkeydown="window.vcKey(this, event)" onpaste="window.vcPaste(this, event)">
+  </div>
+
+  <p class="vc-sent">驗證碼已經發送至 <span id="vcSentTo">lydia7775263@gmail.com</span></p>
+  <p class="vc-expire">驗證碼將於 <b id="vcExpire">3:00</b> 後失效 (有效時間3分鐘)</p>
+  <p class="vc-err" id="vcErr"></p>
+
+  <div class="vc-foot">
+    <button type="button" class="vc-btn vc-btn-ghost" onclick="layer.closeAll();">取 消</button>
+    <button type="button" class="vc-btn vc-btn-main" onclick="
+      var cells = document.querySelectorAll('.vc-in');
+      var code = '';
+      for (var i = 0; i < cells.length; i++) { code += cells[i].value; }
+      var e = document.getElementById('vcErr');
+      if (code.length < cells.length) { e.textContent = '請完整輸入驗證碼。'; cells[code.length].focus(); return; }
+      e.textContent = '';
+      var full = document.getElementById('vcP1').textContent
+               + document.getElementById('vcP2').textContent
+               + document.getElementById('vcP3').textContent + '-' + code;
+      /* TODO: 這裡呼叫後端驗證 API，成功後再關窗 */
+      alert('送出驗證碼：' + full);
+      layer.closeAll();
+    ">確認驗證</button>
+  </div>
+
+  <!-- 這個 svg 只是用來在內容插入頁面時觸發一次初始化（innerHTML 插入的 <script> 不會執行，svg 的 onload 會） -->
+  <svg width="0" height="0" onload="
+    window.vcInput = function (el) {
+      el.value = el.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      if (el.value && el.nextElementSibling && el.nextElementSibling.classList.contains('vc-in')) {
+        el.nextElementSibling.focus();
+      }
+    };
+
+    window.vcKey = function (el, ev) {
+      if (ev.key === 'Backspace' && !el.value &&
+          el.previousElementSibling && el.previousElementSibling.classList.contains('vc-in')) {
+        el.previousElementSibling.focus();
+      }
+    };
+
+    window.vcPaste = function (el, ev) {
+      ev.preventDefault();
+      var txt = (ev.clipboardData || window.clipboardData).getData('text');
+      txt = txt.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+      var cur = el;
+      for (var i = 0; i < txt.length && cur; i++) {
+        cur.value = txt.charAt(i);
+        cur = cur.nextElementSibling && cur.nextElementSibling.classList.contains('vc-in')
+              ? cur.nextElementSibling : null;
+        if (cur) { cur.focus(); }
+      }
+    };
+
+    window.vcStart = function (sec) {
+      if (window.vcTimer) { clearInterval(window.vcTimer); }
+
+      var left = sec;
+      var resend = document.getElementById('vcResend');
+      var rText  = document.getElementById('vcResendText');
+      var expire = document.getElementById('vcExpire');
+
+      function fmt(s) { return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+
+      function tick() {
+        if (!document.getElementById('vcExpire')) { clearInterval(window.vcTimer); return; }
+        rText.textContent  = fmt(left) + ' 後可重新取得';
+        expire.textContent = fmt(left);
+        if (left <= 0) {
+          clearInterval(window.vcTimer);
+          resend.classList.add('on');
+          rText.textContent = '重新取得驗證碼';
+          expire.textContent = '0:00';
+        }
+        left--;
+      }
+
+      tick();
+      window.vcTimer = setInterval(tick, 1000);
+    };
+
+    window.vcStart(180);
+    var first = document.querySelector('.vc-in');
+    if (first) { first.focus(); }
+  "></svg>
+
+</div>
