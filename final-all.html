@@ -1,0 +1,129 @@
+<!-- ==========================================================================
+     手機號碼驗證 — 完整三段
+     第 1 段：聯絡電話那一列的 HTML（整段取代原本的 div#valueCPhone）
+     第 2 段：CSS（放進頁面的 <style> 或你們的 css 檔）
+     第 3 段：彈窗內容（貼進 layer 的 content，也就是彈窗裡顯示的那段）
+     ========================================================================== -->
+
+
+<!-- ==========================================================================
+     第 1 段 ── 聯絡電話那一列
+     整段取代原本的 <div class="profile-info-value text--15" id="valueCPhone">
+     改動：刪掉鉛筆 <i>，把「[我要驗證]」換成「驗證電話號碼」按鈕
+     保留 id="wantMobileValid" 和 modal_mobile_want_verification → 開窗 JS 照舊
+     ========================================================================== -->
+
+<div class="profile-info-value text--15" id="valueCPhone">
+    <div class="edit_vaule">
+        <font class="text--grey">手機：</font>
+        <span id="mobileSpan" class="edit_vaule_input"></span>
+        <a id="wantMobileValid" href="javascript:void(0);" title="驗證電話號碼"
+           class="modal_mobile_want_verification btn btn--primary btn--xs ml-8">驗證電話號碼</a>
+    </div>
+    <div class="edit_vaule_open">
+        <input type="tel" id="valueCPhoneInp" value="" maxlength="20" placeholder="請輸入您的手機號碼" onblur="this.value = this.value.trim()">
+        <div class="btn-box">
+            <a href="javascript:void(0);" title="儲存" class="btn btn--primary btn--xs edit_save">儲存</a>
+            <a href="javascript:void(0);" title="取消" class="btn btn--xs edit_cancel">取消</a>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==========================================================================
+     第 2 段 ── CSS
+     讓「手機：」跟上面「其他：」「住家：」切齊
+     ========================================================================== -->
+
+<style>
+  #valueCPhone .edit_vaule {
+    display: flex;
+    align-items: center;      /* 按鈕比文字高時，文字垂直置中 */
+    padding-left: 0;
+    margin-left: 0;
+    text-indent: 0;
+  }
+
+  #valueCPhone .edit_vaule .text--grey {
+    flex: 0 0 auto;           /* 標籤不被壓縮 */
+  }
+
+  #valueCPhone .edit_vaule .btn {
+    margin-left: 8px;         /* 按鈕和號碼之間的間距 */
+  }
+</style>
+
+
+<!-- ==========================================================================
+     第 3 段 ── 彈窗內容
+     貼進 layer 的 content（彈窗裡顯示的那段），把舊的整個換掉。
+     不含標題列和叉叉（layui 自己會產生），按鈕全部用 inline onclick，
+     不需要任何外部 script 就能運作。
+     ========================================================================== -->
+
+<style>
+  .vp-wrap, .vp-wrap * { box-sizing: border-box; }
+  .vp-wrap { padding: 22px 26px 26px; font-size: 14px; color: #333; }
+  .vp-notice { margin: 0 0 22px; text-align: center; color: #2f78d4; }
+  .vp-label { margin: 0 0 10px; }
+  .vp-row { display: flex; gap: 8px; width: 100%; margin-bottom: 12px; }
+  .vp-in {
+    flex: 1 1 auto; min-width: 0; width: 100%; height: 38px; padding: 0 12px;
+    border: 1px solid #ccc; border-radius: 3px; font-size: 14px; color: #333; outline: none;
+  }
+  .vp-in::placeholder { color: #b3b3b3; }
+  .vp-in:focus { border-color: #2f78d4; }
+  .vp-b {
+    flex: 0 0 auto; height: 38px; padding: 0 18px; border-radius: 3px;
+    font-size: 14px; cursor: pointer; white-space: nowrap;
+  }
+  .vp-b1 { border: 1px solid #2f6fd0; background: #3b7ddd; color: #fff; }
+  .vp-b1:hover { background: #2f6fd0; }
+  .vp-b1:disabled { background: #a9c4ea; border-color: #a9c4ea; cursor: not-allowed; }
+  .vp-b2 { border: 1px solid #2f78d4; background: #fff; color: #2f78d4; }
+  .vp-b2:hover { background: #f0f6ff; }
+  .vp-err { min-height: 18px; margin: 0 0 4px; font-size: 13px; color: #d9534f; }
+  .vp-foot { display: flex; justify-content: center; gap: 12px; padding-top: 14px; }
+  .vp-foot .vp-b { min-width: 96px; }
+  @media (max-width: 400px) {
+    .vp-wrap { padding: 20px 16px 22px; }
+    .vp-b { padding: 0 12px; font-size: 13px; }
+    .vp-foot .vp-b { min-width: 88px; }
+  }
+</style>
+
+<div class="vp-wrap">
+  <p class="vp-notice">為保障你的帳號安全，請協助完成驗證流程。</p>
+  <p class="vp-label">請輸入電話號碼取得驗證碼。</p>
+
+  <div class="vp-row">
+    <input type="tel" class="vp-in" id="vpPhone" placeholder="0912345678" maxlength="10" autocomplete="tel">
+    <button type="button" class="vp-b vp-b1" onclick="
+      var p=document.getElementById('vpPhone'), e=document.getElementById('vpErr'), b=this;
+      if(!/^09\d{8}$/.test(p.value.trim())){ e.textContent='請輸入正確的手機號碼格式（例：0912345678）。'; p.focus(); return; }
+      e.textContent='';
+      var n=60; b.disabled=true; b.textContent='重新取得 ('+n+')';
+      var t=setInterval(function(){ n--;
+        if(n<=0){ clearInterval(t); b.disabled=false; b.textContent='取得驗證碼'; }
+        else { b.textContent='重新取得 ('+n+')'; }
+      },1000);
+    ">取得驗證碼</button>
+  </div>
+
+  <div class="vp-row">
+    <input type="text" class="vp-in" id="vpCode" placeholder="請輸入驗證碼" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+  </div>
+
+  <p class="vp-err" id="vpErr"></p>
+
+  <div class="vp-foot">
+    <button type="button" class="vp-b vp-b2" onclick="layer.closeAll();">取消</button>
+    <button type="button" class="vp-b vp-b1" onclick="
+      var p=document.getElementById('vpPhone'), c=document.getElementById('vpCode'), e=document.getElementById('vpErr');
+      if(!/^09\d{8}$/.test(p.value.trim())){ e.textContent='請輸入正確的手機號碼格式（例：0912345678）。'; p.focus(); return; }
+      if(!c.value.trim()){ e.textContent='請輸入驗證碼。'; c.focus(); return; }
+      var s=document.getElementById('mobileSpan'); if(s){ s.textContent=p.value.trim(); }
+      layer.closeAll();
+    ">確認驗證</button>
+  </div>
+</div>
