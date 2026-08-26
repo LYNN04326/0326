@@ -1,0 +1,180 @@
+<!-- ============================================================
+     只有這一段 <script>，頁面上不需要貼任何 HTML。
+     內容由 JS 在執行時產生，不會被 form / table 的解析規則吃掉。
+     貼在 </body> 前面，且要在 jQuery 與 layui 的 <script> 之後。
+
+     它會攔截 #wantMobileValid 的點擊（capture 階段，比原本的
+     開窗程式碼更早執行並擋下它），所以原本那段開窗程式碼可以留著，
+     不會變成開兩層。
+     ============================================================ -->
+<script>
+(function () {
+  var LAYER_INDEX = null;
+  var timer = null;
+
+  // ---------- 樣式：只注入一次 ----------
+  function injectStyle() {
+    if (document.getElementById('vpStyle')) { return; }
+
+    var css = ''
+      + '.vp-body, .vp-body * { box-sizing: border-box; }'
+      + '.vp-body { padding: 22px 26px 8px; font-size: 14px; color: #333; }'
+      + '.vp-notice { margin: 0 0 22px; text-align: center; color: #2f78d4; }'
+      + '.vp-label { margin: 0 0 10px; }'
+      + '.vp-group { display: flex; gap: 8px; width: 100%; margin-bottom: 12px; }'
+      + '.vp-input { flex: 1 1 auto; min-width: 0; width: 100%; height: 38px;'
+      +   ' padding: 0 12px; border: 1px solid #ccc; border-radius: 3px;'
+      +   ' font-size: 14px; color: #333; outline: none; }'
+      + '.vp-input::placeholder { color: #b3b3b3; }'
+      + '.vp-input:focus { border-color: #2f78d4; }'
+      + '.vp-btn { flex: 0 0 auto; height: 38px; padding: 0 18px; border-radius: 3px;'
+      +   ' font-size: 14px; cursor: pointer; white-space: nowrap; }'
+      + '.vp-btn-primary { border: 1px solid #2f6fd0; background: #3b7ddd; color: #fff; }'
+      + '.vp-btn-primary:hover { background: #2f6fd0; }'
+      + '.vp-btn-primary:disabled { background: #a9c4ea; border-color: #a9c4ea; cursor: not-allowed; }'
+      + '.vp-btn-outline { border: 1px solid #2f78d4; background: #fff; color: #2f78d4; }'
+      + '.vp-btn-outline:hover { background: #f0f6ff; }'
+      + '.vp-footer { display: flex; justify-content: center; gap: 12px; padding: 20px 0 26px; }'
+      + '.vp-footer .vp-btn { min-width: 96px; }'
+      + '.vp-error { min-height: 18px; margin: 0 0 4px; font-size: 13px; color: #d9534f; }'
+      + '@media (max-width: 400px) {'
+      +   ' .vp-body { padding: 20px 16px 8px; }'
+      +   ' .vp-btn { padding: 0 12px; font-size: 13px; }'
+      +   ' .vp-footer .vp-btn { min-width: 88px; }'
+      +   ' .layui-layer.layui-layer-page { width: 92vw !important; left: 4vw !important; margin-left: 0 !important; }'
+      + '}';
+
+    var tag = document.createElement('style');
+    tag.id = 'vpStyle';
+    tag.appendChild(document.createTextNode(css));
+    document.head.appendChild(tag);
+  }
+
+  // ---------- 內容：用字串組出來，開窗時才交給 layui ----------
+  // 用 div 不用 form，避免和頁面上既有的 form 巢狀衝突
+  function buildHtml() {
+    return ''
+      + '<div class="vp-body">'
+      +   '<p class="vp-notice">為保障你的帳號安全，請協助完成驗證流程。</p>'
+      +   '<p class="vp-label">請輸入電話號碼取得驗證碼。</p>'
+      +   '<div class="vp-group">'
+      +     '<input type="tel" class="vp-input" id="vpPhone" placeholder="0912345678" maxlength="10" autocomplete="tel">'
+      +     '<button type="button" class="vp-btn vp-btn-primary" id="vpSend">取得驗證碼</button>'
+      +   '</div>'
+      +   '<div class="vp-group">'
+      +     '<input type="text" class="vp-input" id="vpCode" placeholder="請輸入驗證碼" maxlength="6" inputmode="numeric" autocomplete="one-time-code">'
+      +   '</div>'
+      +   '<p class="vp-error" id="vpError"></p>'
+      +   '<div class="vp-footer">'
+      +     '<button type="button" class="vp-btn vp-btn-outline" id="vpCancel">取消</button>'
+      +     '<button type="button" class="vp-btn vp-btn-primary" id="vpConfirm">確認驗證</button>'
+      +   '</div>'
+      + '</div>';
+  }
+
+  function openVerify() {
+    injectStyle();
+
+    LAYER_INDEX = layer.open({
+      type: 1,
+      title: '驗證手機號碼',
+      area: '30rem',
+      shadeClose: true,
+      content: buildHtml(),
+      end: function () { stopTimer(); LAYER_INDEX = null; }
+    });
+  }
+
+  function closeVerify() {
+    if (LAYER_INDEX !== null) { layer.close(LAYER_INDEX); }
+  }
+
+  function stopTimer() {
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
+  function $id(id) { return document.getElementById(id); }
+
+  function showError(msg) {
+    var el = $id('vpError');
+    if (el) { el.textContent = msg || ''; }
+  }
+
+  function validPhone(v) { return /^09\d{8}$/.test(v); }
+
+  // ---------- 開窗：capture 階段攔截，蓋掉原本的開窗程式碼 ----------
+  document.addEventListener('click', function (e) {
+    if (!e.target || !e.target.closest) { return; }
+    if (!e.target.closest('#wantMobileValid')) { return; }
+
+    e.preventDefault();
+    e.stopPropagation();      // 擋掉原本綁在這顆按鈕上的開窗程式碼
+    openVerify();
+  }, true);
+
+  // ---------- 彈窗內的操作：事件委派 ----------
+  document.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) { return; }
+
+    if (t.closest('#vpCancel')) {
+      closeVerify();
+      return;
+    }
+
+    if (t.closest('#vpSend')) {
+      var send  = $id('vpSend');
+      var phone = $id('vpPhone');
+
+      if (!validPhone(phone.value.trim())) {
+        showError('請輸入正確的手機號碼格式（例：0912345678）。');
+        phone.focus();
+        return;
+      }
+      showError('');
+
+      var left = 60;
+      send.disabled = true;
+      send.textContent = '重新取得 (' + left + ')';
+
+      stopTimer();
+      timer = setInterval(function () {
+        left--;
+        var btn = $id('vpSend');
+        if (!btn) { stopTimer(); return; }       // 視窗已關就停掉
+        if (left <= 0) {
+          stopTimer();
+          btn.disabled = false;
+          btn.textContent = '取得驗證碼';
+        } else {
+          btn.textContent = '重新取得 (' + left + ')';
+        }
+      }, 1000);
+
+      // TODO: 呼叫後端寄送簡訊的 API
+      return;
+    }
+
+    if (t.closest('#vpConfirm')) {
+      var p = $id('vpPhone');
+      var c = $id('vpCode');
+
+      if (!validPhone(p.value.trim())) {
+        showError('請輸入正確的手機號碼格式（例：0912345678）。');
+        p.focus();
+        return;
+      }
+      if (!c.value.trim()) {
+        showError('請輸入驗證碼。');
+        c.focus();
+        return;
+      }
+
+      // TODO: 呼叫後端驗證 API，成功後再執行下面兩行
+      var span = $id('mobileSpan');
+      if (span) { span.textContent = p.value.trim(); }
+      closeVerify();
+    }
+  });
+})();
+</script>
