@@ -1,0 +1,141 @@
+<!-- 貼進 layui 彈窗的 <div id="layui-layer-content"> ... </div> 之間 -->
+<style>
+  /* 全部加 vp- 前綴，避免和頁面既有樣式衝突 */
+  .vp-body { padding: 22px 26px 8px; font-size: 14px; color: #333; }
+
+  .vp-notice { margin: 0 0 22px; text-align: center; color: #2f78d4; }
+
+  .vp-label { margin: 0 0 10px; }
+
+  .vp-group { display: flex; gap: 8px; margin-bottom: 12px; }
+
+  .vp-input {
+    flex: 1;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+  }
+
+  .vp-input::placeholder { color: #b3b3b3; }
+  .vp-input:focus { border-color: #2f78d4; }
+
+  .vp-btn {
+    height: 38px;
+    padding: 0 18px;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .vp-btn-primary { border: 1px solid #2f6fd0; background: #3b7ddd; color: #fff; }
+  .vp-btn-primary:hover { background: #2f6fd0; }
+  .vp-btn-primary:disabled { background: #a9c4ea; border-color: #a9c4ea; cursor: not-allowed; }
+
+  .vp-btn-outline { border: 1px solid #2f78d4; background: #fff; color: #2f78d4; }
+  .vp-btn-outline:hover { background: #f0f6ff; }
+
+  .vp-footer { display: flex; justify-content: center; gap: 12px; padding: 20px 0 26px; }
+  .vp-footer .vp-btn { min-width: 96px; }
+
+  .vp-error { min-height: 18px; margin: 0 0 4px; font-size: 13px; color: #d9534f; }
+</style>
+
+<form class="vp-body" id="vpForm">
+  <p class="vp-notice">為保障你的帳號安全，請協助完成驗證流程。</p>
+
+  <p class="vp-label">請輸入電話號碼取得驗證碼。</p>
+
+  <div class="vp-group">
+    <input type="tel" class="vp-input" id="vpPhone" placeholder="0912345678"
+           maxlength="10" autocomplete="tel">
+    <button type="button" class="vp-btn vp-btn-primary" id="vpSend">取得驗證碼</button>
+  </div>
+
+  <div class="vp-group">
+    <input type="text" class="vp-input" id="vpCode" placeholder="請輸入驗證碼"
+           maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+  </div>
+
+  <p class="vp-error" id="vpError"></p>
+
+  <div class="vp-footer">
+    <button type="button" class="vp-btn vp-btn-outline" id="vpCancel">取消</button>
+    <button type="submit" class="vp-btn vp-btn-primary" id="vpConfirm">確認驗證</button>
+  </div>
+</form>
+
+<script>
+(function () {
+  var form  = document.getElementById('vpForm');
+  var phone = document.getElementById('vpPhone');
+  var code  = document.getElementById('vpCode');
+  var err   = document.getElementById('vpError');
+  var send  = document.getElementById('vpSend');
+
+  function showError(msg) { err.textContent = msg || ''; }
+
+  function validPhone() { return /^09\d{8}$/.test(phone.value.trim()); }
+
+  // 關閉：交給 layui 關掉自己這一層
+  document.getElementById('vpCancel').onclick = function () {
+    if (window.layer && layer.close) {
+      layer.close(layer.index);          // 若拿得到自己的 index，改成 layer.close(index)
+    } else {
+      var box = form.closest('.layui-layer');
+      if (box) { box.style.display = 'none'; }
+    }
+  };
+
+  // 取得驗證碼：格式正確才送，並開始 60 秒倒數
+  send.onclick = function () {
+    if (!validPhone()) {
+      showError('請輸入正確的手機號碼格式（例：0912345678）。');
+      phone.focus();
+      return;
+    }
+    showError('');
+
+    var left = 60;
+    send.disabled = true;
+    send.textContent = '重新取得 (' + left + ')';
+
+    var timer = setInterval(function () {
+      left--;
+      if (left <= 0) {
+        clearInterval(timer);
+        send.disabled = false;
+        send.textContent = '取得驗證碼';
+      } else {
+        send.textContent = '重新取得 (' + left + ')';
+      }
+    }, 1000);
+
+    // TODO: 這裡呼叫後端寄送簡訊的 API
+  };
+
+  // 確認驗證
+  form.onsubmit = function (e) {
+    e.preventDefault();
+
+    if (!validPhone()) {
+      showError('請輸入正確的手機號碼格式（例：0912345678）。');
+      phone.focus();
+      return;
+    }
+    if (!code.value.trim()) {
+      showError('請輸入驗證碼。');
+      code.focus();
+      return;
+    }
+
+    showError('');
+    // TODO: 這裡呼叫後端驗證 API
+    alert('驗證送出：' + phone.value.trim() + ' / ' + code.value.trim());
+  };
+})();
+</script>
