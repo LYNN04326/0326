@@ -16,5 +16,6 @@
 - 安裝任何 skill 時，**同時**要更新 `.claude/skills/wiki/`：新增該 skill 的詳頁，
   並把它加進 [`wiki/Home.md`](.claude/skills/wiki/Home.md) 的索引表。沒進索引等於沒安裝。
 - 名稱不好記就改名，改名要更新所有交叉引用並記進 wiki 的〈改名對照〉。
-- 完整流程見 `.claude/skills/wiki/Home.md`〈安裝新 skill 的流程〉。GitHub Wiki 的同步只能在本機跑
-  `.claude/skills/wiki/sync-to-github-wiki.sh`（session 的 git proxy 不接受 `*.wiki.git`）。
+- wiki 就放在 repo 的 `.claude/skills/wiki/`，不使用 GitHub 的 Wiki 分頁（那是要人工鏡像的獨立
+  repo，session 推不上去也容易跟 repo 內容不同步）。
+- 完整流程見 `.claude/skills/wiki/Home.md`〈安裝新 skill 的流程〉。
