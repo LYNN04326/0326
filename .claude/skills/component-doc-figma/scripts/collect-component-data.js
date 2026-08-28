@@ -1,5 +1,5 @@
 // Collect everything needed to document a Figma component (or component set).
-// Run via use_figma with skillNames: "generate-component-doc-figma".
+// Run via use_figma with skillNames: "component-doc-figma".
 // Returns: anatomy tree, per-variant colors (with bound token names), typography,
 // spacing tokens, component property definitions, description, and annotations.
 // The AGENT assembles Markdown from this — see references/doc-template.md.

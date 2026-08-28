@@ -1,22 +1,22 @@
 ---
-name: photo
+name: shot-overlay
 description: >
   截圖存檔＋標註的**預設做法**：紅框、編號 badge、說明 callout 一律用 HTML 絕對定位疊在
   `<img>` 上方，**不修改原始圖片像素**，因此可隨時調位置、深色模式也讀得清楚。涵蓋「把 Figma／
   瀏覽器截圖存下來、標上紅框與編號、寫成 HackMD 內嵌 HTML 或存進 repo」「多圖點擊流程說明」
   「圖左說明右的步驟卡片」這類任務。觸發時機：使用者要求「截圖標一下」「框起來加編號」
   「做成點擊流程圖」「這段貼到 HackMD」。需要**蓋掉截圖裡既有文字並重寫**、或維護舊格式
-  「規格書 UI 截圖標號慣例」時才改用 `png` skill（Pillow 燒進像素，舊版做法）。
+  「規格書 UI 截圖標號慣例」時才改用 `shot-burn` skill（Pillow 燒進像素，舊版做法）。
 ---
 
-# 截圖標註（photo，預設做法）
+# 截圖疊圖標註（shot-overlay，預設做法）
 
 核心原則：**原始截圖永遠保持原樣**，紅框／badge／說明文字全部是疊在圖片上方的 HTML 元素。
 好處是標註位置隨時可改（不用重新產圖）、文字用瀏覽器字型渲染（深色模式與高 DPI 都清楚）、
 diff 看得出改了什麼。
 
 需要真的**改寫圖片裡的文字**（HTML 疊圖只能蓋在上面、換不掉原字）時，才轉用
-`.claude/skills/png/SKILL.md`。兩者分工表見該 skill 結尾。
+`.claude/skills/shot-burn/SKILL.md`。兩者分工表見該 skill 結尾。
 
 ---
 
@@ -67,7 +67,7 @@ public_url = upload("out/step-1.png", "specs/e1/step-1.png")
 ## 規則二：版面規則（HTML overlay）
 
 所有「截圖＋說明」的版面一律照這套骨架，**輸出成 HackMD 內嵌 HTML 或截圖成 PNG 都一樣**
-（`png` skill 的「整段內容輸出成單一 PNG」直接沿用本節）。
+（`shot-burn` skill 的「整段內容輸出成單一 PNG」直接沿用本節）。
 
 1. **白底容器**：外層 `.page` 白底、`max-width` 收斂寬度、`padding` 留白，不要讓內容貼邊。
 2. **步驟標題列**：每個步驟一張卡片，卡片頂部是標題列（步驟名稱），下面才是圖與說明。
@@ -169,7 +169,7 @@ await (await page.$('.page')).screenshot({ path: 'out.png' });
 
 機械檢查（渲染成功、沒有溢出）**測不出**「比例不對／風格花俏／後面章節比前面退步」這類問題，
 只有並排肉眼比對才看得出來。同一份文件內不同章節的視覺風格必須一致——這是實際被使用者打回過的
-問題，見 `.claude/skills/png/SKILL.md`〈整段內容輸出成單一 PNG〉的事故記錄。
+問題，見 `.claude/skills/shot-burn/SKILL.md`〈整段內容輸出成單一 PNG〉的事故記錄。
 
 ---
 
@@ -182,7 +182,7 @@ await (await page.$('.page')).screenshot({ path: 'out.png' });
 * 步驟編號連續：卡片標題「步驟 N」、圖上 badge `N`、說明欄第 N 條，三者同號。
 * 步驟之間要接續關係時，用卡片之間的向下箭頭（`↓` 文字或 CSS 三角形），**不要用 Pillow 畫箭頭**。
 * 截圖裁切到 UI 元件本身邊界，不含周圍空白背景；badge 不可壓在畫面元素上，必要時在元件上緣
-  補一條剛好容納 badge 的留白（做法見 `png` skill）。
+  補一條剛好容納 badge 的留白（做法見 `shot-burn` skill）。
 
 ---
 

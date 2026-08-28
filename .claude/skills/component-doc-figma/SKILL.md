@@ -1,10 +1,10 @@
 ---
-name: generate-component-doc-figma
+name: component-doc-figma
 description: "Generate complete Markdown documentation for a Figma component — anatomy/layer tree, design tokens (colors, spacing, typography), states/variants matrix, accessibility notes, content guidelines, and optional code-parity + YAML frontmatter. Use when the user wants a docs page or handoff spec for a component or component set. Triggers: 'document this component', 'generate component docs/spec', 'create a docs page for the Button', 'write up the anatomy and variants', 'component handoff doc from Figma', 'turn this component into Markdown docs'. Reads the node tree, bound variables/tokens, and designer annotations, then the agent assembles Markdown. Requires the Figma Desktop app (Plugin API)."
 disable-model-invocation: false
 ---
 
-# generate-component-doc-figma — Figma component → Markdown docs
+# component-doc-figma — Figma component → Markdown docs
 
 Produce a complete documentation page for one component or component set: overview, anatomy tree,
 design tokens, variants/states matrix, typography, accessibility, content guidelines, and (optionally)
@@ -25,7 +25,7 @@ the same collected JSON always produces identical Markdown. Do **not** freehand 
    URL/ID the user provides. Component **sets** (with variants) produce the richest docs. Set `NODE_ID`
    in the collect script. Also note the file URL (for the `figma:` link / frontmatter).
 2. **Collect data → save JSON.** Run [`scripts/collect-component-data.js`](scripts/collect-component-data.js)
-   via `use_figma` (`skillNames: "generate-component-doc-figma"`). It returns the anatomy tree, per-variant
+   via `use_figma` (`skillNames: "component-doc-figma"`). It returns the anatomy tree, per-variant
    colors (with bound token id + name), typography (font family, numeric weight + name, size, line height,
    letter spacing), spacing tokens, component property definitions (variants/booleans/text props), the
    description, and annotations (with category names). **Save the returned JSON to a file** (e.g.
