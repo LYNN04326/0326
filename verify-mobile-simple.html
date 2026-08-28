@@ -1,0 +1,141 @@
+<!-- ==========================================================================
+     驗證手機號碼彈窗 — 版面照圖片重排
+     所有 id / class 都保留原本的，JS（寄送、驗證 API）照舊運作
+     ========================================================================== -->
+
+<style>
+  /* ---------- 內容區 ---------- */
+  .layui-layer-content .modal-content.verification {
+    padding: 24px 26px 8px;
+    font-size: 14px;
+    color: #333;
+  }
+
+  .layui-layer-content .modal-content.verification .text--apply {
+    margin: 0 0 24px;
+    text-align: center;
+    color: #2f78d4;
+  }
+
+  /* 兩列都改成一行排列 */
+  .layui-layer-content .modal-content.verification .text--0 {
+    display: flex;
+    align-items: center;
+    font-size: 14px;          /* 蓋掉 .text--0 的 font-size: 0 */
+    margin-bottom: 12px;
+  }
+
+  /* 圖片上沒有這些標籤和前綴格，隱藏但保留在 DOM 裡（JS 可能會用到） */
+  .layui-layer-content .modal-content.verification .md-info,
+  .layui-layer-content .modal-content.verification .firstCode,
+  .layui-layer-content .modal-content.verification .text--16.md-input {
+    display: none;
+  }
+
+  /* 輸入框 */
+  .layui-layer-content .modal-content.verification input.md-input,
+  .layui-layer-content .modal-content.verification #newMobileWithValid {
+    width: 240px;
+    max-width: 100%;
+    height: 40px;
+    margin: 0;
+    padding: 0 12px;
+    border: 1px solid #d9dde3;
+    border-radius: 3px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+  }
+
+  .layui-layer-content .modal-content.verification input.md-input::placeholder,
+  .layui-layer-content .modal-content.verification #newMobileWithValid::placeholder {
+    color: #b3b3b3;
+  }
+
+  .layui-layer-content .modal-content.verification input.md-input:focus,
+  .layui-layer-content .modal-content.verification #newMobileWithValid:focus {
+    border-color: #2f78d4;
+  }
+
+  /* 取得驗證碼按鈕：緊貼在驗證碼輸入框右邊 */
+  .layui-layer-content .modal-content.verification .verification-btn {
+    height: 40px;
+    margin-left: 8px;
+    padding: 0 16px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  /* ---------- 訊息 ---------- */
+  .layui-layer-content .modal-content.verification .error-txt {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #d9534f;
+  }
+  .layui-layer-content .modal-content.verification .error-txt:empty { margin: 0; }
+
+  /* ---------- 底部按鈕：靠右 ---------- */
+  .layui-layer-content .modal-btn-box {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+    padding: 16px 26px 20px;
+    border-top: 1px solid #eef0f3;
+  }
+
+  .layui-layer-content .modal-btn-box .btn {
+    min-width: 88px;
+    height: 40px;
+    line-height: 38px;
+    margin-right: 0;          /* 蓋掉 mr-8，改用 gap */
+    border-radius: 3px;
+    text-align: center;
+  }
+
+  /* ---------- 手機版 ---------- */
+  @media (max-width: 480px) {
+    .layui-layer.layui-layer-page {
+      width: 92vw !important;
+      left: 4vw !important;
+      margin-left: 0 !important;
+    }
+    .layui-layer-content .modal-content.verification { padding: 20px 16px 8px; }
+    .layui-layer-content .modal-content.verification input.md-input,
+    .layui-layer-content .modal-content.verification #newMobileWithValid { flex: 1 1 auto; width: auto; }
+    .layui-layer-content .modal-btn-box { padding: 16px; }
+  }
+</style>
+
+<div id="" class="layui-layer-content">
+    <div class="modal-content verification cf memberData">
+        <p class="center text--biscay"></p>
+        <p class="center text--apply">為保障你的帳號安全，請協助完成驗證流程。</p>
+
+        <!-- 手機號碼（原本是 hidden，改成看得到的輸入框） -->
+        <div class="mt-16 text--0">
+            <span class="text--grey md-info">目前手機號碼</span>
+            <span class="text--16 pl-8 md-input"></span>
+            <input type="tel" class="ml-24" id="newMobileWithValid" value="" maxlength="10"
+                   placeholder="請輸入您的手機號碼" onblur="this.value = this.value.trim()">
+        </div>
+
+        <!-- 驗證碼 + 取得驗證碼 -->
+        <div class="mt-8 text--0">
+            <span class="text--grey md-info">驗證碼</span>
+            <input type="text" class="firstCode" id="mobileValid" disabled="disabled">
+            <input type="text" class="md-input" id="mobileValidationCode" value="" maxlength="10"
+                   placeholder="請輸入驗證碼" autocomplete="one-time-code" onblur="this.value = this.value.trim()">
+            <button type="button" id="getMobileValidBtn" class="btn btn--apply verification-btn">取得驗證碼</button>
+        </div>
+
+        <p class="mt-16 error-txt" id="mobileValidSubmitMessage"></p>
+        <p class="mt-16 error-txt" id="mobileValidMessage"></p>
+    </div>
+
+    <div class="modal-btn-box">
+        <a href="javascript:layer.close(layer.index);" id="closeBtn" class="btn btn--border--primary mr-8">取消</a>
+        <button type="button" id="confirmValidation" class="btn btn--primary validate-btn">確認驗證</button>
+    </div>
+</div>
