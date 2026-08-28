@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>電子信箱列 — 尚未驗證狀態</title>
+<style>
+  :root{
+    --text:#333;
+    --text-grey:#888;
+    --line:#e5e5e5;
+    --danger:#d93f3f;
+    --danger-bg:#fff4f4;
+    --danger-border:#f3b6b6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:32px 24px; background:#fff; color:var(--text);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:15px; line-height:1.6;
+  }
+  .demo{max-width:720px; margin:0 auto;}
+  .demo h1{font-size:18px; margin:0 0 24px;}
+  .demo h2{
+    font-size:13px; font-weight:700; color:var(--text-grey);
+    margin:0 0 8px; letter-spacing:.05em;
+  }
+  .demo section{margin-bottom:28px;}
+
+  /* ── 欄位列本體 ───────────────────────────────── */
+  .profile-info-row{
+    display:flex; align-items:center; gap:16px;
+    padding:12px 14px; border:1px solid var(--line); border-radius:6px;
+  }
+  .profile-info-name{
+    display:flex; align-items:center; gap:6px;
+    flex:none; width:110px; color:var(--text);
+  }
+  .profile-info-name .icon{flex:none; display:block;}
+  .text--14{font-size:14px;}
+  .text--15{font-size:15px;}
+  .profile-info-value{display:flex; align-items:center; gap:8px; flex:1; min-width:0;}
+  .edit_vaule{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .edit_vaule_input{word-break:break-all;}
+
+  /* 鉛筆（維持原本的編輯入口） */
+  .edit_vaule_input-ctrl{
+    flex:none; width:16px; height:16px; cursor:pointer;
+    color:var(--text-grey);
+  }
+  .edit_vaule_input-ctrl:hover{color:var(--text);}
+
+  /* ── 舊版：純文字連結 ─────────────────────────── */
+  .link-h-underline{color:#1a6fb5; text-decoration:none;}
+  .link-h-underline:hover{text-decoration:underline;}
+  .ml-8{margin-left:8px;}
+
+  /* ── 新版：尚未驗證按鈕 ───────────────────────── */
+  .btn--unverified{
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 10px; border-radius:999px;
+    border:1px solid var(--danger-border); background:var(--danger-bg);
+    color:var(--danger); font-size:13px; line-height:1.4;
+    text-decoration:none; white-space:nowrap; cursor:pointer;
+    transition:background-color .15s, border-color .15s;
+  }
+  .btn--unverified:hover{background:#ffe9e9; border-color:var(--danger);}
+  .btn--unverified:focus-visible{outline:2px solid var(--danger); outline-offset:2px;}
+  .btn--unverified .icon{flex:none;}
+
+  .note{
+    margin-top:24px; padding:14px 16px; border:1px solid var(--line);
+    border-radius:6px; font-size:14px; color:#555; line-height:1.75;
+  }
+  .note b{color:var(--text);}
+  .note ul{margin:8px 0 0; padding-left:20px;}
+</style>
+</head>
+<body>
+
+<div class="demo">
+  <h1>電子信箱列 — 尚未驗證狀態</h1>
+
+  <section>
+    <h2>修改前</h2>
+    <div class="profile-info-row">
+      <div class="profile-info-name">
+        <!-- 綠色打勾：與「尚未驗證」的狀態矛盾 -->
+        <svg class="icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+          <circle cx="8" cy="8" r="8" fill="#3ba55d"/>
+          <path d="M4.4 8.2l2.4 2.4 4.8-4.8" fill="none" stroke="#fff"
+                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="text--14">電子信箱</span>
+      </div>
+      <div class="profile-info-value text--15">
+        <div class="edit_vaule">
+          <span class="edit_vaule_input">lydia7775263@gmail.com</span>
+          <svg class="edit_vaule_input-ctrl" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M11.2 1.9l2.9 2.9-8.4 8.4-3.6.7.7-3.6 8.4-8.4z" fill="none"
+                  stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg>
+          <a href="javascript:void(0);" class="link-h-underline ml-8">[我要驗證]</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>修改後</h2>
+    <div class="profile-info-row">
+      <div class="profile-info-name">
+        <!-- 改為紅色驚嘆號，與未驗證狀態一致 -->
+        <svg class="icon" viewBox="0 0 16 16" width="16" height="16" role="img"
+             aria-label="尚未驗證">
+          <circle cx="8" cy="8" r="8" fill="#d93f3f"/>
+          <rect x="7.1" y="3.4" width="1.8" height="5.6" rx=".9" fill="#fff"/>
+          <circle cx="8" cy="11.6" r="1.05" fill="#fff"/>
+        </svg>
+        <span class="text--14">電子信箱</span>
+      </div>
+      <div class="profile-info-value text--15" id="valueEmail">
+        <div class="edit_vaule">
+          <span id="emailSpan" class="edit_vaule_input">lydia7775263@gmail.com</span>
+          <svg class="edit_vaule_input-ctrl" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M11.2 1.9l2.9 2.9-8.4 8.4-3.6.7.7-3.6 8.4-8.4z" fill="none"
+                  stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg>
+          <a id="wantEmailValid" href="javascript:void(0);" title="點此進行驗證"
+             class="modal_email_want_verification btn--unverified ml-8">
+            <svg class="icon" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+              <circle cx="8" cy="8" r="8" fill="#d93f3f"/>
+              <rect x="7.1" y="3.4" width="1.8" height="5.6" rx=".9" fill="#fff"/>
+              <circle cx="8" cy="11.6" r="1.05" fill="#fff"/>
+            </svg>
+            尚未驗證
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="note">
+    <b>改了三處</b>
+    <ul>
+      <li>欄位名稱左邊的綠色打勾 → 紅色驚嘆號圖示</li>
+      <li>按鈕文字「[我要驗證]」→「尚未驗證」，並拿掉方括號</li>
+      <li>按鈕前面加上紅色驚嘆號，整顆改成淡紅底的膠囊樣式</li>
+    </ul>
+    <b style="display:block; margin-top:10px;">保留沒動的部分</b>
+    <ul>
+      <li><code>id="wantEmailValid"</code> 與 <code>modal_email_want_verification</code> 都保留，開窗的 JS 照舊運作</li>
+      <li>鉛筆編輯鈕、<code>id="valueEmail"</code>、<code>id="emailSpan"</code> 都維持原樣</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     可直接置換的片段（沿用專案既有的 class 命名）
+
+     <div class="profile-info-row">
+         <div class="profile-info-name">
+             <i id="emailIsValidIcon" class="jb-db-warning-circle text--danger" aria-hidden="true"></i>
+             <span class="text--14">電子信箱</span>
+         </div>
+         <div class="profile-info-value text--15" id="valueEmail">
+             <div class="edit_vaule">
+                 <span id="emailSpan" class="edit_vaule_input"></span>
+                 <i class="jb-df-edit-write edit_vaule_input-ctrl" aria-hidden="true"></i>
+                 <a id="wantEmailValid" href="javascript:void(0);" title="點此進行驗證"
+                    class="modal_email_want_verification btn--unverified ml-8">
+                     <i class="jb-db-warning-circle" aria-hidden="true"></i>尚未驗證
+                 </a>
+             </div>
+         </div>
+     </div>
+
+     兩個 icon class 依專案 icon font 實際名稱調整（原本綠勾是 jb-db-check-circle）。
+     若 icon font 沒有對應字符，直接用本頁的 inline SVG 取代 <i> 即可。
+     .btn--unverified 的樣式請一併加進共用 CSS。
+     ══════════════════════════════════════════════════════════════ -->
+
+</body>
+</html>
