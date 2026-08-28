@@ -9,6 +9,7 @@
     padding: 24px 26px 8px;
     font-size: 14px;
     color: #333;
+    background: #fff;
   }
 
   .layui-layer-content .modal-content.verification .text--apply {
@@ -17,28 +18,33 @@
     color: #2f78d4;
   }
 
-  /* 兩列都改成一行排列 */
+  /* 兩列都排成一行；清掉原本的 float */
   .layui-layer-content .modal-content.verification .text--0 {
-    display: flex;
+    display: flex !important;
     align-items: center;
-    font-size: 14px;          /* 蓋掉 .text--0 的 font-size: 0 */
+    justify-content: flex-start;
+    font-size: 14px;              /* 蓋掉 .text--0 的 font-size: 0 */
     margin-bottom: 12px;
   }
 
-  /* 圖片上沒有這些標籤和前綴格，隱藏但保留在 DOM 裡（JS 可能會用到） */
+  .layui-layer-content .modal-content.verification .text--0 > * {
+    float: none !important;        /* 關鍵：原本的 float 會把按鈕推到最右邊 */
+  }
+
+  /* 圖片上沒有這些，隱藏但保留在 DOM（JS 可能會用到） */
   .layui-layer-content .modal-content.verification .md-info,
   .layui-layer-content .modal-content.verification .firstCode,
   .layui-layer-content .modal-content.verification .text--16.md-input {
-    display: none;
+    display: none !important;
   }
 
   /* 輸入框 */
   .layui-layer-content .modal-content.verification input.md-input,
   .layui-layer-content .modal-content.verification #newMobileWithValid {
-    width: 240px;
+    width: 240px !important;
     max-width: 100%;
     height: 40px;
-    margin: 0;
+    margin: 0 !important;
     padding: 0 12px;
     border: 1px solid #d9dde3;
     border-radius: 3px;
@@ -57,13 +63,17 @@
     border-color: #2f78d4;
   }
 
-  /* 取得驗證碼按鈕：緊貼在驗證碼輸入框右邊 */
+  /* 取得驗證碼：緊貼在驗證碼輸入框右邊 */
   .layui-layer-content .modal-content.verification .verification-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     height: 40px;
-    margin-left: 8px;
+    margin: 0 0 0 8px !important;
     padding: 0 16px;
     border-radius: 3px;
     white-space: nowrap;
+    line-height: normal;
   }
 
   /* ---------- 訊息 ---------- */
@@ -74,24 +84,31 @@
   }
   .layui-layer-content .modal-content.verification .error-txt:empty { margin: 0; }
 
-  /* ---------- 底部按鈕：靠右 ---------- */
+  /* ---------- 底部按鈕：靠右、兩顆等高對齊 ---------- */
   .layui-layer-content .modal-btn-box {
-    display: flex;
+    display: flex !important;
     justify-content: flex-end;
     align-items: center;
     gap: 10px;
-    margin-top: 20px;
+    margin: 0;
     padding: 16px 26px 20px;
     border-top: 1px solid #eef0f3;
+    background: #fff;
   }
 
   .layui-layer-content .modal-btn-box .btn {
-    min-width: 88px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    float: none !important;
+    min-width: 92px;
     height: 40px;
-    line-height: 38px;
-    margin-right: 0;          /* 蓋掉 mr-8，改用 gap */
+    margin: 0 !important;         /* 蓋掉 mr-8，間距交給 gap */
+    padding: 0 16px;
     border-radius: 3px;
-    text-align: center;
+    font-size: 14px;
+    line-height: normal;
+    vertical-align: middle;
   }
 
   /* ---------- 手機版 ---------- */
@@ -103,7 +120,10 @@
     }
     .layui-layer-content .modal-content.verification { padding: 20px 16px 8px; }
     .layui-layer-content .modal-content.verification input.md-input,
-    .layui-layer-content .modal-content.verification #newMobileWithValid { flex: 1 1 auto; width: auto; }
+    .layui-layer-content .modal-content.verification #newMobileWithValid {
+      flex: 1 1 auto;
+      width: auto !important;
+    }
     .layui-layer-content .modal-btn-box { padding: 16px; }
   }
 </style>
