@@ -10,8 +10,6 @@
     --text-grey:#888;
     --line:#e5e5e5;
     --danger:#d93f3f;
-    --danger-bg:#fff4f4;
-    --danger-border:#f3b6b6;
   }
   *{box-sizing:border-box;}
   body{
@@ -50,30 +48,20 @@
   }
   .edit_vaule_input-ctrl:hover{color:var(--text);}
 
-  /* ── 舊版：純文字連結 ─────────────────────────── */
+  /* ── 連結樣式：完全沿用原本的 ─────────────────── */
   .link-h-underline{color:#1a6fb5; text-decoration:none;}
   .link-h-underline:hover{text-decoration:underline;}
   .ml-8{margin-left:8px;}
 
-  /* ── 新版：尚未驗證按鈕 ───────────────────────── */
-  .btn--unverified{
-    display:inline-flex; align-items:center; gap:5px;
-    padding:3px 10px; border-radius:999px;
-    border:1px solid var(--danger-border); background:var(--danger-bg);
-    color:var(--danger); font-size:13px; line-height:1.4;
-    text-decoration:none; white-space:nowrap; cursor:pointer;
-    transition:background-color .15s, border-color .15s;
-  }
-  .btn--unverified:hover{background:#ffe9e9; border-color:var(--danger);}
-  .btn--unverified:focus-visible{outline:2px solid var(--danger); outline-offset:2px;}
-  .btn--unverified .icon{flex:none;}
+  /* 唯一新增：紅色驚嘆號 */
+  .text--danger{color:var(--danger);}
 
   .note{
     margin-top:24px; padding:14px 16px; border:1px solid var(--line);
-    border-radius:6px; font-size:14px; color:#555; line-height:1.75;
+    border-radius:6px; font-size:14px; color:#555; line-height:1.8;
   }
   .note b{color:var(--text);}
-  .note ul{margin:8px 0 0; padding-left:20px;}
+  .note ul{margin:6px 0 0; padding-left:20px;}
 </style>
 </head>
 <body>
@@ -85,7 +73,6 @@
     <h2>修改前</h2>
     <div class="profile-info-row">
       <div class="profile-info-name">
-        <!-- 綠色打勾：與「尚未驗證」的狀態矛盾 -->
         <svg class="icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
           <circle cx="8" cy="8" r="8" fill="#3ba55d"/>
           <path d="M4.4 8.2l2.4 2.4 4.8-4.8" fill="none" stroke="#fff"
@@ -100,7 +87,8 @@
             <path d="M11.2 1.9l2.9 2.9-8.4 8.4-3.6.7.7-3.6 8.4-8.4z" fill="none"
                   stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
           </svg>
-          <a href="javascript:void(0);" class="link-h-underline ml-8">[我要驗證]</a>
+          <a href="javascript:void(0);" title="我要驗證"
+             class="modal_email_want_verification link-h-underline ml-8">[我要驗證]</a>
         </div>
       </div>
     </div>
@@ -110,7 +98,7 @@
     <h2>修改後</h2>
     <div class="profile-info-row">
       <div class="profile-info-name">
-        <!-- 改為紅色驚嘆號，與未驗證狀態一致 -->
+        <!-- 綠色打勾 → 紅色驚嘆號 -->
         <svg class="icon" viewBox="0 0 16 16" width="16" height="16" role="img"
              aria-label="尚未驗證">
           <circle cx="8" cy="8" r="8" fill="#d93f3f"/>
@@ -126,58 +114,40 @@
             <path d="M11.2 1.9l2.9 2.9-8.4 8.4-3.6.7.7-3.6 8.4-8.4z" fill="none"
                   stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
           </svg>
-          <a id="wantEmailValid" href="javascript:void(0);" title="點此進行驗證"
-             class="modal_email_want_verification btn--unverified ml-8">
-            <svg class="icon" viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
-              <circle cx="8" cy="8" r="8" fill="#d93f3f"/>
-              <rect x="7.1" y="3.4" width="1.8" height="5.6" rx=".9" fill="#fff"/>
-              <circle cx="8" cy="11.6" r="1.05" fill="#fff"/>
-            </svg>
-            尚未驗證
-          </a>
+          <a id="wantEmailValid" href="javascript:void(0);" title="尚未驗證"
+             class="modal_email_want_verification link-h-underline ml-8">[<span class="text--danger">！</span>尚未驗證]</a>
         </div>
       </div>
     </div>
   </section>
 
   <div class="note">
-    <b>改了三處</b>
+    <b>改了兩處</b>
     <ul>
       <li>欄位名稱左邊的綠色打勾 → 紅色驚嘆號圖示</li>
-      <li>按鈕文字「[我要驗證]」→「尚未驗證」，並拿掉方括號</li>
-      <li>按鈕前面加上紅色驚嘆號，整顆改成淡紅底的膠囊樣式</li>
-    </ul>
-    <b style="display:block; margin-top:10px;">保留沒動的部分</b>
-    <ul>
-      <li><code>id="wantEmailValid"</code> 與 <code>modal_email_want_verification</code> 都保留，開窗的 JS 照舊運作</li>
-      <li>鉛筆編輯鈕、<code>id="valueEmail"</code>、<code>id="emailSpan"</code> 都維持原樣</li>
+      <li>連結文字「[我要驗證]」→「[！尚未驗證]」，只有驚嘆號是紅色，其餘沿用原本的連結樣式</li>
     </ul>
   </div>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════
-     可直接置換的片段（沿用專案既有的 class 命名）
+     直接置換的一行（class、id、方括號、連結樣式全部照舊）
 
-     <div class="profile-info-row">
-         <div class="profile-info-name">
-             <i id="emailIsValidIcon" class="jb-db-warning-circle text--danger" aria-hidden="true"></i>
-             <span class="text--14">電子信箱</span>
-         </div>
-         <div class="profile-info-value text--15" id="valueEmail">
-             <div class="edit_vaule">
-                 <span id="emailSpan" class="edit_vaule_input"></span>
-                 <i class="jb-df-edit-write edit_vaule_input-ctrl" aria-hidden="true"></i>
-                 <a id="wantEmailValid" href="javascript:void(0);" title="點此進行驗證"
-                    class="modal_email_want_verification btn--unverified ml-8">
-                     <i class="jb-db-warning-circle" aria-hidden="true"></i>尚未驗證
-                 </a>
-             </div>
-         </div>
-     </div>
+     舊：
+     <a id="wantEmailValid" href="javascript:void(0);" title="我要驗證"
+        class="modal_email_want_verification link-h-underline ml-8">[我要驗證]</a>
 
-     兩個 icon class 依專案 icon font 實際名稱調整（原本綠勾是 jb-db-check-circle）。
-     若 icon font 沒有對應字符，直接用本頁的 inline SVG 取代 <i> 即可。
-     .btn--unverified 的樣式請一併加進共用 CSS。
+     新：
+     <a id="wantEmailValid" href="javascript:void(0);" title="尚未驗證"
+        class="modal_email_want_verification link-h-underline ml-8">[<span class="text--danger">！</span>尚未驗證]</a>
+
+     若專案沒有 .text--danger 這個 class，改成 inline style 即可：
+     [<span style="color:#d93f3f;">！</span>尚未驗證]
+
+     欄位左邊的圖示（原本是綠色打勾）：
+     舊：<i id="emailIsValidIcon" class="jb-db-check-circle" aria-hidden="true"></i>
+     新：<i id="emailIsValidIcon" class="jb-db-warning-circle text--danger" aria-hidden="true"></i>
+     icon class 依專案 icon font 實際名稱調整；沒有對應字符就用本頁的 inline SVG。
      ══════════════════════════════════════════════════════════════ -->
 
 </body>
