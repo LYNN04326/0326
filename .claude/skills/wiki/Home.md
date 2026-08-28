@@ -77,7 +77,22 @@ pip install playwright            # 或 npm i -D playwright
 3. 名稱不好記就改名，**同時更新所有交叉引用**（`grep -rn` 舊名確認無殘留）。
 4. **在本 wiki 加一頁詳頁、並把它加進上方索引表**，改名的話補進〈改名對照〉。
 5. 確認交叉引用到的其他 skill 是否存在，缺的列進〈尚未安裝的交叉引用〉。
-6. commit ＋ push。
+6. commit ＋ push；在本機跑 `bash .claude/skills/wiki/sync-to-github-wiki.sh` 同步到 GitHub Wiki。
 
-> 本 wiki 用 GitHub Wiki 的檔名慣例（`Home.md`、`_Sidebar.md`）撰寫，
-> 需要時可整包複製進 `0326.wiki.git` 直接當 GitHub Wiki 使用。
+## 同步到 GitHub Wiki
+
+本目錄是**唯一事實來源**，GitHub Wiki（<https://github.com/LYNN04326/0326/wiki>）是它的鏡像。
+改完這裡之後，在**本機**跑：
+
+```bash
+bash .claude/skills/wiki/sync-to-github-wiki.sh
+```
+
+腳本會 clone wiki repo、把連結轉成 GitHub Wiki 格式（內頁連結去掉 `.md`、指回原始碼的相對路徑
+改成絕對 blob 網址）、commit 並推送。
+
+> ⚠️ **不能在 Claude Code session 裡跑這支腳本**：session 的 git proxy 只對授權清單內的 repo
+> 注入憑證，而 `*.wiki.git` 不是 GitHub API 認得的 repo，加不進清單，push 一定回 403。
+> 讀取（clone）沒問題，只有 push 不行。所以 wiki 同步是**人工在本機執行**的步驟。
+>
+> ⚠️ 不要直接在 GitHub 網頁上編輯 wiki——下次同步會被覆蓋。
