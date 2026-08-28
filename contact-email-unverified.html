@@ -5,175 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>電子信箱列 — 尚未驗證狀態</title>
 <style>
-  :root{
-    --text:#333;
-    --text-grey:#888;
-    --line:#e5e5e5;
-    --danger:#d93f3f;
-  }
   *{box-sizing:border-box;}
   body{
-    margin:0; padding:32px 24px; background:#fff; color:var(--text);
-    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
-    font-size:15px; line-height:1.6;
+    margin:0; padding:20px; background:#fff; color:#333;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",Arial,sans-serif;
+    font-size:13px;
   }
-  .demo{max-width:720px; margin:0 auto;}
-  .demo h1{font-size:18px; margin:0 0 24px;}
-  .demo h2{
-    font-size:13px; font-weight:700; color:var(--text-grey);
-    margin:0 0 8px; letter-spacing:.05em;
-  }
-  .demo section{margin-bottom:24px;}
+  .stack{display:flex; flex-direction:column; gap:14px; align-items:flex-start;}
+  .cap{font-size:11px; color:#999; margin-bottom:4px;}
 
-  /* ── 欄位列本體 ───────────────────────────────── */
+  /* ── 依截圖配色的欄位列 ──────────────────────── */
   .profile-info-row{
-    display:inline-flex; align-items:center; gap:16px;
-    padding:10px 14px; border:1px solid var(--line); border-radius:6px;
+    display:inline-flex; align-items:center;
+    background:#f2f4f7; border-radius:4px;
+    padding:5px 10px; gap:14px;
+    white-space:nowrap;
   }
-  .profile-info-name{display:flex; align-items:center; gap:6px; flex:none;}
+  .profile-info-name{display:inline-flex; align-items:center; gap:6px; flex:none;}
   .profile-info-name .icon{flex:none; display:block;}
-  .text--14{font-size:14px;}
-  .text--15{font-size:15px;}
-  .profile-info-value{display:flex; align-items:center;}
+  .text--14{font-size:13px; color:#3b3b3b;}
 
-  /* ★ 關鍵：整列排在同一行，不換行 */
+  .profile-info-value{display:inline-flex; align-items:center;}
   .edit_vaule{
-    display:flex;            /* flex 的預設就是 nowrap */
-    align-items:center;
-    gap:8px;
-    flex-wrap:nowrap;        /* 明寫一次，避免被其他樣式覆寫 */
+    display:flex; align-items:center; gap:7px;
+    flex-wrap:nowrap;              /* ★ 固定同一行 */
   }
-  .edit_vaule_input{white-space:nowrap;}
-
-  /* 鉛筆（維持原本的編輯入口） */
+  .edit_vaule_input{
+    font-size:13px; color:#333;
+    white-space:nowrap;            /* ★ 信箱不斷行 */
+  }
   .edit_vaule_input-ctrl{
-    flex:none; width:16px; height:16px; cursor:pointer;
-    color:var(--text-grey);
+    flex:none; width:14px; height:14px;
+    color:#86b0dd; cursor:pointer;
   }
-  .edit_vaule_input-ctrl:hover{color:var(--text);}
+  .edit_vaule_input-ctrl:hover{color:#3f7fbf;}
 
-  /* ── 連結樣式：完全沿用原本的 ─────────────────── */
   .link-h-underline{
-    color:#1a6fb5; text-decoration:none;
-    white-space:nowrap;      /* ★ 連結本身也不准斷行 */
-    flex:none;
+    color:#3f7fbf; text-decoration:none; font-size:13px;
+    white-space:nowrap; flex:none;  /* ★ 連結不斷行、不被壓縮 */
   }
   .link-h-underline:hover{text-decoration:underline;}
-  .ml-8{margin-left:8px;}
+  .ml-8{margin-left:1px;}
 
-  /* 紅色驚嘆號 */
-  .text--danger{color:var(--danger);}
-
-  .note{
-    margin-top:20px; padding:14px 16px; border:1px solid var(--line);
-    border-radius:6px; font-size:14px; color:#555; line-height:1.8;
-  }
-  .note b{color:var(--text);}
-  .note ul{margin:6px 0 0; padding-left:20px;}
-  .note code{
-    background:#f5f5f5; padding:1px 5px; border-radius:3px;
-    font-size:13px; font-family:ui-monospace,Menlo,Consolas,monospace;
-  }
+  .text--danger{color:#e02b2b;}
 </style>
 </head>
 <body>
 
-<div class="demo">
-  <h1>電子信箱列 — 尚未驗證狀態</h1>
+<div class="stack">
 
-  <section>
-    <h2>修改前</h2>
+  <div>
+    <div class="cap">修改前</div>
     <div class="profile-info-row">
       <div class="profile-info-name">
-        <svg class="icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
-          <circle cx="8" cy="8" r="8" fill="#3ba55d"/>
-          <path d="M4.4 8.2l2.4 2.4 4.8-4.8" fill="none" stroke="#fff"
-                stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <svg class="icon" viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+          <circle cx="8" cy="8" r="8" fill="#3fa64b"/>
+          <path d="M4.5 8.2l2.3 2.3 4.7-4.7" fill="none" stroke="#fff"
+                stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span class="text--14">電子信箱</span>
       </div>
-      <div class="profile-info-value text--15">
+      <div class="profile-info-value">
         <div class="edit_vaule">
           <span class="edit_vaule_input">lydia7775263@gmail.com</span>
           <svg class="edit_vaule_input-ctrl" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M11.2 1.9l2.9 2.9-8.4 8.4-3.6.7.7-3.6 8.4-8.4z" fill="none"
-                  stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M11.2 2.2l2.6 2.6-8.2 8.2-3.3.7.7-3.3 8.2-8.2z" fill="none"
+                  stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
           </svg>
           <a href="javascript:void(0);" title="我要驗證"
              class="modal_email_want_verification link-h-underline ml-8">[我要驗證]</a>
         </div>
       </div>
     </div>
-  </section>
+  </div>
 
-  <section>
-    <h2>修改後</h2>
+  <div>
+    <div class="cap">修改後</div>
     <div class="profile-info-row">
       <div class="profile-info-name">
-        <!-- 綠色打勾 → 紅色驚嘆號 -->
-        <svg class="icon" viewBox="0 0 16 16" width="16" height="16" role="img"
-             aria-label="尚未驗證">
-          <circle cx="8" cy="8" r="8" fill="#d93f3f"/>
-          <rect x="7.1" y="3.4" width="1.8" height="5.6" rx=".9" fill="#fff"/>
-          <circle cx="8" cy="11.6" r="1.05" fill="#fff"/>
+        <svg class="icon" viewBox="0 0 16 16" width="15" height="15" role="img" aria-label="尚未驗證">
+          <circle cx="8" cy="8" r="8" fill="#e02b2b"/>
+          <rect x="7.15" y="3.5" width="1.7" height="5.4" rx=".85" fill="#fff"/>
+          <circle cx="8" cy="11.5" r="1" fill="#fff"/>
         </svg>
         <span class="text--14">電子信箱</span>
       </div>
-      <div class="profile-info-value text--15" id="valueEmail">
+      <div class="profile-info-value" id="valueEmail">
         <div class="edit_vaule">
           <span id="emailSpan" class="edit_vaule_input">lydia7775263@gmail.com</span>
           <svg class="edit_vaule_input-ctrl" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M11.2 1.9l2.9 2.9-8.4 8.4-3.6.7.7-3.6 8.4-8.4z" fill="none"
-                  stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <path d="M11.2 2.2l2.6 2.6-8.2 8.2-3.3.7.7-3.3 8.2-8.2z" fill="none"
+                  stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
           </svg>
           <a id="wantEmailValid" href="javascript:void(0);" title="尚未驗證"
              class="modal_email_want_verification link-h-underline ml-8">[<span class="text--danger">！</span>尚未驗證]</a>
         </div>
       </div>
     </div>
-  </section>
-
-  <div class="note">
-    <b>不換行怎麼做到的</b>
-    <ul>
-      <li><code>.edit_vaule</code> 用 <code>display:flex</code> ＋ <code>flex-wrap:nowrap</code>，信箱、鉛筆、連結固定同一行</li>
-      <li>連結加 <code>white-space:nowrap</code> ＋ <code>flex:none</code>，不會被壓縮也不會斷字</li>
-      <li>信箱文字加 <code>white-space:nowrap</code>，取代原本會把網址拆行的 <code>word-break:break-all</code></li>
-    </ul>
   </div>
+
 </div>
 
 <!-- ══════════════════════════════════════════════════════════════
-     一、置換這一行（class、id、方括號、連結樣式全部照舊）
+     要貼回專案的只有三件事：
 
-     舊：
-     <a id="wantEmailValid" href="javascript:void(0);" title="我要驗證"
-        class="modal_email_want_verification link-h-underline ml-8">[我要驗證]</a>
+     一、連結那一行（id、class、方括號、連結樣式全部照舊）
+     舊：<a id="wantEmailValid" href="javascript:void(0);" title="我要驗證"
+            class="modal_email_want_verification link-h-underline ml-8">[我要驗證]</a>
+     新：<a id="wantEmailValid" href="javascript:void(0);" title="尚未驗證"
+            class="modal_email_want_verification link-h-underline ml-8">[<span class="text--danger">！</span>尚未驗證]</a>
 
-     新：
-     <a id="wantEmailValid" href="javascript:void(0);" title="尚未驗證"
-        class="modal_email_want_verification link-h-underline ml-8">[<span class="text--danger">！</span>尚未驗證]</a>
-
-     沒有 .text--danger 就用 inline style：[<span style="color:#d93f3f;">！</span>尚未驗證]
+     沒有 .text--danger 就寫死：[<span style="color:#e02b2b;">！</span>尚未驗證]
 
      二、欄位左邊的圖示
      舊：<i id="emailIsValidIcon" class="jb-db-check-circle" aria-hidden="true"></i>
      新：<i id="emailIsValidIcon" class="jb-db-warning-circle text--danger" aria-hidden="true"></i>
 
-     三、讓整列不換行（文字變長後才需要）——加這段 CSS：
-
-     #valueEmail .edit_vaule{
-         display:flex;
-         align-items:center;
-         flex-wrap:nowrap;
-     }
+     三、避免文字變長後被擠到第二行
+     #valueEmail .edit_vaule{display:flex; align-items:center; flex-wrap:nowrap;}
      #valueEmail .edit_vaule_input{white-space:nowrap;}
-     #valueEmail .modal_email_want_verification{
-         white-space:nowrap;
-         flex:none;
-     }
+     #valueEmail .modal_email_want_verification{white-space:nowrap; flex:none;}
 
-     用 #valueEmail 前綴把影響範圍限制在這一列，不動到其他欄位。
+     本頁其餘 CSS 只是為了讓預覽圖接近實際頁面，不需要貼進專案。
      ══════════════════════════════════════════════════════════════ -->
 
 </body>
