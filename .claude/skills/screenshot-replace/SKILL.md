@@ -1,9 +1,9 @@
 ---
-name: shot-burn
+name: screenshot-replace
 description: >
   Pillow 直接把編號徽章／覆蓋文字燒進截圖像素的舊版工作流程（棄用中，僅供特殊情境備用）。
-  一般截圖存檔＋標註任務一律優先用 `shot-overlay` skill（HTML 絕對定位覆蓋，不燒進圖片像素）。
-  只有在 `shot-overlay` skill 的 HTML overlay 做不到的情況——例如需要**覆蓋改寫截圖裡的文字內容**
+  一般截圖存檔＋標註任務一律優先用 `screenshot-add` skill（HTML 絕對定位覆蓋，不燒進圖片像素）。
+  只有在 `screenshot-add` skill 的 HTML overlay 做不到的情況——例如需要**覆蓋改寫截圖裡的文字內容**
   （HTML 疊圖辦不到「換掉圖片本身的文字」，只能疊加在上面）、或需要產出「規格書 UI 截圖標號
   慣例」（截圖標號 1:1 對應章節編號 `## N`／`### N.M`）這種舊格式規格書的既有存量文件時，才用本
   skill。觸發時機：使用者明確要求「用 Pillow 疊字」「蓋掉截圖裡的文字重寫」「舊版標號慣例」
@@ -12,11 +12,11 @@ description: >
   詳見下方「整段內容輸出成單一 PNG」。
 ---
 
-# 截圖像素標註（shot-burn，舊版工作流程）
+# 截圖換內容（screenshot-replace，舊版工作流程）
 
 > ⚠️ **本 skill 是舊版做法，非預設選項**。任何新的「截圖存檔＋標註」任務，一律先用
-> `.claude/skills/shot-overlay/SKILL.md`（HTML 絕對定位覆蓋，不修改原始圖片像素）。本 skill 僅在
-> `shot-overlay` skill 的 HTML overlay 無法達成時使用——最常見的情況是**需要覆蓋、改寫截圖裡既有的文字**
+> `.claude/skills/screenshot-add/SKILL.md`（HTML 絕對定位覆蓋，不修改原始圖片像素）。本 skill 僅在
+> `screenshot-add` skill 的 HTML overlay 無法達成時使用——最常見的情況是**需要覆蓋、改寫截圖裡既有的文字**
 > （HTML `<div>` 只能疊加在圖片上方，沒辦法真的把圖片裡的文字換掉；要換字只能先用白色矩形蓋住
 > 舊文字，再用 `ImageDraw.text` 寫新文字，這件事只有 Pillow 直接操作像素才做得到）。
 
@@ -26,14 +26,14 @@ description: >
 - 維護沿用「規格書 UI 截圖標號慣例」（見下方）既有格式的舊規格書時，需要產出同款編號徽章截圖。
 - 需要把**整段流程／對照說明輸出成單一張 PNG**（使用者說「整張圖存到 R2」「產出 PNG 給我」，
   而不是在 HackMD 內嵌 HTML）——見下一節，**但排版方式不是 Pillow**。
-- 其餘情況（單純框紅框、加編號、多圖點擊流程、存檔進 repo）一律改用 `shot-overlay` skill。
+- 其餘情況（單純框紅框、加編號、多圖點擊流程、存檔進 repo）一律改用 `screenshot-add` skill。
 
 ---
 
 ## ⚠️⚠️ 整段內容輸出成單一 PNG —— 版面用 HTML 組，Pillow 只做像素級處理
 
 **這是真實事故、而且是「明明前面做得好、後面反而退步」那種**：同一份 HackMD 文件（人才推薦優化）
-裡，`Rex版本` 章節用 `shot-overlay` skill 的 HTML 版面（白底卡片＋步驟標題列＋圖左說明右 flex＋15px 說明
+裡，`Rex版本` 章節用 `screenshot-add` skill 的 HTML 版面（白底卡片＋步驟標題列＋圖左說明右 flex＋15px 說明
 文字＋紅框圓形 badge），品質很好；後來 `短解` 章節因為使用者要「整張圖存 R2」，我改用
 `PIL.ImageDraw` 手工把標題、說明文字、箭頭一個一個 `draw.text()` 畫上去合成一張 820px 寬的圖，
 結果**視覺品質明顯倒退**，被使用者直接指出「為什麼樣式差這麼多、後來退步了」。
@@ -54,14 +54,14 @@ description: >
 1. **版面（layout）一律用 HTML 組，再用 Playwright 截圖成 PNG。**
    `PIL.ImageDraw.text()` **只允許**用在「單張截圖的像素級處理」——蓋白重寫文字、畫紅框、裁切、
    量測 bounding box。**任何標題、說明文字、箭頭、卡片、表格，都不准用 Pillow 畫。**
-2. **版面規則直接沿用 `shot-overlay` skill 規則二**（白底容器、步驟標題列、圖左說明右的 flex、
+2. **版面規則直接沿用 `screenshot-add` skill 規則二**（白底容器、步驟標題列、圖左說明右的 flex、
    `font-size:15px; color:#222; line-height:1.65` 的 callout、紅框＋圓形 badge、badge 與 callout
    數字呼應）。**不可以因為「這次輸出成 PNG」就退回置中單欄、圖下小字的簡化版面。**
-   輸出格式改變，版面標準不變。**這裡包含 `shot-overlay` skill 規則二的「純圖片（無紅框）也要用外層
+   輸出格式改變，版面標準不變。**這裡包含 `screenshot-add` skill 規則二的「純圖片（無紅框）也要用外層
    `div` 帶 `max-width` 包住，不能只靠 `<img>` 自己的 inline `max-width`」**——雖然本 skill輸出的
    是截圖成 PNG（不會再遇到 HackMD 覆寫 `img` 樣式的問題），但同一份版面組字的程式碼常常跟
-   `shot-overlay` skill 共用／複製，若沿用了「`<img>` 自己扛 `max-width`」的寫法，之後這段程式碼被
-   copy 回 HackMD HTML 情境時一樣會踩雷；一律照 `shot-overlay` skill 的容器包法寫，兩邊行為才一致。
+   `screenshot-add` skill 共用／複製，若沿用了「`<img>` 自己扛 `max-width`」的寫法，之後這段程式碼被
+   copy 回 HackMD HTML 情境時一樣會踩雷；一律照 `screenshot-add` skill 的容器包法寫，兩邊行為才一致。
 3. **`deviceScaleFactor` 至少 2**（截圖內原始 UI 文字很小的，用 3）。**絕不用 1。**
 4. **圖片顯示寬度要滿足 `CSS 寬度 × dsf ≥ 原生寬`**，否則等於在縮圖、細節會掉。
    實務寫法：`disp = min(原生寬, 欄寬上限)`，欄寬上限抓 520–620px，搭配 dsf=2。
@@ -75,11 +75,11 @@ description: >
    有沒有明顯錯」（那是有沒有渲染成功的問題），而是要拿新產出的 PNG 跟舊區塊的截圖（或
    同文件另一張既有 PNG）**並排放在一起看**，逐項核對比例級距、字級顏色、卡片間距是否
    同一量級；機械檢查（渲染成功、沒有溢出）測不出「比例不對／風格花俏」這類問題，只有
-   並排肉眼比對才看得出來。完整做法見 `.claude/skills/shot-overlay/SKILL.md`〈PATCH 前跟同文件
+   並排肉眼比對才看得出來。完整做法見 `.claude/skills/screenshot-add/SKILL.md`〈PATCH 前跟同文件
    既有段落並排比對〉，本 skill 的產出（截圖成 PNG 前的 HTML 版面）同樣適用。
-7. **座標來源優先順序跟 `shot-overlay` skill 一致**：素材是 Figma 來源時，優先用 `get_metadata`／
+7. **座標來源優先順序跟 `screenshot-add` skill 一致**：素材是 Figma 來源時，優先用 `get_metadata`／
    `get_design_context` 拿 node 的精確 bounding box，不要截圖後才用像素顏色掃描猜——像素掃描
-   是沒有更好資料來源時的退場方案，細節見 `.claude/skills/shot-overlay/SKILL.md`〈座標怎麼抓〉第 0 點。
+   是沒有更好資料來源時的退場方案，細節見 `.claude/skills/screenshot-add/SKILL.md`〈座標怎麼抓〉第 0 點。
 
 ### 參考骨架
 
@@ -152,18 +152,18 @@ await (await page.$('.page')).screenshot({ path: 'out.png' });
 * **改字**：先畫白底矩形蓋舊內容，再 `ImageDraw.text` 重寫；中文字型用 `/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc`（無 Noto TC 時後備）。
 * **標號徽章**：紅底白字圓角，底色 `#FF5F57`、`border-radius:10px`、`padding:4px 10px`、字型 `Inter` 700 / `20px` / `line-height:24px`，`N` / `N.M` 依慣例放置。
 * **落差標注**：黃框（`(255,200,0)`）圈出差異處，旁注「規格：XX／現況：OO」。
-* **入庫**：HackMD `upload` 端點不可用→上傳到 Cloudflare R2 圖床（見 `.claude/skills/shot-overlay/SKILL.md` 規則一「上傳到 Cloudflare R2 圖床」的 boto3 流程與環境變數），用回傳的 `public_url` 引用；不再 commit 進 `.claude/assets/`／`raw.githubusercontent.com`（舊法棄用，僅 R2 環境變數不可用時當備案）。
+* **入庫**：HackMD `upload` 端點不可用→上傳到 Cloudflare R2 圖床（見 `.claude/skills/screenshot-add/SKILL.md` 規則一「上傳到 Cloudflare R2 圖床」的 boto3 流程與環境變數），用回傳的 `public_url` 引用；不再 commit 進 `.claude/assets/`／`raw.githubusercontent.com`（舊法棄用，僅 R2 環境變數不可用時當備案）。
 * **限制**：只能蓋白重寫，無法智慧抹除；要乾淨換字改用 Figma MCP 編輯設計稿文字節點再重截。
 * **裁切精準＋badge 打在留白處不壓畫面**：截圖裁切至 UI 元件本身邊界，不含周圍聊天背景／空白；但 badge **不可壓在畫面元素上**——改用 `Image.new` 在元件上緣（或左緣）擴增一條純白邊（高度**剛好容納 badge**，約 33px＋上下各約 4px，不留多餘空白），原圖貼在白邊下方，badge 畫在這塊新留白內（`x=4`）。badge 文字可用「類型·視角」（如 `詢問意願·廠商發出`）讓截圖自我標示訊息類型。
 * **狀態邏輯收斂進表格欄位，不另開小表格／合成截圖**：同一元件在不同條件下的呈現差異（如按鈕 disabled 規則），優先用 `<ul><li>` 巢狀條列寫進對應表格欄位本身，不另立獨立子表格或段落重述；截圖維持單張完整 UI 元件原始畫面，不用多張局部裁切堆疊拼接成合成圖。
 
 ---
 
-## 與 `shot-overlay` 的分工
+## 與 `screenshot-add` 的分工
 
 | 需求 | 用哪個 skill |
 | :--- | :--- |
-| 框紅框、編號 badge、多圖點擊流程、存檔進 repo | `shot-overlay`（HTML 覆蓋，預設選項） |
-| 覆蓋改寫截圖裡既有文字內容 | 本 skill（`shot-burn`，唯一做得到的方式） |
+| 框紅框、編號 badge、多圖點擊流程、存檔進 repo | `screenshot-add`（HTML 覆蓋，預設選項） |
+| 覆蓋改寫截圖裡既有文字內容 | 本 skill（`screenshot-replace`，唯一做得到的方式） |
 | 維護既有「規格書 UI 截圖標號慣例」格式的舊文件 | 本 skill（沿用既有格式） |
-| 深色模式可讀性、不燒像素、可事後修改標註位置 | `shot-overlay`（HTML 疊圖可隨時調整、不用重新產圖） |
+| 深色模式可讀性、不燒像素、可事後修改標註位置 | `screenshot-add`（HTML 疊圖可隨時調整、不用重新產圖） |
