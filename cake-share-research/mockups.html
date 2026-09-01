@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>Cake 分享履歷功能 — 介面示意圖</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    background: #eef1f4;
+    font-family: "WenQuanYi Zen Hei", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    color: #212B36;
+  }
+  .shot { background: #fff; margin: 0 0 32px; }
+
+  /* ── 共用元件 ── */
+  .radio-row { display: flex; gap: 12px; padding: 10px 0; align-items: flex-start; }
+  .radio {
+    width: 18px; height: 18px; border-radius: 50%; border: 2px solid #C4CDD5;
+    flex: 0 0 18px; margin-top: 2px; background: #fff; position: relative;
+  }
+  .radio.on { border-color: #00A886; }
+  .radio.on::after {
+    content: ""; position: absolute; inset: 3px;
+    border-radius: 50%; background: #00A886;
+  }
+  .opt-title { font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 7px; }
+  .opt-desc { font-size: 12.5px; color: #919EAB; line-height: 1.6; margin-top: 3px; }
+  .ico { font-size: 15px; }
+
+  /* ── 圖1：分享您的履歷 ── */
+  #fig1 { width: 585px; padding: 22px 24px 20px; }
+  #fig1 .head { display: flex; justify-content: space-between; align-items: center; }
+  #fig1 .head h2 { font-size: 19px; margin: 0; font-weight: 700; }
+  #fig1 .x { color: #637381; font-size: 20px; line-height: 1; }
+  #fig1 h3 { font-size: 15.5px; font-weight: 600; margin: 22px 0 6px; }
+  #fig1 .tip {
+    display: flex; gap: 8px; align-items: flex-start;
+    font-size: 12.5px; color: #919EAB; padding: 8px 0 4px;
+  }
+  #fig1 .linkbar { display: flex; margin-top: 22px; }
+  #fig1 .linkbar input {
+    flex: 1; border: 1px solid #DFE3E8; border-right: 0;
+    border-radius: 4px 0 0 4px; padding: 12px 14px;
+    font-size: 13.5px; color: #B6BEC6; background: #fff;
+    font-family: inherit; outline: none;
+  }
+  #fig1 .linkbar button {
+    background: #00A886; color: #fff; border: 0; border-radius: 0 4px 4px 0;
+    padding: 0 22px; font-size: 14.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 7px;
+    font-family: inherit; cursor: pointer;
+  }
+  #fig1 .alert {
+    margin-top: 12px; background: #EAF7F4; border-radius: 4px;
+    padding: 11px 14px; font-size: 13px; color: #33475B; line-height: 1.75;
+    display: flex; gap: 9px; align-items: flex-start;
+  }
+  #fig1 .alert b { color: #212B36; font-weight: 600; }
+  #fig1 .share { margin-top: 22px; display: flex; justify-content: center; align-items: center; gap: 18px; }
+  #fig1 .share span { font-size: 14px; margin-right: 4px; }
+  #fig1 .share i { font-style: normal; font-size: 17px; color: #454F5B; }
+
+  /* ── 圖2：履歷設定頁 ── */
+  #fig2 { width: 706px; background: #F4F6F8; padding: 20px 24px 24px; }
+  #fig2 > h2 { font-size: 17px; font-weight: 600; margin: 0 0 16px; }
+  #fig2 .card { background: #fff; border-radius: 4px; padding: 24px 28px 20px; }
+  #fig2 label.f { display: block; font-size: 13.5px; font-weight: 500; margin-bottom: 7px; }
+  #fig2 label.f em { color: #E4572E; font-style: normal; }
+  #fig2 input.t {
+    width: 100%; border: 1px solid #DFE3E8; border-radius: 4px;
+    padding: 11px 13px; font-size: 14px; font-family: inherit; outline: none; color: #212B36;
+  }
+  #fig2 input.t::placeholder { color: #B6BEC6; }
+  #fig2 .field { margin-bottom: 18px; }
+  #fig2 .urlrow { display: flex; }
+  #fig2 .urlrow .pre {
+    background: #F4F6F8; border: 1px solid #DFE3E8; border-right: 0;
+    border-radius: 4px 0 0 4px; padding: 11px 13px;
+    font-size: 14px; color: #919EAB; white-space: nowrap;
+  }
+  #fig2 .urlrow input { border-radius: 0 4px 4px 0; }
+  #fig2 .hint { font-size: 12.5px; color: #919EAB; margin-top: 6px; }
+  #fig2 .hint a { color: #00A886; text-decoration: none; }
+  #fig2 .chk { display: flex; align-items: center; gap: 9px; font-size: 14px; margin: 4px 0 22px; }
+  #fig2 .box {
+    width: 17px; height: 17px; border-radius: 3px; background: #00A886;
+    color: #fff; font-size: 12px; display: flex; align-items: center; justify-content: center;
+  }
+  #fig2 h3 { font-size: 16px; font-weight: 600; margin: 0 0 4px; }
+  #fig2 .sub { display: flex; gap: 8px; font-size: 12.5px; color: #919EAB; padding-left: 30px; margin: -2px 0 2px; }
+  #fig2 .foot { display: flex; justify-content: flex-end; align-items: center; gap: 18px; margin-top: 26px; }
+  #fig2 .foot .cancel { font-size: 14px; color: #637381; }
+  #fig2 .foot .ok {
+    background: #00A886; color: #fff; border: 0; border-radius: 4px;
+    padding: 10px 26px; font-size: 14px; font-family: inherit; cursor: pointer;
+  }
+
+  /* ── 圖3：發布確認 ── */
+  #fig3 { width: 574px; height: 200px; position: relative; overflow: hidden; background: #1F2A44; }
+  #fig3 .bg { padding: 14px 18px; font-size: 12.5px; color: #4A5570; line-height: 2.05; }
+  #fig3 .dlg {
+    position: absolute; left: 84px; top: 26px; width: 404px;
+    background: #fff; border-radius: 6px; padding: 22px 24px 14px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.35); text-align: center;
+  }
+  #fig3 .dlg h4 { margin: 0 0 10px; font-size: 16.5px; font-weight: 700; }
+  #fig3 .dlg p { margin: 0 0 18px; font-size: 13.5px; color: #637381; }
+  #fig3 .dlg .btns { display: flex; border-top: 1px solid #EDF0F2; }
+  #fig3 .dlg .btns div { flex: 1; padding: 12px 0; font-size: 15px; }
+  #fig3 .dlg .btns .c { color: #454F5B; border-right: 1px solid #EDF0F2; }
+  #fig3 .dlg .btns .p { color: #00A886; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ══ 圖1 ══ -->
+<div class="shot" id="fig1">
+  <div class="head"><h2>分享您的履歷</h2><div class="x">✕</div></div>
+  <h3>履歷隱私設定</h3>
+
+  <div class="radio-row">
+    <div class="radio"></div>
+    <div>
+      <div class="opt-title"><span class="ico">🌐</span>公開</div>
+      <div class="opt-desc">任何人無須登入皆可透過公開連結檢視。</div>
+    </div>
+  </div>
+  <div class="tip"><span>ⓘ</span><span>將履歷設為公開，吸引更多機會。</span></div>
+
+  <div class="radio-row">
+    <div class="radio on"></div>
+    <div>
+      <div class="opt-title"><span class="ico">🔗</span>任何有連結的人、平台上的付費使用者及雇主</div>
+      <div class="opt-desc">任何有加密連結的（無須登入）、Cake 平台上的付費使用者及雇主都可以檢視。</div>
+    </div>
+  </div>
+
+  <div class="radio-row">
+    <div class="radio"></div>
+    <div>
+      <div class="opt-title"><span class="ico">🔒</span>僅限有連結的人</div>
+      <div class="opt-desc">僅限持有你加密連結的人（無須登入）才能瀏覽，您的履歷不會出現在雇主的搜尋結果中。</div>
+    </div>
+  </div>
+
+  <div class="linkbar">
+    <input value="https://www.cake.me/s--aVlUdrPIrr4Y8Vo1vWlOXA..." readonly>
+    <button><span>🔗</span>製連結</button>
+  </div>
+
+  <div class="alert">
+    <span>ⓘ</span>
+    <span>已切換 <b>密連結</b>。公開連結已失效，請確保您分享出去的為此 <b>密連結</b>。</span>
+  </div>
+
+  <div class="share">
+    <span>分享到</span><i>in</i><i>✕</i><i>f</i><i>✉</i>
+  </div>
+</div>
+
+<!-- ══ 圖2 ══ -->
+<div class="shot" id="fig2">
+  <h2>李子琳的履歷 設定</h2>
+  <div class="card">
+    <div class="field">
+      <label class="f">名稱 <em>*</em></label>
+      <input class="t" value="李子琳的履歷">
+    </div>
+
+    <div class="field">
+      <label class="f">網址 <em>*</em></label>
+      <div class="urlrow">
+        <div class="pre">https://www.cake.me/</div>
+        <input class="t" value="lin-04e689">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="f">Google Analytics 追蹤碼</label>
+      <input class="t" placeholder="G-XXXXXXXXXX" disabled>
+      <div class="hint"><a href="#">升級您的帳戶</a> 以啟用這項功能。</div>
+    </div>
+
+    <div class="chk"><div class="box">✓</div><span>連結作品集</span></div>
+
+    <h3>隱私</h3>
+
+    <div class="radio-row">
+      <div class="radio"></div>
+      <div>
+        <div class="opt-title"><span class="ico">🌐</span>公開 <span style="color:#919EAB;font-size:12px">ⓘ</span></div>
+        <div class="opt-desc">任何人無須登入皆可透過公開連結檢視。</div>
+      </div>
+    </div>
+    <div class="sub"><span>ⓘ</span><span>建議將履歷設為公開以獲得更多潛在機會。</span></div>
+
+    <div class="radio-row">
+      <div class="radio on"></div>
+      <div>
+        <div class="opt-title"><span class="ico">🔗</span>任何有連結的人、平台上的付費使用者及雇主</div>
+        <div class="opt-desc">任何有加密連結的（無須登入）、Cake 平台上的付費使用者及雇主都可以檢視。</div>
+      </div>
+    </div>
+
+    <div class="radio-row">
+      <div class="radio"></div>
+      <div>
+        <div class="opt-title"><span class="ico">🔒</span>僅限有連結的人</div>
+        <div class="opt-desc">僅限持有你加密連結的人（無須登入）才能瀏覽，您的履歷不會出現在雇主的搜尋結果中。</div>
+      </div>
+    </div>
+
+    <div class="foot"><span class="cancel">取消</span><button class="ok">更新</button></div>
+  </div>
+</div>
+
+<!-- ══ 圖3 ══ -->
+<div class="shot" id="fig3">
+  <div class="bg">
+    執行，包含專案流程整理、簡報製作、EDM 與行銷素材設計<br>
+    營及活動成效分析，並協助跨部門溝通與協調，確保專案依<br>
+    <br>
+    wan<br>
+    <br>
+    <br>
+    的一致性，並培養以產品思維解決問題的能力。
+  </div>
+  <div class="dlg">
+    <h4>您確定要發布嗎？</h4>
+    <p>這將覆蓋您目前已發佈的版本</p>
+    <div class="btns"><div class="c">取消</div><div class="p">發布</div></div>
+  </div>
+</div>
+
+</body>
+</html>
