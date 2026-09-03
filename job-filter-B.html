@@ -66,20 +66,26 @@
     });
   }
 
-  // 對齊查詢列（.searchmail .floatL 那一排）的左右邊界；版型裡若已能對齊可整段刪除
+  // 對齊查詢列：量測該列所有輸入元件的最左／最右邊界（屬性 → 查詢），用 padding 對齊
   function alignToSearchRow() {
     var bar = document.getElementById('rptToolBar');
-    var ref = document.querySelector('.searchmail .floatL');
-    if (!bar || !ref || !bar.parentNode || ref.offsetParent === null) return;
-    var rr = ref.getBoundingClientRect();
-    if (!rr.width) return;
-    var p  = bar.parentNode;
-    var cs = window.getComputedStyle(p);
-    var pr = p.getBoundingClientRect();
-    var left = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.paddingLeft) || 0);
-    bar.style.width = rr.width + 'px';
-    bar.style.marginLeft = (rr.left - left) + 'px';
-    bar.style.marginRight = '0';
+    if (!bar) return;
+    var sm = document.querySelector('.searchmail');
+    if (!sm || sm.offsetParent === null) return;
+    bar.style.paddingLeft = '0'; bar.style.paddingRight = '0';
+    var els = sm.querySelectorAll('input,select,button,textarea,a');
+    var minLeft = null, maxRight = null, i, r;
+    for (i = 0; i < els.length; i++) {
+      if (bar.contains(els[i]) || els[i].offsetParent === null) continue;
+      r = els[i].getBoundingClientRect();
+      if (!r.width) continue;
+      if (minLeft === null || r.left < minLeft) minLeft = r.left;
+      if (maxRight === null || r.right > maxRight) maxRight = r.right;
+    }
+    if (minLeft === null) return;
+    var br = bar.getBoundingClientRect();
+    bar.style.paddingLeft  = Math.max(0, minLeft - br.left) + 'px';
+    bar.style.paddingRight = Math.max(0, br.right - maxRight) + 'px';
   }
   alignToSearchRow();
   window.addEventListener('load', alignToSearchRow);
