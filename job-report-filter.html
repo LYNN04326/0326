@@ -5,129 +5,59 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>職缺成效報表－篩選選單（測試頁）</title>
 <style>
-  /* ===== 測試頁用的模擬樣式（1111 網站已有，正式貼上時不必帶） ===== */
-  body { margin: 0; padding: 16px; background: #fff;
-         font-family: "Microsoft JhengHei", "Segoe UI", Arial, sans-serif; font-size: 13px; color: #333; }
-  .demoWrap { max-width: 980px; margin: 0 auto; }
-  .intro { padding: 10px 12px; background: #eaf3fb; color: #1a5fb4; }
-  .searchmail { margin-top: 10px; padding: 8px 10px; border: 1px solid #cfd6de; background: #eef3f8; }
-  .searchmail .floatL { float: left; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  .searchmail::after { content: ""; display: table; clear: both; }
-  .searchmail label { color: #444; }
-  .searchmail select, .searchmail input[type="text"] {
-    height: 28px; padding: 0 8px; border: 1px solid #c9ced6; border-radius: 3px; background: #fff;
-    font-size: 13px; color: #333; box-sizing: border-box; }
-  .searchmail .keyword { width: 230px; }
-  .button0_b { height: 28px; padding: 0 16px; border: 0; border-radius: 3px;
-               background: #1e6fd9; color: #fff; font-size: 13px; cursor: pointer; }
-  .button0_s { height: 28px; padding: 0 14px; border: 0; border-radius: 3px;
-               background: #1e6fd9; color: #fff; font-size: 13px; cursor: pointer; }
-  .button0_s + .button0_s { margin-left: 6px; }
-  .jobHead { margin-top: 10px; padding: 8px 10px; background: #fdf7ea; overflow: hidden; }
-  .jobHead p { margin: 3px 0; }
-  .jobHead .jobName { float: left; color: #1a5fb4; font-weight: bold; }
-  .jobHead .jobDate { clear: both; color: #444; }
-  .jobHead .jobNote { color: #d05a1e; }
-  .rptTable { width: 100%; margin-top: 8px; border-collapse: collapse; }
-  .rptTable th, .rptTable td { border: 1px solid #e2e5ea; padding: 8px; text-align: center; }
-  .rptTable th { background: #eaf3fb; font-weight: normal; color: #555; }
-  .rptTable td.cName { text-align: left; }
-  .switcher { margin-top: 14px; padding: 8px 10px; border: 1px dashed #c9ced6; color: #666; }
-
-  /* ===== 以下才是本次要加到 1111 網頁的樣式 ===== */
-
-  /* 篩選列：左邊選單、右邊報表按鈕，同一列垂直置中對齊 */
-  .rptToolBar {
-    clear: both;
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: none;
-    flex: 0 0 auto;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;          /* 「列印報表」「匯出報表」與選單同一水平線 */
-    justify-content: space-between;  /* 版型A：左右兩端對齊 */
-    flex-wrap: wrap;
-    gap: 8px;
-    min-height: 34px;
-    margin: 10px 0;
-    padding: 0;
-  }
-  .rptToolBar::before { content: ""; display: table; clear: both; }
-  .rptToolBar::after  { content: ""; display: table; clear: both; }
-
-  /* 版型B：整組靠右（在 class 後面加上 alignRight 即可切換） */
-  .rptToolBar.alignRight { justify-content: flex-end; gap: 16px; }
-
-  .rptToolBar .jobFilter { display: flex; align-items: center; gap: 6px; }
-  .rptToolBar .jobFilter .jfLabel { color: #333; font-weight: bold; white-space: nowrap; }
-
-  /* 職缺篩選下拉選單 */
-  .rptToolBar .jobFilter .jfSelect {
-    height: 30px;
-    min-width: 168px;
-    padding: 0 28px 0 10px;
-    border: 1px solid #c9ced6;
-    border-radius: 3px;
-    background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23666'/%3E%3C/svg%3E") no-repeat right 10px center;
-    font-size: 13px;
-    color: #333;
-    line-height: 28px;
-    box-sizing: border-box;
-    cursor: pointer;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-  }
-  .rptToolBar .jobFilter .jfSelect:focus { border-color: #1e6fd9; outline: none; }
-
-  /* 說明圖示（i） */
-  .rptToolBar .jobFilter .jfTip { position: relative; display: inline-flex; }
-  .rptToolBar .jobFilter .jfTipIcon {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 16px; height: 16px;
-    border: 1px solid #9aa3ae; border-radius: 50%; background: #fff;
-    color: #6b7480; font-size: 11px; font-style: normal;
-    font-family: Georgia, "Times New Roman", serif; line-height: 1;
-    cursor: pointer; user-select: none;
-  }
-  .rptToolBar .jobFilter .jfTipIcon:hover,
-  .rptToolBar .jobFilter .jfTipIcon:focus { border-color: #1e6fd9; color: #1e6fd9; outline: none; }
-
-  /* tooltip 內容 */
-  .rptToolBar .jobFilter .jfTipBox {
-    position: absolute; top: calc(100% + 9px); left: 50%; transform: translateX(-16px);
-    z-index: 999; display: none;
-    min-width: 200px; max-width: 280px; padding: 7px 10px;
-    border: 1px solid #d8dde4; border-radius: 3px; background: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
-    color: #d05a1e; font-size: 12px; line-height: 1.5; text-align: left;
-    white-space: normal; word-break: break-all;
-  }
-  .rptToolBar .jobFilter .jfTipBox::before,
-  .rptToolBar .jobFilter .jfTipBox::after {
-    content: ""; position: absolute; left: 12px; border: 6px solid transparent;
-  }
-  .rptToolBar .jobFilter .jfTipBox::before { top: -13px; border-bottom-color: #d8dde4; }
-  .rptToolBar .jobFilter .jfTipBox::after  { top: -12px; border-bottom-color: #fff; }
-
-  /* 滑鼠移入、鍵盤 focus、或點擊（is-show）都會顯示 */
-  .rptToolBar .jobFilter .jfTip:hover .jfTipBox,
-  .rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
-  .rptToolBar .jobFilter .jfTipBox.is-show { display: block; }
-
-  /* 右側報表按鈕：在 flex 容器內不再需要 float，但保留原 class */
-  .rptToolBar .floatR { float: none; display: flex; align-items: center; }
-
-  /* 保險：若查詢列容器高度被寫死，讓它自動撐開 */
-  .searchmail { height: auto !important; }
-
-  @media screen and (max-width: 640px) {
-    .rptToolBar { align-items: flex-start; }
-    .rptToolBar .floatR { width: 100%; justify-content: flex-end; }
-  }
-  @media print { .rptToolBar { display: none; } }
+/* 篩選列：左右兩端對齊，與查詢列同一容器所以邊界一致 */
+.rptToolBar{clear:both;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:8px 0 2px;padding:0;}
+.rptToolBar::before{content:"";display:table;clear:both;}
+.rptToolBar::after{content:"";display:table;clear:both;}
+.rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
+.rptToolBar .jobFilter .jfLabel{color:#333;font-weight:bold;white-space:nowrap;}
+.rptToolBar .jobFilter .jfSelect{height:30px;min-width:168px;padding:0 28px 0 10px;border:1px solid #c9ced6;border-radius:3px;background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23666'/%3E%3C/svg%3E") no-repeat right 10px center;font-size:13px;color:#333;line-height:28px;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;}
+.rptToolBar .jobFilter .jfSelect:focus{border-color:#1e6fd9;outline:none;}
+.rptToolBar .jobFilter .jfTip{position:relative;display:inline-flex;}
+.rptToolBar .jobFilter .jfTipIcon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid #9aa3ae;border-radius:50%;background:#fff;color:#6b7480;font-size:11px;font-style:normal;font-family:Georgia,"Times New Roman",serif;line-height:1;cursor:pointer;user-select:none;}
+.rptToolBar .jobFilter .jfTipIcon:hover,.rptToolBar .jobFilter .jfTipIcon:focus{border-color:#1e6fd9;color:#1e6fd9;outline:none;}
+.rptToolBar .jobFilter .jfTipBox{position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-16px);z-index:999;display:none;min-width:200px;max-width:280px;padding:7px 10px;border:1px solid #d8dde4;border-radius:3px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#d05a1e;font-size:12px;line-height:1.5;text-align:left;white-space:normal;word-break:break-all;}
+.rptToolBar .jobFilter .jfTipBox::before,.rptToolBar .jobFilter .jfTipBox::after{content:"";position:absolute;left:12px;border:6px solid transparent;}
+.rptToolBar .jobFilter .jfTipBox::before{top:-13px;border-bottom-color:#d8dde4;}
+.rptToolBar .jobFilter .jfTipBox::after{top:-12px;border-bottom-color:#fff;}
+.rptToolBar .jobFilter .jfTip:hover .jfTipBox,
+.rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
+.rptToolBar .jobFilter .jfTipBox.is-show{display:block;}
+/* 右側按鈕：在 flex 容器內不用 float，仍保留原 class */
+.rptToolBar .floatR{float:none;display:flex;align-items:center;}
+@media screen and (max-width:640px){
+  .rptToolBar{align-items:flex-start;}
+  .rptToolBar .floatR{width:100%;justify-content:flex-end;}
+}
+/* 關鍵：讓查詢列容器高度自動撐開，篩選列放在裡面就不會溢出重疊 */
+.searchmail{height:auto!important;}
+.searchmail::after{content:"";display:table;clear:both;}
+@media print{ .rptToolBar{display:none;} }
+</style>
+<style>
+  body { margin:0; padding:16px; background:#fff; font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif; font-size:13px; color:#333; }
+  .demoWrap { max-width:980px; margin:0 auto; }
+  .intro { padding:10px 12px; background:#eaf3fb; color:#1a5fb4; }
+  .searchmail { margin-top:10px; padding:8px 10px; border:1px solid #cfd6de; background:#eef3f8; height:40px; }
+  .searchmail .floatL { float:left; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
+  .searchmail label { color:#444; }
+  .searchmail select, .searchmail input[type="text"] { height:28px; padding:0 8px; border:1px solid #c9ced6; border-radius:3px; background:#fff; font-size:13px; color:#333; box-sizing:border-box; }
+  .searchmail .keyword { width:230px; }
+  .button0_b { height:28px; padding:0 16px; border:0; border-radius:3px; background:#1e6fd9; color:#fff; font-size:13px; cursor:pointer; }
+  .button0_s { height:28px; padding:0 14px; border:0; border-radius:3px; background:#1e6fd9; color:#fff; font-size:13px; cursor:pointer; }
+  .button0_s + .button0_s { margin-left:6px; }
+  .jobHead { margin-top:10px; padding:8px 10px; background:#fdf7ea; overflow:hidden; }
+  .jobHead p { margin:3px 0; }
+  .jobHead .jobName { float:left; color:#1a5fb4; font-weight:bold; }
+  .jobHead .jobDate { clear:both; color:#444; }
+  .jobHead .jobNote { color:#d05a1e; }
+  .rptTable { width:100%; margin-top:8px; border-collapse:collapse; }
+  .rptTable th,.rptTable td { border:1px solid #e2e5ea; padding:8px; text-align:center; }
+  .rptTable th { background:#eaf3fb; font-weight:normal; color:#555; }
+  .rptTable td.cName { text-align:left; }
+  .switcher { margin-top:14px; padding:8px 10px; border:1px dashed #c9ced6; color:#666; }
+  /* 版型B：整組靠右 */
+  .rptToolBar.alignRight { justify-content:flex-end; gap:16px; }
 </style>
 </head>
 <body>
@@ -136,7 +66,7 @@
 
   <div class="intro">【說明】本紀錄系統僅保留90天。</div>
 
-  <!-- 查詢列（原網頁既有，僅為了測試呈現） -->
+  <!-- 查詢列（原網頁既有；故意設 height:40px 重現高度被寫死的情況） -->
   <div class="searchmail ">
     <div class="floatL">
       <label for="demoAttr">屬性：</label>
@@ -150,29 +80,30 @@
     </div>
     <br>
 
-    <!-- ====== ↓↓↓ 要貼到 1111 網頁的區塊（貼在這裡也沒關係，JS 會自動搬出去） ↓↓↓ ====== -->
-    <div class="rptToolBar" id="rptToolBar">
+    <!-- ====== ↓↓↓ 要貼到 1111 網頁的區塊（貼在 searchmail 裡面的最後面） ↓↓↓ ====== -->
+<div class="rptToolBar" id="rptToolBar">
 
-      <div class="jobFilter">
-        <span class="jfLabel">篩選：</span>
-        <select class="jfSelect" id="selJobFilter" aria-label="職缺篩選">
-          <option value="all">全部職缺</option>
-          <option value="hasData" selected>僅顯示有數據職缺</option>
-          <option value="mainApply">僅顯示有主投職缺</option>
-        </select>
-        <span class="jfTip">
-          <i class="jfTipIcon" id="jobFilterTipIcon" tabindex="0" role="button"
-             aria-label="篩選說明" aria-describedby="jobFilterTipBox">i</i>
-          <span class="jfTipBox" id="jobFilterTipBox" role="tooltip">數據指瀏覽統計、應徵統計、曝光數統計</span>
-        </span>
-      </div>
+  <div class="jobFilter">
+    <span class="jfLabel">篩選：</span>
+    <select class="jfSelect" id="selJobFilter" aria-label="職缺篩選">
+      <option value="all">全部職缺</option>
+      <option value="hasData" selected>僅顯示有數據職缺</option>
+      <option value="mainApply">僅顯示有主投職缺</option>
+    </select>
+    <span class="jfTip">
+      <i class="jfTipIcon" id="jobFilterTipIcon" tabindex="0" role="button"
+         aria-label="篩選說明" aria-describedby="jobFilterTipBox">i</i>
+      <span class="jfTipBox" id="jobFilterTipBox" role="tooltip">數據指瀏覽統計、應徵統計、曝光數統計</span>
+    </span>
+  </div>
 
-      <div class="floatR">
-        <input type="button" class="button0_s" id="btnExport" value="匯出報表">
-        <input type="button" class="button0_s" id="btnPrint" value="列印報表">
-      </div>
+  <div class="floatR">
+    <input type="button" class="button0_s" id="btnExport" value="匯出報表">
+    <input type="button" class="button0_s" id="btnPrint" value="列印報表">
+  </div>
 
-    </div>
+</div>
+
     <!-- ====== ↑↑↑ 區塊到這裡結束 ↑↑↑ ====== -->
   </div>
 
@@ -183,7 +114,7 @@
     <p class="jobNote">➜ 曝光數(主網與app搜尋頁真實數據）僅供內部IP檢視，若廠商有需求，請自行斟酌是否有提供的必要性。</p>
   </div>
 
-  <table class="rptTable" id="demoTable">
+  <table class="rptTable">
     <thead>
       <tr><th>當週日期</th><th>08/27</th><th>08/28</th><th>08/29</th><th>08/30</th><th>08/31</th><th>總和</th></tr>
     </thead>
@@ -203,70 +134,26 @@
 </div>
 
 <script>
-/* ===== 以下才是本次要加到 1111 網頁的 JS ===== */
 (function () {
   function visible(el) {
     if (!el || el.offsetParent === null) return false;
     var r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
   }
-  /* 頁面上可能有多個 .searchmail（各分頁一個），只取看得見、且與篩選列同層的那個 */
-  function findRef(bar) {
-    var list = document.querySelectorAll('.searchmail'), first = null, i, c;
-    for (i = 0; i < list.length; i++) {
-      c = list[i];
-      if (!visible(c)) continue;
-      if (!first) first = c;
-      if (bar && c.parentNode === bar.parentNode) return c;
-    }
-    return first;
-  }
-  /* 位置保險：不論貼在哪，都把整塊搬到查詢列之後（找不到就插在報表表格之前） */
+  /* 位置保險：確保本區塊位於「看得見的」查詢列 .searchmail 之內（同一容器＝左右自然對齊） */
   function place() {
     var bar = document.getElementById('rptToolBar');
     if (!bar) return;
-    var sm = findRef(bar);
-    if (sm && !bar.contains(sm)) {
-      if (bar.previousElementSibling !== sm || bar.parentNode !== sm.parentNode) {
-        sm.parentNode.insertBefore(bar, sm.nextSibling);
-      }
+    var list = document.querySelectorAll('.searchmail'), i, c;
+    for (i = 0; i < list.length; i++) {
+      c = list[i];
+      if (!visible(c) || bar.contains(c)) continue;
+      if (c.lastElementChild !== bar) { c.appendChild(bar); }
       return;
     }
-    var tbls = document.getElementsByTagName('table');
-    for (var i = 0; i < tbls.length; i++) {
-      if (/當週日期|當月日期|當日日期/.test(tbls[i].textContent || '')) {
-        tbls[i].parentNode.insertBefore(bar, tbls[i]);
-        return;
-      }
-    }
   }
-  /* 左右對齊：寬度與左邊界都對齊查詢列；基準異常時退回滿版 */
-  function align() {
-    var bar = document.getElementById('rptToolBar');
-    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
-    bar.style.width = ''; bar.style.marginLeft = ''; bar.style.marginRight = '';
-    var p  = bar.parentNode;
-    var cs = window.getComputedStyle(p);
-    var padL = parseFloat(cs.paddingLeft) || 0;
-    var padR = parseFloat(cs.paddingRight) || 0;
-    var innerW = p.clientWidth - padL - padR;
-    var sm = findRef(bar);
-    if (!sm) return;
-    var sr = sm.getBoundingClientRect();
-    if (!sr.width || (innerW > 0 && sr.width < innerW * 0.6)) return;  /* 基準太窄就維持 width:100% */
-    var pr = p.getBoundingClientRect();
-    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + padL;
-    bar.style.width = sr.width + 'px';
-    bar.style.marginLeft = (sr.left - contentLeft) + 'px';
-    bar.style.marginRight = '0';
-  }
-
-  place(); align();
-  if (document.readyState !== 'complete') {
-    window.addEventListener('load', function () { place(); align(); });
-  }
-  window.addEventListener('resize', align);
-  setTimeout(align, 300);
+  place();
+  if (document.readyState !== 'complete') { window.addEventListener('load', place); }
 
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');
@@ -283,16 +170,14 @@
 
   /* 測試頁專用：切換版型A／版型B */
   var radios = document.querySelectorAll('input[name="layout"]');
-  for (var i = 0; i < radios.length; i++) {
-    radios[i].addEventListener('change', function () {
-      var bar = document.getElementById('rptToolBar');
-      if (this.value === 'B') { bar.classList.add('alignRight'); }
-      else { bar.classList.remove('alignRight'); }
+  for (var k = 0; k < radios.length; k++) {
+    radios[k].addEventListener('change', function () {
+      var b = document.getElementById('rptToolBar');
+      if (this.value === 'B') { b.classList.add('alignRight'); } else { b.classList.remove('alignRight'); }
     });
   }
 })();
 </script>
-
 
 </body>
 </html>

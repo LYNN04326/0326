@@ -1,23 +1,16 @@
 <!-- ============================================================
-     用途：取代 1111「數據統計查詢」報表原本的
-           <div class="floatR"> …匯出報表／列印報表… </div>
+     版型A：分開左右對齊
+       篩選：靠左（左邊界對齊「屬性」）
+       匯出報表／列印報表 靠右（右邊界對齊「查詢」）
 
      步驟1：把原本職缺標題那一行裡的 <div class="floatR">…</div> 整段刪掉
-     步驟2：把本段貼在 <div class="searchmail"> 的 </div> 「之後」，
-            也就是查詢列容器的外面、跟它同一層：
-
-              <div class="searchmail"> … </div>
-              ★ 貼在這裡 ★
-              <div>➜ WONG測試職缺 … 新增日 … 曝光數說明 …</div>
-              <table> 當週日期 … </table>
-
-     注意：不要貼在 <div class="searchmail"> 或職缺標題那個 div 「裡面」，
-           那些容器內部有浮動元素，貼進去會壓到底下的文字。
-           萬一還是貼進去了，下方 JS 會自動把它搬到正確位置。
+     步驟2：本段貼在 <div class="searchmail"> 「裡面的最後面」（</div> 之前），
+            也就是 <div class="floatL">…</div><br> 的後面。
+            同一個容器＝左右邊界天生對齊，不需要 JS 計算。
      ============================================================ -->
 <style>
-/* 篩選列：左邊選單、右邊報表按鈕，同一列垂直置中對齊 */
-.rptToolBar{clear:both;position:relative;z-index:1;width:100%;max-width:none;flex:0 0 auto;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:10px 0;padding:0;}
+/* 篩選列：左右兩端對齊，與查詢列同一容器所以邊界一致 */
+.rptToolBar{clear:both;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:8px 0 2px;padding:0;}
 .rptToolBar::before{content:"";display:table;clear:both;}
 .rptToolBar::after{content:"";display:table;clear:both;}
 .rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
@@ -34,15 +27,13 @@
 .rptToolBar .jobFilter .jfTip:hover .jfTipBox,
 .rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
 .rptToolBar .jobFilter .jfTipBox.is-show{display:block;}
-/* 版型B：整組靠右（把 class="rptToolBar" 改成 class="rptToolBar alignRight" 即可切換） */
-.rptToolBar.alignRight{justify-content:flex-end;gap:16px;}
 /* 右側按鈕：在 flex 容器內不用 float，仍保留原 class */
 .rptToolBar .floatR{float:none;display:flex;align-items:center;}
 @media screen and (max-width:640px){
   .rptToolBar{align-items:flex-start;}
   .rptToolBar .floatR{width:100%;justify-content:flex-end;}
 }
-/* 保險：若查詢列容器高度被寫死，讓它自動撐開，避免內容溢出壓到下方文字 */
+/* 關鍵：讓查詢列容器高度自動撐開，篩選列放在裡面就不會溢出重疊 */
 .searchmail{height:auto!important;}
 .searchmail::after{content:"";display:table;clear:both;}
 @media print{ .rptToolBar{display:none;} }
@@ -78,63 +69,20 @@
     var r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
   }
-  /* 頁面上可能有多個 .searchmail（各分頁一個），只取看得見、且與篩選列同層的那個 */
-  function findRef(bar) {
-    var list = document.querySelectorAll('.searchmail'), first = null, i, c;
-    for (i = 0; i < list.length; i++) {
-      c = list[i];
-      if (!visible(c)) continue;
-      if (!first) first = c;
-      if (bar && c.parentNode === bar.parentNode) return c;
-    }
-    return first;
-  }
-  /* 位置保險：不論貼在哪，都把整塊搬到查詢列之後（找不到就插在報表表格之前） */
+  /* 位置保險：確保本區塊位於「看得見的」查詢列 .searchmail 之內（同一容器＝左右自然對齊） */
   function place() {
     var bar = document.getElementById('rptToolBar');
     if (!bar) return;
-    var sm = findRef(bar);
-    if (sm && !bar.contains(sm)) {
-      if (bar.previousElementSibling !== sm || bar.parentNode !== sm.parentNode) {
-        sm.parentNode.insertBefore(bar, sm.nextSibling);
-      }
+    var list = document.querySelectorAll('.searchmail'), i, c;
+    for (i = 0; i < list.length; i++) {
+      c = list[i];
+      if (!visible(c) || bar.contains(c)) continue;
+      if (c.lastElementChild !== bar) { c.appendChild(bar); }
       return;
     }
-    var tbls = document.getElementsByTagName('table');
-    for (var i = 0; i < tbls.length; i++) {
-      if (/當週日期|當月日期|當日日期/.test(tbls[i].textContent || '')) {
-        tbls[i].parentNode.insertBefore(bar, tbls[i]);
-        return;
-      }
-    }
   }
-  /* 左右對齊：寬度與左邊界都對齊查詢列；基準異常時退回滿版 */
-  function align() {
-    var bar = document.getElementById('rptToolBar');
-    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
-    bar.style.width = ''; bar.style.marginLeft = ''; bar.style.marginRight = '';
-    var p  = bar.parentNode;
-    var cs = window.getComputedStyle(p);
-    var padL = parseFloat(cs.paddingLeft) || 0;
-    var padR = parseFloat(cs.paddingRight) || 0;
-    var innerW = p.clientWidth - padL - padR;
-    var sm = findRef(bar);
-    if (!sm) return;
-    var sr = sm.getBoundingClientRect();
-    if (!sr.width || (innerW > 0 && sr.width < innerW * 0.6)) return;  /* 基準太窄就維持 width:100% */
-    var pr = p.getBoundingClientRect();
-    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + padL;
-    bar.style.width = sr.width + 'px';
-    bar.style.marginLeft = (sr.left - contentLeft) + 'px';
-    bar.style.marginRight = '0';
-  }
-
-  place(); align();
-  if (document.readyState !== 'complete') {
-    window.addEventListener('load', function () { place(); align(); });
-  }
-  window.addEventListener('resize', align);
-  setTimeout(align, 300);
+  place();
+  if (document.readyState !== 'complete') { window.addEventListener('load', place); }
 
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');
