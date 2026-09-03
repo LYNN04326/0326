@@ -16,9 +16,6 @@
 .rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
 .rptToolBar .jobFilter .jfTipBox.is-show{display:block;}
 .rptToolBar .floatR{float:none;display:flex;align-items:center;}
-/* 讓查詢列容器高度自動撐開（否則篩選列會溢出壓到下方文字），並清除浮動維持原本灰底框線 */
-.searchmail{height:auto!important;}
-.searchmail::after{content:"";display:table;clear:both;}
 @media screen and (max-width:640px){
   .rptToolBar{align-items:flex-start;}
   .rptToolBar .floatR{width:100%;justify-content:flex-end;}
@@ -66,19 +63,46 @@
     });
   }
 
-  // 保險：確保本區塊位於查詢列容器內的最後面（版型已放對位置時不會有任何動作）
-  function placeInSearchmail() {
-    var bar = document.getElementById('rptToolBar');
-    if (!bar) return;
-    var list = document.querySelectorAll('.searchmail'), i, c;
-    for (i = 0; i < list.length; i++) {
-      c = list[i];
-      if (c.offsetParent === null || bar.contains(c)) continue;
-      if (c.lastElementChild !== bar) { c.appendChild(bar); }
-      return;
+  // 位置：移到查詢列容器之外，避免被其固定高度夾住而壓到下方文字
+  function moveOut() {
+    var bar = document.getElementById('rptToolBar'), el = bar && bar.parentNode;
+    while (el && el.nodeType === 1) {
+      if ((' ' + (el.className || '') + ' ').indexOf(' searchmail ') > -1) {
+        el.parentNode.insertBefore(bar, el.nextSibling);
+        return;
+      }
+      el = el.parentNode;
     }
   }
-  placeInSearchmail();
-  window.addEventListener('load', placeInSearchmail);
+
+  // 對齊：寬度與左邊界對齊查詢列內框（左＝屬性、右＝查詢）
+  function align() {
+    var bar = document.getElementById('rptToolBar');
+    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
+    var list = document.querySelectorAll('.searchmail'), sm = null, i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i].offsetParent !== null && list[i].getBoundingClientRect().width > 0) { sm = list[i]; break; }
+    }
+    if (!sm || bar.contains(sm)) return;
+    var scs = window.getComputedStyle(sm), sr = sm.getBoundingClientRect();
+    var l = sr.left  + (parseFloat(scs.borderLeftWidth)  || 0) + (parseFloat(scs.paddingLeft)  || 0);
+    var r = sr.right - (parseFloat(scs.borderRightWidth) || 0) - (parseFloat(scs.paddingRight) || 0);
+    if (r - l <= 0) return;
+    var p = bar.parentNode, pcs = window.getComputedStyle(p), pr = p.getBoundingClientRect();
+    var pl = pr.left + (parseFloat(pcs.borderLeftWidth) || 0) + (parseFloat(pcs.paddingLeft) || 0);
+    bar.style.flex = '0 0 auto';
+    bar.style.minWidth = '0';
+    bar.style.maxWidth = 'none';
+    bar.style.width = (r - l) + 'px';
+    bar.style.marginLeft = (l - pl) + 'px';
+    bar.style.marginRight = '0';
+  }
+
+  function run() { moveOut(); align(); }
+  run();
+  window.addEventListener('load', run);
+  window.addEventListener('resize', align);
+  setTimeout(run, 300);
+  setTimeout(run, 1200);
 })();
 </script>
