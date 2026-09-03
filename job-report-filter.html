@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>職缺成效報表－篩選選單（測試頁）</title>
+<style>
+  /* ===== 測試頁用的模擬樣式（1111 網站已有這些樣式，正式貼上時不必帶） ===== */
+  body { margin: 0; padding: 16px; background: #fff;
+         font-family: "Microsoft JhengHei", "Segoe UI", Arial, sans-serif; font-size: 13px; color: #333; }
+  .demoWrap { max-width: 980px; margin: 0 auto; }
+  .searchBar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+               padding: 10px 12px; border: 1px solid #e2e5ea; border-radius: 4px; background: #fafbfc; }
+  .searchBar label { color: #666; }
+  .searchBar select, .searchBar input[type="text"] {
+    height: 30px; padding: 0 8px; border: 1px solid #c9ced6; border-radius: 3px; background: #fff;
+    font-size: 13px; color: #333; box-sizing: border-box; }
+  .searchBar .keyword { width: 220px; }
+  .button0_b { height: 30px; padding: 0 18px; border: 0; border-radius: 3px;
+               background: #1e6fd9; color: #fff; font-size: 13px; cursor: pointer; }
+  .button0_s { height: 30px; padding: 0 14px; border: 0; border-radius: 3px;
+               background: #1e6fd9; color: #fff; font-size: 13px; cursor: pointer; }
+  .button0_s + .button0_s { margin-left: 6px; }
+  .rptTable { width: 100%; margin-top: 12px; border-collapse: collapse; }
+  .rptTable th, .rptTable td { border: 1px solid #e2e5ea; padding: 8px; text-align: center; }
+  .rptTable th { background: #f2f5f9; font-weight: normal; color: #555; }
+  .rptTable td.cName { text-align: left; }
+
+  /* ===== 以下才是本次要加到 1111 網頁的樣式 ===== */
+
+  /* 篩選列：左邊選單、右邊報表按鈕，同一列垂直置中對齊 */
+  .rptToolBar {
+    display: flex;
+    align-items: center;      /* 「列印報表」「匯出報表」與選單同一水平線 */
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+  }
+  .rptToolBar::after { content: ""; display: block; clear: both; }
+
+  .rptToolBar .jobFilter { display: flex; align-items: center; gap: 6px; }
+  .rptToolBar .jobFilter .jfLabel { color: #333; white-space: nowrap; }
+
+  /* 職缺篩選下拉選單 */
+  .rptToolBar .jobFilter .jfSelect {
+    height: 30px;
+    min-width: 168px;
+    padding: 0 28px 0 10px;
+    border: 1px solid #c9ced6;
+    border-radius: 3px;
+    background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23666'/%3E%3C/svg%3E") no-repeat right 10px center;
+    font-size: 13px;
+    color: #333;
+    line-height: 28px;
+    box-sizing: border-box;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  .rptToolBar .jobFilter .jfSelect:focus { border-color: #1e6fd9; outline: none; }
+
+  /* 說明圖示（i） */
+  .rptToolBar .jobFilter .jfTip { position: relative; display: inline-flex; }
+  .rptToolBar .jobFilter .jfTipIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #9aa3ae;
+    border-radius: 50%;
+    background: #fff;
+    color: #6b7480;
+    font-size: 11px;
+    font-style: normal;
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+  }
+  .rptToolBar .jobFilter .jfTipIcon:hover,
+  .rptToolBar .jobFilter .jfTipIcon:focus { border-color: #1e6fd9; color: #1e6fd9; outline: none; }
+
+  /* tooltip 內容 */
+  .rptToolBar .jobFilter .jfTipBox {
+    position: absolute;
+    top: calc(100% + 9px);
+    left: 50%;
+    transform: translateX(-16px);
+    z-index: 999;
+    display: none;
+    min-width: 200px;
+    max-width: 280px;
+    padding: 7px 10px;
+    border: 1px solid #d8dde4;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
+    color: #d05a1e;             /* 說明文字顏色 */
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: left;
+    white-space: normal;
+    word-break: break-all;
+  }
+  /* 小三角形 */
+  .rptToolBar .jobFilter .jfTipBox::before,
+  .rptToolBar .jobFilter .jfTipBox::after {
+    content: "";
+    position: absolute;
+    left: 12px;
+    border: 6px solid transparent;
+  }
+  .rptToolBar .jobFilter .jfTipBox::before { top: -13px; border-bottom-color: #d8dde4; }
+  .rptToolBar .jobFilter .jfTipBox::after  { top: -12px; border-bottom-color: #fff; }
+
+  /* 滑鼠移入、鍵盤 focus、或點擊（加上 is-show）都會顯示 */
+  .rptToolBar .jobFilter .jfTip:hover .jfTipBox,
+  .rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
+  .rptToolBar .jobFilter .jfTipBox.is-show { display: block; }
+
+  /* 右側報表按鈕：在 flex 容器內不再需要 float，但保留原 class 不影響其他頁面 */
+  .rptToolBar .floatR { float: none; display: flex; align-items: center; }
+
+  /* 手機版：選單與按鈕各自成列 */
+  @media screen and (max-width: 640px) {
+    .rptToolBar { align-items: flex-start; }
+    .rptToolBar .floatR { width: 100%; justify-content: flex-end; }
+  }
+
+  /* 列印時不要印出工具列 */
+  @media print {
+    .rptToolBar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="demoWrap">
+
+  <!-- 上方查詢列（原網頁既有，僅為了測試呈現） -->
+  <div class="searchBar">
+    <label for="demoAttr">屬性：</label>
+    <select id="demoAttr"><option>全區</option></select>
+    <label for="demoStatus">職缺顯示狀態：</label>
+    <select id="demoStatus"><option>開啟</option></select>
+    <label for="demoDate">起始日期</label>
+    <input type="text" id="demoDate" value="2026/08/27" style="width:110px;">
+    <input type="text" class="keyword" placeholder="請輸入職缺名稱關鍵字">
+    <input type="button" class="button0_b" value="查詢">
+  </div>
+
+  <!-- ============ ↓↓↓ 從這裡開始，是要貼到 1111 網頁的區塊 ↓↓↓ ============ -->
+  <div class="rptToolBar">
+
+    <div class="jobFilter">
+      <span class="jfLabel">篩選：</span>
+      <select class="jfSelect" id="selJobFilter" aria-label="職缺篩選">
+        <option value="all">全部職缺</option>
+        <option value="hasData" selected>僅顯示有數據職缺</option>
+        <option value="mainApply">僅顯示有主投職缺</option>
+      </select>
+      <span class="jfTip">
+        <i class="jfTipIcon" id="jobFilterTipIcon" tabindex="0" role="button"
+           aria-label="篩選說明" aria-describedby="jobFilterTipBox">i</i>
+        <span class="jfTipBox" id="jobFilterTipBox" role="tooltip">數據指瀏覽統計、應徵統計、曝光數統計</span>
+      </span>
+    </div>
+
+    <div class="floatR">
+      <input type="button" class="button0_s" id="btnExport" value="匯出報表">
+      <input type="button" class="button0_s" id="btnPrint" value="列印報表">
+    </div>
+
+  </div>
+  <!-- ============ ↑↑↑ 貼到 1111 網頁的區塊到這裡結束 ↑↑↑ ============ -->
+
+  <!-- 下方報表（原網頁既有，僅為了測試呈現） -->
+  <table class="rptTable" id="demoTable">
+    <thead>
+      <tr><th>職缺名稱</th><th>瀏覽統計</th><th>應徵統計</th><th>曝光數統計</th><th>主投</th></tr>
+    </thead>
+    <tbody>
+      <tr data-has-data="1" data-main-apply="1"><td class="cName">WONG測試職缺（連江縣南竿鄉）</td><td>128</td><td>12</td><td>3,400</td><td>有</td></tr>
+      <tr data-has-data="1" data-main-apply="0"><td class="cName">前端工程師（台北市內湖區）</td><td>56</td><td>3</td><td>1,120</td><td>—</td></tr>
+      <tr data-has-data="0" data-main-apply="0"><td class="cName">倉管人員（新北市五股區）</td><td>0</td><td>0</td><td>0</td><td>—</td></tr>
+      <tr data-has-data="0" data-main-apply="1"><td class="cName">門市儲備幹部（台中市西屯區）</td><td>0</td><td>0</td><td>0</td><td>有</td></tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script>
+/* ===== 以下才是本次要加到 1111 網頁的 JS ===== */
+(function () {
+  /* tooltip：手機沒有 hover，用點擊切換；點空白處關閉 */
+  var tipIcon = document.getElementById('jobFilterTipIcon');
+  var tipBox  = document.getElementById('jobFilterTipBox');
+  if (tipIcon && tipBox) {
+    tipIcon.addEventListener('click', function (e) {
+      e.stopPropagation();
+      tipBox.classList.toggle('is-show');
+    });
+    document.addEventListener('click', function () {
+      tipBox.classList.remove('is-show');
+    });
+    tipIcon.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { tipBox.classList.remove('is-show'); tipIcon.blur(); }
+    });
+  }
+
+  /* 篩選下拉：這裡示範前端過濾，正式站請改成呼叫原本的查詢／AJAX */
+  var sel = document.getElementById('selJobFilter');
+  if (sel) {
+    sel.addEventListener('change', function () {
+      var v = this.value;
+      var rows = document.querySelectorAll('#demoTable tbody tr');
+      for (var i = 0; i < rows.length; i++) {
+        var hasData = rows[i].getAttribute('data-has-data') === '1';
+        var isMain  = rows[i].getAttribute('data-main-apply') === '1';
+        var show = (v === 'all') || (v === 'hasData' && hasData) || (v === 'mainApply' && isMain);
+        rows[i].style.display = show ? '' : 'none';
+      }
+    });
+    sel.dispatchEvent(new Event('change'));
+  }
+
+  /* 報表按鈕（示範用） */
+  var btnPrint = document.getElementById('btnPrint');
+  if (btnPrint) { btnPrint.addEventListener('click', function () { window.print(); }); }
+  var btnExport = document.getElementById('btnExport');
+  if (btnExport) { btnExport.addEventListener('click', function () { alert('匯出報表'); }); }
+})();
+</script>
+
+</body>
+</html>
