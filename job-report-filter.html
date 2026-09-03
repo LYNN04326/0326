@@ -173,7 +173,7 @@
   </div>
 
   <!-- ============ ↓↓↓ 從這裡開始，是要貼到 1111 網頁的區塊 ↓↓↓ ============ -->
-  <div class="rptToolBar">
+  <div class="rptToolBar" id="rptToolBar">
 
     <div class="jobFilter">
       <span class="jfLabel">篩選：</span>
@@ -215,6 +215,19 @@
 <script>
 /* ===== 以下才是本次要加到 1111 網頁的 JS ===== */
 (function () {
+  /* 保險：若本區塊被貼在 searchmail／intro 等容器「裡面」，自動搬到該容器之後，避免重疊 */
+  var bar = document.getElementById('rptToolBar');
+  if (bar) {
+    var host = bar.parentNode;
+    while (host && host.nodeType === 1 && host !== document.body) {
+      if (/(^|\s)(searchmail|intro|floatL|floatR)(\s|$)/.test(host.className || '')) {
+        host.parentNode.insertBefore(bar, host.nextSibling);
+        break;
+      }
+      host = host.parentNode;
+    }
+  }
+
   /* tooltip：手機沒有 hover，用點擊切換；點空白處關閉 */
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');
