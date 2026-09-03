@@ -34,6 +34,8 @@
 .rptToolBar .jobFilter .jfTip:hover .jfTipBox,
 .rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
 .rptToolBar .jobFilter .jfTipBox.is-show{display:block;}
+/* 版型B：整組靠右（把 class="rptToolBar" 改成 class="rptToolBar alignRight" 即可切換） */
+.rptToolBar.alignRight{justify-content:flex-end;gap:16px;}
 /* 右側按鈕：在 flex 容器內不用 float，仍保留原 class */
 .rptToolBar .floatR{float:none;display:flex;align-items:center;}
 @media screen and (max-width:640px){
