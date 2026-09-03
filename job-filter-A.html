@@ -1,5 +1,5 @@
 <style>
-.rptToolBar{clear:both;width:100%;flex:1 0 100%;min-width:0;max-width:none;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:8px 0 2px;padding:0;}
+.rptToolBar{clear:both;width:100%;flex:1 0 100%;min-width:0;max-width:none;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:10px 0;padding:0;}
 .rptToolBar::after{content:"";display:table;clear:both;}
 .rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
 .rptToolBar .jobFilter .jfLabel{color:#333;font-weight:bold;white-space:nowrap;}
@@ -16,7 +16,6 @@
 .rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
 .rptToolBar .jobFilter .jfTipBox.is-show{display:block;}
 .rptToolBar .floatR{float:none;display:flex;align-items:center;}
-.searchmail{height:auto;}
 @media screen and (max-width:640px){
   .rptToolBar{align-items:flex-start;}
   .rptToolBar .floatR{width:100%;justify-content:flex-end;}
@@ -24,7 +23,7 @@
 @media print{ .rptToolBar{display:none;} }
 </style>
 
-<div class="rptToolBar">
+<div class="rptToolBar" id="rptToolBar">
   <div class="jobFilter">
     <span class="jfLabel">篩選：</span>
     <select class="jfSelect" id="selJobFilter" aria-label="職缺篩選">
@@ -56,11 +55,31 @@
       if (e.key === 'Escape') { tipBox.classList.remove('is-show'); tipIcon.blur(); }
     });
   }
+
   var sel = document.getElementById('selJobFilter');
   if (sel) {
     sel.addEventListener('change', function () {
       // TODO: 改為呼叫既有查詢／AJAX，帶入 this.value（all / hasData / mainApply）
     });
   }
+
+  // 對齊查詢列（.searchmail .floatL 那一排）的左右邊界；版型裡若已能對齊可整段刪除
+  function alignToSearchRow() {
+    var bar = document.getElementById('rptToolBar');
+    var ref = document.querySelector('.searchmail .floatL');
+    if (!bar || !ref || !bar.parentNode || ref.offsetParent === null) return;
+    var rr = ref.getBoundingClientRect();
+    if (!rr.width) return;
+    var p  = bar.parentNode;
+    var cs = window.getComputedStyle(p);
+    var pr = p.getBoundingClientRect();
+    var left = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.paddingLeft) || 0);
+    bar.style.width = rr.width + 'px';
+    bar.style.marginLeft = (rr.left - left) + 'px';
+    bar.style.marginRight = '0';
+  }
+  alignToSearchRow();
+  window.addEventListener('load', alignToSearchRow);
+  window.addEventListener('resize', alignToSearchRow);
 })();
 </script>
