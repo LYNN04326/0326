@@ -10,7 +10,7 @@
      ============================================================ -->
 <style>
 /* 篩選列：整組靠右，與查詢列同一容器所以右邊界一致 */
-.rptToolBar{clear:both;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:16px;min-height:34px;margin:8px 0 2px;padding:0;}
+.rptToolBar{clear:both;width:100%;flex:1 0 100%;min-width:0;max-width:none;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:16px;min-height:34px;margin:8px 0 2px;padding:0;}
 .rptToolBar::before{content:"";display:table;clear:both;}
 .rptToolBar::after{content:"";display:table;clear:both;}
 .rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
@@ -69,20 +69,54 @@
     var r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
   }
-  /* 位置保險：確保本區塊位於「看得見的」查詢列 .searchmail 之內（同一容器＝左右自然對齊） */
+  function closestBy(el, cls) {
+    while (el && el.nodeType === 1) {
+      if ((' ' + (el.className || '') + ' ').indexOf(' ' + cls + ' ') > -1) return el;
+      el = el.parentNode;
+    }
+    return null;
+  }
+  function visibleSearchmail() {
+    var list = document.querySelectorAll('.searchmail');
+    for (var i = 0; i < list.length; i++) { if (visible(list[i])) return list[i]; }
+    return null;
+  }
+  /* 位置保險：確保本區塊位於「看得見的」查詢列 .searchmail 之內 */
   function place() {
     var bar = document.getElementById('rptToolBar');
     if (!bar) return;
-    var list = document.querySelectorAll('.searchmail'), i, c;
-    for (i = 0; i < list.length; i++) {
-      c = list[i];
-      if (!visible(c) || bar.contains(c)) continue;
-      if (c.lastElementChild !== bar) { c.appendChild(bar); }
-      return;
-    }
+    var sm = visibleSearchmail();
+    if (!sm || bar.contains(sm)) return;
+    if (sm.lastElementChild !== bar) { sm.appendChild(bar); }
   }
-  place();
-  if (document.readyState !== 'complete') { window.addEventListener('load', place); }
+  /* 對齊：量測查詢列那排（.floatL）的實際左右邊界後套用，並覆蓋 flex 造成的壓縮 */
+  function align() {
+    var bar = document.getElementById('rptToolBar');
+    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
+    var sm  = closestBy(bar, 'searchmail') || visibleSearchmail();
+    if (!sm) return;
+    var ref = sm.querySelector('.floatL');
+    if (!ref || !visible(ref)) ref = sm;
+    var rr = ref.getBoundingClientRect();
+    if (!rr.width) return;
+    var p  = bar.parentNode;
+    var cs = window.getComputedStyle(p);
+    var pr = p.getBoundingClientRect();
+    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.paddingLeft) || 0);
+    bar.style.flex = '0 0 auto';
+    bar.style.minWidth = '0';
+    bar.style.maxWidth = 'none';
+    bar.style.width = rr.width + 'px';
+    bar.style.marginLeft = (rr.left - contentLeft) + 'px';
+    bar.style.marginRight = '0';
+  }
+  function run() { place(); align(); }
+
+  run();
+  if (document.readyState !== 'complete') { window.addEventListener('load', run); }
+  window.addEventListener('resize', align);
+  setTimeout(run, 300);
+  setTimeout(run, 1200);
 
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');

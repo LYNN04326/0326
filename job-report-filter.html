@@ -6,7 +6,7 @@
 <title>職缺成效報表－篩選選單（測試頁）</title>
 <style>
 /* 篩選列：左右兩端對齊，與查詢列同一容器所以邊界一致 */
-.rptToolBar{clear:both;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:8px 0 2px;padding:0;}
+.rptToolBar{clear:both;width:100%;flex:1 0 100%;min-width:0;max-width:none;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:8px 0 2px;padding:0;}
 .rptToolBar::before{content:"";display:table;clear:both;}
 .rptToolBar::after{content:"";display:table;clear:both;}
 .rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
@@ -35,29 +35,29 @@
 @media print{ .rptToolBar{display:none;} }
 </style>
 <style>
-  body { margin:0; padding:16px; background:#fff; font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif; font-size:13px; color:#333; }
-  .demoWrap { max-width:980px; margin:0 auto; }
-  .intro { padding:10px 12px; background:#eaf3fb; color:#1a5fb4; }
-  .searchmail { margin-top:10px; padding:8px 10px; border:1px solid #cfd6de; background:#eef3f8; height:40px; }
-  .searchmail .floatL { float:left; display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
-  .searchmail label { color:#444; }
-  .searchmail select, .searchmail input[type="text"] { height:28px; padding:0 8px; border:1px solid #c9ced6; border-radius:3px; background:#fff; font-size:13px; color:#333; box-sizing:border-box; }
-  .searchmail .keyword { width:230px; }
-  .button0_b { height:28px; padding:0 16px; border:0; border-radius:3px; background:#1e6fd9; color:#fff; font-size:13px; cursor:pointer; }
-  .button0_s { height:28px; padding:0 14px; border:0; border-radius:3px; background:#1e6fd9; color:#fff; font-size:13px; cursor:pointer; }
-  .button0_s + .button0_s { margin-left:6px; }
-  .jobHead { margin-top:10px; padding:8px 10px; background:#fdf7ea; overflow:hidden; }
-  .jobHead p { margin:3px 0; }
-  .jobHead .jobName { float:left; color:#1a5fb4; font-weight:bold; }
-  .jobHead .jobDate { clear:both; color:#444; }
-  .jobHead .jobNote { color:#d05a1e; }
-  .rptTable { width:100%; margin-top:8px; border-collapse:collapse; }
-  .rptTable th,.rptTable td { border:1px solid #e2e5ea; padding:8px; text-align:center; }
-  .rptTable th { background:#eaf3fb; font-weight:normal; color:#555; }
-  .rptTable td.cName { text-align:left; }
-  .switcher { margin-top:14px; padding:8px 10px; border:1px dashed #c9ced6; color:#666; }
-  /* 版型B：整組靠右 */
-  .rptToolBar.alignRight { justify-content:flex-end; gap:16px; }
+  body{margin:0;padding:16px;background:#fff;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;font-size:13px;color:#333;}
+  .demoWrap{max-width:980px;margin:0 auto;}
+  .intro{padding:10px 12px;background:#eaf3fb;color:#1a5fb4;}
+  /* 故意做成 flex+置中+固定高度，重現實際頁面把篩選列壓縮置中的情況 */
+  .searchmail{margin-top:10px;padding:8px 10px;border:1px solid #cfd6de;background:#eef3f8;height:40px;display:flex;flex-wrap:wrap;justify-content:center;}
+  .searchmail .floatL{float:left;display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+  .searchmail label{color:#444;}
+  .searchmail select,.searchmail input[type="text"]{height:28px;padding:0 8px;border:1px solid #c9ced6;border-radius:3px;background:#fff;font-size:13px;color:#333;box-sizing:border-box;}
+  .searchmail .keyword{width:230px;}
+  .button0_b{height:28px;padding:0 16px;border:0;border-radius:3px;background:#1e6fd9;color:#fff;font-size:13px;cursor:pointer;}
+  .button0_s{height:28px;padding:0 14px;border:0;border-radius:3px;background:#1e6fd9;color:#fff;font-size:13px;cursor:pointer;}
+  .button0_s + .button0_s{margin-left:6px;}
+  .jobHead{margin-top:10px;padding:8px 10px;background:#fdf7ea;overflow:hidden;}
+  .jobHead p{margin:3px 0;}
+  .jobHead .jobName{float:left;color:#1a5fb4;font-weight:bold;}
+  .jobHead .jobDate{clear:both;color:#444;}
+  .jobHead .jobNote{color:#d05a1e;}
+  .rptTable{width:100%;margin-top:8px;border-collapse:collapse;}
+  .rptTable th,.rptTable td{border:1px solid #e2e5ea;padding:8px;text-align:center;}
+  .rptTable th{background:#eaf3fb;font-weight:normal;color:#555;}
+  .rptTable td.cName{text-align:left;}
+  .switcher{margin-top:14px;padding:8px 10px;border:1px dashed #c9ced6;color:#666;}
+  .rptToolBar.alignRight{justify-content:flex-end;gap:16px;}
 </style>
 </head>
 <body>
@@ -66,7 +66,6 @@
 
   <div class="intro">【說明】本紀錄系統僅保留90天。</div>
 
-  <!-- 查詢列（原網頁既有；故意設 height:40px 重現高度被寫死的情況） -->
   <div class="searchmail ">
     <div class="floatL">
       <label for="demoAttr">屬性：</label>
@@ -80,7 +79,7 @@
     </div>
     <br>
 
-    <!-- ====== ↓↓↓ 要貼到 1111 網頁的區塊（貼在 searchmail 裡面的最後面） ↓↓↓ ====== -->
+    <!-- ====== ↓↓↓ 要貼到 1111 網頁的區塊 ↓↓↓ ====== -->
 <div class="rptToolBar" id="rptToolBar">
 
   <div class="jobFilter">
@@ -107,7 +106,6 @@
     <!-- ====== ↑↑↑ 區塊到這裡結束 ↑↑↑ ====== -->
   </div>
 
-  <!-- 職缺標題區塊（原網頁既有，內部元素是浮動的） -->
   <div class="jobHead">
     <p class="jobName">➜ WONG測試職缺（連江縣南竿鄉）</p>
     <p class="jobDate">➜ 新增日：2026-06-05 15:03 ➜ 修改日：2026-09-03 15:18</p>
@@ -140,20 +138,54 @@
     var r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
   }
-  /* 位置保險：確保本區塊位於「看得見的」查詢列 .searchmail 之內（同一容器＝左右自然對齊） */
+  function closestBy(el, cls) {
+    while (el && el.nodeType === 1) {
+      if ((' ' + (el.className || '') + ' ').indexOf(' ' + cls + ' ') > -1) return el;
+      el = el.parentNode;
+    }
+    return null;
+  }
+  function visibleSearchmail() {
+    var list = document.querySelectorAll('.searchmail');
+    for (var i = 0; i < list.length; i++) { if (visible(list[i])) return list[i]; }
+    return null;
+  }
+  /* 位置保險：確保本區塊位於「看得見的」查詢列 .searchmail 之內 */
   function place() {
     var bar = document.getElementById('rptToolBar');
     if (!bar) return;
-    var list = document.querySelectorAll('.searchmail'), i, c;
-    for (i = 0; i < list.length; i++) {
-      c = list[i];
-      if (!visible(c) || bar.contains(c)) continue;
-      if (c.lastElementChild !== bar) { c.appendChild(bar); }
-      return;
-    }
+    var sm = visibleSearchmail();
+    if (!sm || bar.contains(sm)) return;
+    if (sm.lastElementChild !== bar) { sm.appendChild(bar); }
   }
-  place();
-  if (document.readyState !== 'complete') { window.addEventListener('load', place); }
+  /* 對齊：量測查詢列那排（.floatL）的實際左右邊界後套用，並覆蓋 flex 造成的壓縮 */
+  function align() {
+    var bar = document.getElementById('rptToolBar');
+    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
+    var sm  = closestBy(bar, 'searchmail') || visibleSearchmail();
+    if (!sm) return;
+    var ref = sm.querySelector('.floatL');
+    if (!ref || !visible(ref)) ref = sm;
+    var rr = ref.getBoundingClientRect();
+    if (!rr.width) return;
+    var p  = bar.parentNode;
+    var cs = window.getComputedStyle(p);
+    var pr = p.getBoundingClientRect();
+    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.paddingLeft) || 0);
+    bar.style.flex = '0 0 auto';
+    bar.style.minWidth = '0';
+    bar.style.maxWidth = 'none';
+    bar.style.width = rr.width + 'px';
+    bar.style.marginLeft = (rr.left - contentLeft) + 'px';
+    bar.style.marginRight = '0';
+  }
+  function run() { place(); align(); }
+
+  run();
+  if (document.readyState !== 'complete') { window.addEventListener('load', run); }
+  window.addEventListener('resize', align);
+  setTimeout(run, 300);
+  setTimeout(run, 1200);
 
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');
