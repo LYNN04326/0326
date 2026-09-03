@@ -21,6 +21,11 @@
   .button0_s { height: 30px; padding: 0 14px; border: 0; border-radius: 3px;
                background: #1e6fd9; color: #fff; font-size: 13px; cursor: pointer; }
   .button0_s + .button0_s { margin-left: 6px; }
+  .jobHead { margin-top: 10px; padding: 8px 10px; border: 1px solid #e2e5ea; background: #fdf7ea; overflow: hidden; }
+  .jobHead p { margin: 3px 0; }
+  .jobHead .jobName { float: left; color: #1a5fb4; font-weight: bold; }
+  .jobHead .jobDate { clear: both; color: #444; }
+  .jobHead .jobNote { color: #d05a1e; }
   .rptTable { width: 100%; margin-top: 12px; border-collapse: collapse; }
   .rptTable th, .rptTable td { border: 1px solid #e2e5ea; padding: 8px; text-align: center; }
   .rptTable th { background: #f2f5f9; font-weight: normal; color: #555; }
@@ -30,14 +35,22 @@
 
   /* 篩選列：左邊選單、右邊報表按鈕，同一列垂直置中對齊 */
   .rptToolBar {
+    clear: both;              /* 清除標題列的浮動，避免壓到「新增日／修改日」那行 */
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
     display: flex;
     align-items: center;      /* 「列印報表」「匯出報表」與選單同一水平線 */
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 8px;
+    min-height: 34px;
     margin: 10px 0;
+    padding: 0;
   }
-  .rptToolBar::after { content: ""; display: block; clear: both; }
+  .rptToolBar::before { content: ""; display: table; clear: both; }
+  .rptToolBar::after  { content: ""; display: table; clear: both; }
 
   .rptToolBar .jobFilter { display: flex; align-items: center; gap: 6px; }
   .rptToolBar .jobFilter .jfLabel { color: #333; white-space: nowrap; }
@@ -150,6 +163,13 @@
     <input type="text" id="demoDate" value="2026/08/27" style="width:110px;">
     <input type="text" class="keyword" placeholder="請輸入職缺名稱關鍵字">
     <input type="button" class="button0_b" value="查詢">
+  </div>
+
+  <!-- 職缺標題區塊（原網頁既有，內部元素是浮動的，僅為了測試呈現） -->
+  <div class="jobHead">
+    <p class="jobName">➜ WONG測試職缺（連江縣南竿鄉）</p>
+    <p class="jobDate">➜ 新增日：2026-06-05 15:03 ➜ 修改日：2026-09-03 15:18</p>
+    <p class="jobNote">➜ 曝光數(主網與app搜尋頁真實數據）僅供內部IP檢視，若廠商有需求，請自行斟酌是否有提供的必要性。</p>
   </div>
 
   <!-- ============ ↓↓↓ 從這裡開始，是要貼到 1111 網頁的區塊 ↓↓↓ ============ -->

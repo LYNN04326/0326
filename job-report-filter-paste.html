@@ -1,12 +1,18 @@
 <!-- ============================================================
      用途：取代 1111 職缺成效報表原本的
            <div class="floatR"> …匯出報表／列印報表… </div>
-     位置：貼在「查詢列」下方、報表表格上方（原 floatR 那一行）
+
+     步驟1：把原本標題那一行裡的 <div class="floatR">…</div> 整段刪掉
+     步驟2：把本段貼在「職缺標題區塊（含新增日／修改日／曝光數說明）
+            的結束標籤之後、報表 <table> 之前」──
+            也就是標題區塊「外面」，不要貼在標題那個 div 裡面，
+            否則會被標題列的浮動元素壓到而重疊。
      ============================================================ -->
 <style>
 /* 篩選列：左邊選單、右邊報表按鈕，同一列垂直置中對齊 */
-.rptToolBar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin:10px 0;}
-.rptToolBar::after{content:"";display:block;clear:both;}
+.rptToolBar{clear:both;position:relative;z-index:1;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:10px 0;padding:0;}
+.rptToolBar::before{content:"";display:table;clear:both;}
+.rptToolBar::after{content:"";display:table;clear:both;}
 .rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
 .rptToolBar .jobFilter .jfLabel{color:#333;white-space:nowrap;}
 .rptToolBar .jobFilter .jfSelect{height:30px;min-width:168px;padding:0 28px 0 10px;border:1px solid #c9ced6;border-radius:3px;background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23666'/%3E%3C/svg%3E") no-repeat right 10px center;font-size:13px;color:#333;line-height:28px;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;}
