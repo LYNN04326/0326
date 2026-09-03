@@ -1,0 +1,66 @@
+<style>
+.rptToolBar{clear:both;width:100%;flex:1 0 100%;min-width:0;max-width:none;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:8px 0 2px;padding:0;}
+.rptToolBar::after{content:"";display:table;clear:both;}
+.rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
+.rptToolBar .jobFilter .jfLabel{color:#333;font-weight:bold;white-space:nowrap;}
+.rptToolBar .jobFilter .jfSelect{height:30px;min-width:168px;padding:0 28px 0 10px;border:1px solid #c9ced6;border-radius:3px;background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23666'/%3E%3C/svg%3E") no-repeat right 10px center;font-size:13px;color:#333;line-height:28px;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;}
+.rptToolBar .jobFilter .jfSelect:focus{border-color:#1e6fd9;outline:none;}
+.rptToolBar .jobFilter .jfTip{position:relative;display:inline-flex;}
+.rptToolBar .jobFilter .jfTipIcon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid #9aa3ae;border-radius:50%;background:#fff;color:#6b7480;font-size:11px;font-style:normal;font-family:Georgia,"Times New Roman",serif;line-height:1;cursor:pointer;user-select:none;}
+.rptToolBar .jobFilter .jfTipIcon:hover,.rptToolBar .jobFilter .jfTipIcon:focus{border-color:#1e6fd9;color:#1e6fd9;outline:none;}
+.rptToolBar .jobFilter .jfTipBox{position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-16px);z-index:999;display:none;min-width:200px;max-width:280px;padding:7px 10px;border:1px solid #d8dde4;border-radius:3px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#d05a1e;font-size:12px;line-height:1.5;text-align:left;white-space:normal;word-break:break-all;}
+.rptToolBar .jobFilter .jfTipBox::before,.rptToolBar .jobFilter .jfTipBox::after{content:"";position:absolute;left:12px;border:6px solid transparent;}
+.rptToolBar .jobFilter .jfTipBox::before{top:-13px;border-bottom-color:#d8dde4;}
+.rptToolBar .jobFilter .jfTipBox::after{top:-12px;border-bottom-color:#fff;}
+.rptToolBar .jobFilter .jfTip:hover .jfTipBox,
+.rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
+.rptToolBar .jobFilter .jfTipBox.is-show{display:block;}
+.rptToolBar .floatR{float:none;display:flex;align-items:center;}
+.searchmail{height:auto;}
+@media screen and (max-width:640px){
+  .rptToolBar{align-items:flex-start;}
+  .rptToolBar .floatR{width:100%;justify-content:flex-end;}
+}
+@media print{ .rptToolBar{display:none;} }
+</style>
+
+<div class="rptToolBar">
+  <div class="jobFilter">
+    <span class="jfLabel">篩選：</span>
+    <select class="jfSelect" id="selJobFilter" aria-label="職缺篩選">
+      <option value="all">全部職缺</option>
+      <option value="hasData" selected>僅顯示有數據職缺</option>
+      <option value="mainApply">僅顯示有主投職缺</option>
+    </select>
+    <span class="jfTip">
+      <i class="jfTipIcon" id="jobFilterTipIcon" tabindex="0" role="button"
+         aria-label="篩選說明" aria-describedby="jobFilterTipBox">i</i>
+      <span class="jfTipBox" id="jobFilterTipBox" role="tooltip">數據指瀏覽統計、應徵統計、曝光數統計</span>
+    </span>
+  </div>
+
+  <div class="floatR">
+    <input type="button" class="button0_s" id="btnExport" value="匯出報表">
+    <input type="button" class="button0_s" id="btnPrint" value="列印報表">
+  </div>
+</div>
+
+<script>
+(function () {
+  var tipIcon = document.getElementById('jobFilterTipIcon');
+  var tipBox  = document.getElementById('jobFilterTipBox');
+  if (tipIcon && tipBox) {
+    tipIcon.addEventListener('click', function (e) { e.stopPropagation(); tipBox.classList.toggle('is-show'); });
+    document.addEventListener('click', function () { tipBox.classList.remove('is-show'); });
+    tipIcon.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { tipBox.classList.remove('is-show'); tipIcon.blur(); }
+    });
+  }
+  var sel = document.getElementById('selJobFilter');
+  if (sel) {
+    sel.addEventListener('change', function () {
+      // TODO: 改為呼叫既有查詢／AJAX，帶入 this.value（all / hasData / mainApply）
+    });
+  }
+})();
+</script>
