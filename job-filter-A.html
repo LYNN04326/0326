@@ -8,7 +8,7 @@
 .rptToolBar .jobFilter .jfTip{position:relative;display:inline-flex;}
 .rptToolBar .jobFilter .jfTipIcon{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid #9aa3ae;border-radius:50%;background:#fff;color:#6b7480;font-size:11px;font-style:normal;font-family:Georgia,"Times New Roman",serif;line-height:1;cursor:pointer;user-select:none;}
 .rptToolBar .jobFilter .jfTipIcon:hover,.rptToolBar .jobFilter .jfTipIcon:focus{border-color:#1e6fd9;color:#1e6fd9;outline:none;}
-.rptToolBar .jobFilter .jfTipBox{position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-16px);z-index:999;display:none;min-width:200px;max-width:280px;padding:7px 10px;border:1px solid #d8dde4;border-radius:3px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#d05a1e;font-size:12px;line-height:1.5;text-align:left;white-space:normal;word-break:break-all;}
+.rptToolBar .jobFilter .jfTipBox{position:absolute;top:calc(100% + 9px);left:50%;transform:translateX(-16px);z-index:999;display:none;min-width:200px;max-width:280px;padding:7px 10px;border:1px solid #d8dde4;border-radius:3px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15);color:#000;font-size:12px;line-height:1.5;text-align:left;white-space:normal;word-break:break-all;}
 .rptToolBar .jobFilter .jfTipBox::before,.rptToolBar .jobFilter .jfTipBox::after{content:"";position:absolute;left:12px;border:6px solid transparent;}
 .rptToolBar .jobFilter .jfTipBox::before{top:-13px;border-bottom-color:#d8dde4;}
 .rptToolBar .jobFilter .jfTipBox::after{top:-12px;border-bottom-color:#fff;}
@@ -63,6 +63,18 @@
     });
   }
 
+  // 確保區塊位於查詢列容器之外（放在容器內會因其固定高度而溢出、壓到下方文字）
+  function moveOutOfSearchmail() {
+    var bar = document.getElementById('rptToolBar'), el = bar && bar.parentNode;
+    while (el && el.nodeType === 1) {
+      if ((' ' + (el.className || '') + ' ').indexOf(' searchmail ') > -1) {
+        el.parentNode.insertBefore(bar, el.nextSibling);
+        return;
+      }
+      el = el.parentNode;
+    }
+  }
+
   // 對齊查詢列（.searchmail .floatL 那一排）的左右邊界；版型裡若已能對齊可整段刪除
   function alignToSearchRow() {
     var bar = document.getElementById('rptToolBar');
@@ -78,8 +90,9 @@
     bar.style.marginLeft = (rr.left - left) + 'px';
     bar.style.marginRight = '0';
   }
+  moveOutOfSearchmail();
   alignToSearchRow();
-  window.addEventListener('load', alignToSearchRow);
+  window.addEventListener('load', function () { moveOutOfSearchmail(); alignToSearchRow(); });
   window.addEventListener('resize', alignToSearchRow);
 })();
 </script>
