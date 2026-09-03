@@ -17,7 +17,7 @@
      ============================================================ -->
 <style>
 /* 篩選列：左邊選單、右邊報表按鈕，同一列垂直置中對齊 */
-.rptToolBar{clear:both;position:relative;z-index:1;width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:10px 0;padding:0;}
+.rptToolBar{clear:both;position:relative;z-index:1;width:100%;max-width:none;flex:0 0 auto;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;min-height:34px;margin:10px 0;padding:0;}
 .rptToolBar::before{content:"";display:table;clear:both;}
 .rptToolBar::after{content:"";display:table;clear:both;}
 .rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
@@ -90,8 +90,27 @@
       }
     }
   }
-  place();
-  if (document.readyState !== 'complete') { window.addEventListener('load', place); }
+  /* 左右對齊：把寬度與左邊界對齊查詢列 .searchmail */
+  function align() {
+    var bar = document.getElementById('rptToolBar');
+    var sm  = document.querySelector('.searchmail');
+    if (!bar || !sm || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
+    bar.style.width = ''; bar.style.marginLeft = ''; bar.style.marginRight = '';
+    var sr = sm.getBoundingClientRect();
+    if (!sr.width) return;
+    var pr = bar.parentNode.getBoundingClientRect();
+    var cs = window.getComputedStyle(bar.parentNode);
+    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.paddingLeft) || 0);
+    bar.style.width = sr.width + 'px';
+    bar.style.marginLeft = (sr.left - contentLeft) + 'px';
+    bar.style.marginRight = '0';
+  }
+
+  place(); align();
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', function () { place(); align(); });
+  }
+  window.addEventListener('resize', align);
 
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');
