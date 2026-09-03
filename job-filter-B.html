@@ -1,6 +1,5 @@
 <style>
 .rptToolBar{clear:both;width:100%;flex:1 0 100%;min-width:0;max-width:none;box-sizing:border-box;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:16px;min-height:34px;margin:8px 0 0;padding:0;}
-.rptToolBar::after{content:"";display:table;clear:both;}
 .rptToolBar .jobFilter{display:flex;align-items:center;gap:6px;}
 .rptToolBar .jobFilter .jfLabel{color:#333;font-weight:bold;white-space:nowrap;}
 .rptToolBar .jobFilter .jfSelect{height:30px;min-width:168px;padding:0 28px 0 10px;border:1px solid #c9ced6;border-radius:3px;background:#fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23666'/%3E%3C/svg%3E") no-repeat right 10px center;font-size:13px;color:#333;line-height:28px;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;-moz-appearance:none;appearance:none;}
@@ -63,46 +62,5 @@
     });
   }
 
-  // 位置：移到查詢列容器之外，避免被其固定高度夾住而壓到下方文字
-  function moveOut() {
-    var bar = document.getElementById('rptToolBar'), el = bar && bar.parentNode;
-    while (el && el.nodeType === 1) {
-      if ((' ' + (el.className || '') + ' ').indexOf(' searchmail ') > -1) {
-        el.parentNode.insertBefore(bar, el.nextSibling);
-        return;
-      }
-      el = el.parentNode;
-    }
-  }
-
-  // 對齊：寬度與左邊界對齊查詢列內框（左＝屬性、右＝查詢）
-  function align() {
-    var bar = document.getElementById('rptToolBar');
-    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
-    var list = document.querySelectorAll('.searchmail'), sm = null, i;
-    for (i = 0; i < list.length; i++) {
-      if (list[i].offsetParent !== null && list[i].getBoundingClientRect().width > 0) { sm = list[i]; break; }
-    }
-    if (!sm || bar.contains(sm)) return;
-    var scs = window.getComputedStyle(sm), sr = sm.getBoundingClientRect();
-    var l = sr.left  + (parseFloat(scs.borderLeftWidth)  || 0) + (parseFloat(scs.paddingLeft)  || 0);
-    var r = sr.right - (parseFloat(scs.borderRightWidth) || 0) - (parseFloat(scs.paddingRight) || 0);
-    if (r - l <= 0) return;
-    var p = bar.parentNode, pcs = window.getComputedStyle(p), pr = p.getBoundingClientRect();
-    var pl = pr.left + (parseFloat(pcs.borderLeftWidth) || 0) + (parseFloat(pcs.paddingLeft) || 0);
-    bar.style.flex = '0 0 auto';
-    bar.style.minWidth = '0';
-    bar.style.maxWidth = 'none';
-    bar.style.width = (r - l) + 'px';
-    bar.style.marginLeft = (l - pl) + 'px';
-    bar.style.marginRight = '0';
-  }
-
-  function run() { moveOut(); align(); }
-  run();
-  window.addEventListener('load', run);
-  window.addEventListener('resize', align);
-  setTimeout(run, 300);
-  setTimeout(run, 1200);
 })();
 </script>
