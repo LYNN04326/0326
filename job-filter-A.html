@@ -16,9 +16,6 @@
 .rptToolBar .jobFilter .jfTipIcon:focus + .jfTipBox,
 .rptToolBar .jobFilter .jfTipBox.is-show{display:block;}
 .rptToolBar .floatR{float:none;display:flex;align-items:center;}
-/* 查詢列容器高度被寫死時內容會溢出壓到下方文字，改為自動高度並補回清除浮動（維持原灰底框線） */
-.searchmail{height:auto!important;}
-.searchmail::after{content:"";display:table;clear:both;}
 @media screen and (max-width:640px){
   .rptToolBar{align-items:flex-start;}
   .rptToolBar .floatR{width:100%;justify-content:flex-end;}
@@ -66,26 +63,29 @@
     });
   }
 
-  // 對齊查詢列：量測該列所有輸入元件的最左／最右邊界（屬性 → 查詢），用 padding 對齊
+  // 對齊查詢列容器的內框（左內緣＝屬性、右內緣＝查詢）；版型裡若已能對齊可整段刪除
   function alignToSearchRow() {
     var bar = document.getElementById('rptToolBar');
-    if (!bar) return;
-    var sm = document.querySelector('.searchmail');
-    if (!sm || sm.offsetParent === null) return;
-    bar.style.paddingLeft = '0'; bar.style.paddingRight = '0';
-    var els = sm.querySelectorAll('input,select,button,textarea,a');
-    var minLeft = null, maxRight = null, i, r;
-    for (i = 0; i < els.length; i++) {
-      if (bar.contains(els[i]) || els[i].offsetParent === null) continue;
-      r = els[i].getBoundingClientRect();
-      if (!r.width) continue;
-      if (minLeft === null || r.left < minLeft) minLeft = r.left;
-      if (maxRight === null || r.right > maxRight) maxRight = r.right;
+    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
+    var list = document.querySelectorAll('.searchmail'), sm = null, i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i].offsetParent !== null && list[i].getBoundingClientRect().width > 0) { sm = list[i]; break; }
     }
-    if (minLeft === null) return;
-    var br = bar.getBoundingClientRect();
-    bar.style.paddingLeft  = Math.max(0, minLeft - br.left) + 'px';
-    bar.style.paddingRight = Math.max(0, br.right - maxRight) + 'px';
+    if (!sm || bar.contains(sm)) return;
+    var scs = window.getComputedStyle(sm), sr = sm.getBoundingClientRect();
+    var left  = sr.left  + (parseFloat(scs.borderLeftWidth)  || 0) + (parseFloat(scs.paddingLeft)  || 0);
+    var right = sr.right - (parseFloat(scs.borderRightWidth) || 0) - (parseFloat(scs.paddingRight) || 0);
+    if (right - left <= 0) return;
+    var p = bar.parentNode, pcs = window.getComputedStyle(p), pr = p.getBoundingClientRect();
+    var pLeft = pr.left + (parseFloat(pcs.borderLeftWidth) || 0) + (parseFloat(pcs.paddingLeft) || 0);
+    bar.style.flex = '0 0 auto';
+    bar.style.minWidth = '0';
+    bar.style.maxWidth = 'none';
+    bar.style.paddingLeft = '0';
+    bar.style.paddingRight = '0';
+    bar.style.width = (right - left) + 'px';
+    bar.style.marginLeft = (left - pLeft) + 'px';
+    bar.style.marginRight = '0';
   }
   alignToSearchRow();
   window.addEventListener('load', alignToSearchRow);
