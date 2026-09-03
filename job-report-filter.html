@@ -154,7 +154,7 @@
 <div class="demoWrap">
 
   <!-- 上方查詢列（原網頁既有，僅為了測試呈現） -->
-  <div class="searchBar">
+  <div class="searchBar searchmail">
     <label for="demoAttr">屬性：</label>
     <select id="demoAttr"><option>全區</option></select>
     <label for="demoStatus">職缺顯示狀態：</label>
@@ -215,18 +215,27 @@
 <script>
 /* ===== 以下才是本次要加到 1111 網頁的 JS ===== */
 (function () {
-  /* 保險：若本區塊被貼在 searchmail／intro 等容器「裡面」，自動搬到該容器之後，避免重疊 */
-  var bar = document.getElementById('rptToolBar');
-  if (bar) {
-    var host = bar.parentNode;
-    while (host && host.nodeType === 1 && host !== document.body) {
-      if (/(^|\s)(searchmail|intro|floatL|floatR)(\s|$)/.test(host.className || '')) {
-        host.parentNode.insertBefore(bar, host.nextSibling);
-        break;
+  /* 位置保險：不論貼在哪，都把整塊搬到查詢列 .searchmail 之後（找不到就插在報表表格之前） */
+  function place() {
+    var bar = document.getElementById('rptToolBar');
+    if (!bar) return;
+    var sm = document.querySelector('.searchmail');
+    if (sm && !bar.contains(sm)) {
+      if (bar.previousElementSibling !== sm || bar.parentNode !== sm.parentNode) {
+        sm.parentNode.insertBefore(bar, sm.nextSibling);
       }
-      host = host.parentNode;
+      return;
+    }
+    var tbls = document.getElementsByTagName('table');
+    for (var i = 0; i < tbls.length; i++) {
+      if (/當週日期|當月日期|當日日期/.test(tbls[i].textContent || '')) {
+        tbls[i].parentNode.insertBefore(bar, tbls[i]);
+        return;
+      }
     }
   }
+  place();
+  if (document.readyState !== 'complete') { window.addEventListener('load', place); }
 
   /* tooltip：手機沒有 hover，用點擊切換；點空白處關閉 */
   var tipIcon = document.getElementById('jobFilterTipIcon');
