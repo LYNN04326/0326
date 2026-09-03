@@ -205,11 +205,27 @@
 <script>
 /* ===== 以下才是本次要加到 1111 網頁的 JS ===== */
 (function () {
-  /* 位置保險：不論貼在哪，都把整塊搬到查詢列 .searchmail 之後（找不到就插在報表表格之前） */
+  function visible(el) {
+    if (!el || el.offsetParent === null) return false;
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  }
+  /* 頁面上可能有多個 .searchmail（各分頁一個），只取看得見、且與篩選列同層的那個 */
+  function findRef(bar) {
+    var list = document.querySelectorAll('.searchmail'), first = null, i, c;
+    for (i = 0; i < list.length; i++) {
+      c = list[i];
+      if (!visible(c)) continue;
+      if (!first) first = c;
+      if (bar && c.parentNode === bar.parentNode) return c;
+    }
+    return first;
+  }
+  /* 位置保險：不論貼在哪，都把整塊搬到查詢列之後（找不到就插在報表表格之前） */
   function place() {
     var bar = document.getElementById('rptToolBar');
     if (!bar) return;
-    var sm = document.querySelector('.searchmail');
+    var sm = findRef(bar);
     if (sm && !bar.contains(sm)) {
       if (bar.previousElementSibling !== sm || bar.parentNode !== sm.parentNode) {
         sm.parentNode.insertBefore(bar, sm.nextSibling);
@@ -224,18 +240,22 @@
       }
     }
   }
-
-  /* 左右對齊：寬度與左邊界都對齊查詢列 .searchmail */
+  /* 左右對齊：寬度與左邊界都對齊查詢列；基準異常時退回滿版 */
   function align() {
     var bar = document.getElementById('rptToolBar');
-    var sm  = document.querySelector('.searchmail');
-    if (!bar || !sm || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
+    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
     bar.style.width = ''; bar.style.marginLeft = ''; bar.style.marginRight = '';
+    var p  = bar.parentNode;
+    var cs = window.getComputedStyle(p);
+    var padL = parseFloat(cs.paddingLeft) || 0;
+    var padR = parseFloat(cs.paddingRight) || 0;
+    var innerW = p.clientWidth - padL - padR;
+    var sm = findRef(bar);
+    if (!sm) return;
     var sr = sm.getBoundingClientRect();
-    if (!sr.width) return;
-    var pr = bar.parentNode.getBoundingClientRect();
-    var cs = window.getComputedStyle(bar.parentNode);
-    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.paddingLeft) || 0);
+    if (!sr.width || (innerW > 0 && sr.width < innerW * 0.6)) return;  /* 基準太窄就維持 width:100% */
+    var pr = p.getBoundingClientRect();
+    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + padL;
     bar.style.width = sr.width + 'px';
     bar.style.marginLeft = (sr.left - contentLeft) + 'px';
     bar.style.marginRight = '0';
@@ -246,8 +266,8 @@
     window.addEventListener('load', function () { place(); align(); });
   }
   window.addEventListener('resize', align);
+  setTimeout(align, 300);
 
-  /* tooltip：手機沒有 hover，用點擊切換；點空白處或 Esc 關閉 */
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');
   if (tipIcon && tipBox) {
@@ -257,8 +277,7 @@
       if (e.key === 'Escape') { tipBox.classList.remove('is-show'); tipIcon.blur(); }
     });
   }
-
-  /* 切換篩選條件時，正式站請改成呼叫原本的查詢／AJAX，例如 doSearch(this.value); */
+  /* 切換篩選條件時，請改成呼叫網站原本的查詢／AJAX，例如 doSearch(this.value); */
   var sel = document.getElementById('selJobFilter');
   if (sel) { sel.addEventListener('change', function () { /* doSearch(this.value); */ }); }
 
@@ -273,6 +292,7 @@
   }
 })();
 </script>
+
 
 </body>
 </html>

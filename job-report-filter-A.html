@@ -65,11 +65,27 @@
 
 <script>
 (function () {
-  /* 位置保險：不論貼在哪，都把整塊搬到查詢列 .searchmail 之後（找不到就插在報表表格之前） */
+  function visible(el) {
+    if (!el || el.offsetParent === null) return false;
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  }
+  /* 頁面上可能有多個 .searchmail（各分頁一個），只取看得見、且與篩選列同層的那個 */
+  function findRef(bar) {
+    var list = document.querySelectorAll('.searchmail'), first = null, i, c;
+    for (i = 0; i < list.length; i++) {
+      c = list[i];
+      if (!visible(c)) continue;
+      if (!first) first = c;
+      if (bar && c.parentNode === bar.parentNode) return c;
+    }
+    return first;
+  }
+  /* 位置保險：不論貼在哪，都把整塊搬到查詢列之後（找不到就插在報表表格之前） */
   function place() {
     var bar = document.getElementById('rptToolBar');
     if (!bar) return;
-    var sm = document.querySelector('.searchmail');
+    var sm = findRef(bar);
     if (sm && !bar.contains(sm)) {
       if (bar.previousElementSibling !== sm || bar.parentNode !== sm.parentNode) {
         sm.parentNode.insertBefore(bar, sm.nextSibling);
@@ -84,17 +100,22 @@
       }
     }
   }
-  /* 左右對齊：把寬度與左邊界對齊查詢列 .searchmail */
+  /* 左右對齊：寬度與左邊界都對齊查詢列；基準異常時退回滿版 */
   function align() {
     var bar = document.getElementById('rptToolBar');
-    var sm  = document.querySelector('.searchmail');
-    if (!bar || !sm || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
+    if (!bar || !bar.parentNode || bar.parentNode.nodeType !== 1) return;
     bar.style.width = ''; bar.style.marginLeft = ''; bar.style.marginRight = '';
+    var p  = bar.parentNode;
+    var cs = window.getComputedStyle(p);
+    var padL = parseFloat(cs.paddingLeft) || 0;
+    var padR = parseFloat(cs.paddingRight) || 0;
+    var innerW = p.clientWidth - padL - padR;
+    var sm = findRef(bar);
+    if (!sm) return;
     var sr = sm.getBoundingClientRect();
-    if (!sr.width) return;
-    var pr = bar.parentNode.getBoundingClientRect();
-    var cs = window.getComputedStyle(bar.parentNode);
-    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + (parseFloat(cs.paddingLeft) || 0);
+    if (!sr.width || (innerW > 0 && sr.width < innerW * 0.6)) return;  /* 基準太窄就維持 width:100% */
+    var pr = p.getBoundingClientRect();
+    var contentLeft = pr.left + (parseFloat(cs.borderLeftWidth) || 0) + padL;
     bar.style.width = sr.width + 'px';
     bar.style.marginLeft = (sr.left - contentLeft) + 'px';
     bar.style.marginRight = '0';
@@ -105,6 +126,7 @@
     window.addEventListener('load', function () { place(); align(); });
   }
   window.addEventListener('resize', align);
+  setTimeout(align, 300);
 
   var tipIcon = document.getElementById('jobFilterTipIcon');
   var tipBox  = document.getElementById('jobFilterTipBox');
