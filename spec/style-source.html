@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;padding:14px;background:#fff;font-family:"WenQuanYi Zen Hei","Microsoft JhengHei",Arial,sans-serif;color:#222;}
+  .wrap{position:relative;width:732px;height:317px;border:1px solid #e2e5ea;}
+  .wrap img{display:block;width:732px;height:317px;}
+  .box{position:absolute;border:2px solid #e8380d;border-radius:3px;}
+  .box.g{border-color:#2e9e4f;}
+  .num{position:absolute;width:20px;height:20px;border-radius:50%;background:#e8380d;color:#fff;
+       font-size:11.5px;font-weight:bold;display:flex;align-items:center;justify-content:center;}
+  .num.g{background:#2e9e4f;}
+  .legend{width:732px;margin:10px 0 0;font-size:12.5px;line-height:2;color:#333;}
+  .legend .k{display:inline-block;width:19px;height:19px;border-radius:50%;color:#fff;font-size:11px;
+             font-weight:bold;text-align:center;line-height:19px;margin-right:6px;vertical-align:-4px;}
+  .k1{background:#e8380d;} .kg{background:#2e9e4f;}
+  code{background:#f2f4f7;border:1px solid #e2e5ea;border-radius:3px;padding:0 5px;font-size:12px;}
+  h3{margin:0 0 10px;font-size:15px;padding-left:9px;border-left:4px solid #1e6fb8;}
+</style></head>
+<body>
+<h3>樣式沿用來源（本次不另出 Figma，一律沿用現版既有元件樣式）</h3>
+<div class="wrap">
+  <img src="page.png" alt="">
+  <!-- 1 標籤文字樣式來源：屬性： -->
+  <div class="box" style="left:14px;top:168px;width:44px;height:26px;"></div>
+  <div class="num" style="left:14px;top:143px;">1</div>
+  <!-- 2 下拉選單樣式來源：全職 -->
+  <div class="box" style="left:58px;top:168px;width:86px;height:26px;"></div>
+  <div class="num" style="left:60px;top:143px;">2</div>
+  <!-- 3 新增元件位置 -->
+  <div class="box" style="left:12px;top:206px;width:240px;height:34px;border-style:dashed;"></div>
+  <div class="num" style="left:258px;top:214px;">3</div>
+  <!-- 綠：維持不動 -->
+  <div class="box g" style="left:601px;top:208px;width:127px;height:32px;"></div>
+  <div class="num g" style="left:575px;top:214px;">4</div>
+</div>
+<div class="legend">
+  <span class="k k1">1</span>「篩選：」標籤 → 沿用查詢列標籤（「屬性：」）的字級與顏色，僅加粗。<br>
+  <span class="k k1">2</span> 篩選下拉選單 → 沿用查詢列 <code>select</code> 既有樣式（同 <code>屬性</code>／<code>職缺顯示狀態</code>），不另做樣式。<br>
+  <span class="k k1">3</span> 新增元件放置位置（虛線處）：<code>.searchmail</code> 內 <code>&lt;br&gt;</code> 之後、<code>.floatR</code> 之前，沿用既有 <code>.floatL</code>。<br>
+  <span class="k kg">4</span> 匯出報表／列印報表 → 位置與樣式維持不變。<br>
+  <span class="k k1">5</span> 說明圖示「?」與 tooltip → 沿用站上既有說明元件樣式（例：職缺編輯頁「立即上工 ?」的藍色圓形問號與白底說明泡泡）。
+</div>
+</body></html>
