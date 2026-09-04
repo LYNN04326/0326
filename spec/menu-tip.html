@@ -6,7 +6,7 @@
   *{box-sizing:border-box;}
   body{margin:0;padding:16px;background:#fff;
        font-family:"WenQuanYi Zen Hei","Microsoft JhengHei",Arial,sans-serif;color:#222;}
-  .wrap{width:840px;}
+  .wrap{width:760px;}
   h3{margin:0 0 10px;font-size:14px;padding-left:8px;border-left:4px solid #1e6fb8;line-height:1.3;}
   .panel{border:1px solid #e2e5ea;border-radius:4px;padding:16px;background:#fff;position:relative;}
   .row{display:flex;align-items:center;gap:8px;}
@@ -22,16 +22,18 @@
   .opts div{padding:4px 8px;}
   .opts .on{background:#2f86d3;color:#fff;}
 
-  /* tooltip：白底、圓角、淡藍框、黑字，上方小箭頭 */
-  .tipwrap{margin:8px 0 0 60px;position:relative;width:300px;}
-  .tip{border:1px solid #bcd6ea;border-radius:8px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);
+  /* tooltip：以問號為定位基準，箭頭對準問號中心 */
+  .tipholder{position:relative;display:inline-block;}
+  .tip{position:absolute;top:38px;left:-12px;white-space:nowrap;
+       border:1px solid #bcd6ea;border-radius:8px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);
        padding:11px 14px;font-size:12.5px;line-height:1.7;color:#000;}
-  .tip::before,.tip::after{content:"";position:absolute;left:22px;border:8px solid transparent;}
+  .tip::before,.tip::after{content:"";position:absolute;left:14px;border:8px solid transparent;}
   .tip::before{top:-17px;border-bottom-color:#bcd6ea;}
   .tip::after{top:-15px;border-bottom-color:#fff;}
+  .tipPanel{padding-bottom:84px;}
 
-  .two{display:flex;gap:18px;}
-  .two>div{flex:1;}
+  .two{display:block;}
+  .two>div{margin-bottom:18px;}
   .cap{font-size:12px;color:#555;margin:8px 0 0;line-height:1.7;}
   .spec{margin-top:18px;font-size:12.5px;line-height:1.9;color:#333;}
   .spec b{color:#000;}
@@ -61,14 +63,14 @@
 
     <div>
       <h3>說明 tooltip</h3>
-      <div class="panel">
+      <div class="panel tipPanel">
         <div class="row">
           <span class="lbl">篩選：</span>
           <span class="sel">僅顯示有數據職缺<span class="arw">▼</span></span>
-          <span class="ico">?</span>
-        </div>
-        <div class="tipwrap">
-          <div class="tip">數據指瀏覽統計、應徵統計、曝光數統計</div>
+          <span class="tipholder">
+            <span class="ico">?</span>
+            <span class="tip">數據指瀏覽統計、應徵統計、曝光數統計</span>
+          </span>
         </div>
       </div>
       <p class="cap">滑鼠移入藍色「?」時顯示（手機為點擊）；樣式同站上既有說明泡泡。</p>
@@ -76,7 +78,7 @@
   </div>
 
   <div class="spec">
-    <b>規格</b>：說明圖示＝藍色實心圓 16×16、白色「?」；tooltip＝白底、1px 淡藍框 <code>#bcd6ea</code>、圓角 8px、內距 11/14、黑字 12.5px、上方帶小箭頭指向圖示，寬度依內容自動、最寬 300px。
+    <b>規格</b>：說明圖示＝藍色實心圓 16×16、白色「?」；tooltip＝白底、1px 淡藍框 <code>#bcd6ea</code>、圓角 8px、內距 11/14、黑字 12.5px、<b>箭頭對準「?」正下方</b>（tooltip 以問號為定位基準，跟著問號走），寬度依內容自動。
   </div>
 </div>
 </body>
