@@ -4,16 +4,15 @@
 <meta charset="utf-8">
 <style>
   *{box-sizing:border-box;}
-  body{margin:0;padding:28px 32px 36px;background:#fff;
+  body{margin:0;padding:28px 32px 32px;background:#fff;
        font-family:"Microsoft JhengHei","Noto Sans TC","PingFang TC","Segoe UI",Arial,sans-serif;color:#222;}
   .page{width:1016px;margin:0 auto;}
-  h1{margin:0 0 4px;font-size:24px;letter-spacing:.5px;}
+  h1{margin:0 0 4px;font-size:24px;}
   .sub{margin:0 0 22px;font-size:13px;color:#777;}
   h2{margin:26px 0 10px;font-size:16px;padding-left:10px;border-left:4px solid #1e6fd9;line-height:1.2;}
-  .note{font-size:12.5px;color:#666;margin:0 0 10px;}
+  .cap{font-size:12.5px;color:#555;margin:8px 0 0;}
 
-  /* ---- 模擬畫面 ---- */
-  .screen{border:1px solid #dfe3e8;border-radius:4px;padding:14px;background:#fff;position:relative;}
+  .screen{border:1px solid #dfe3e8;border-radius:4px;padding:14px 14px 14px 46px;background:#fff;position:relative;}
   .intro{padding:9px 12px;background:#eaf3fb;color:#1a5fb4;font-size:13px;border-radius:2px;}
   .searchbar{margin-top:10px;padding:9px 10px;border:1px solid #cfd6de;background:#f2f5f8;border-radius:2px;
              display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
@@ -25,32 +24,31 @@
   .btn{height:26px;padding:0 14px;background:#1e6fd9;color:#fff;font-size:12.5px;border-radius:3px;
        display:inline-flex;align-items:center;}
 
-  .toolbar{display:flex;align-items:center;gap:10px;margin:10px 0 0;padding:0;}
-  .toolbar.right{justify-content:flex-end;gap:16px;}
-  .toolbar.split{justify-content:space-between;}
-  .filter{display:flex;align-items:center;gap:6px;}
-  .filter b{font-size:13px;}
+  /* 新增的篩選列：靠左，左緣對齊「屬性」 */
+  .filterRow{margin:9px 0 0;padding:0 10px;display:flex;align-items:center;gap:6px;}
+  .filterRow b{font-size:13px;}
   .selBox{height:28px;min-width:172px;border:1px solid #c2c8d0;background:#fff;border-radius:3px;
           font-size:12.5px;display:inline-flex;align-items:center;justify-content:space-between;padding:0 10px;}
   .selBox i{font-style:normal;color:#666;font-size:11px;margin-left:10px;}
   .iIcon{width:17px;height:17px;border:1px solid #9aa3ae;border-radius:50%;color:#6b7480;font-size:11px;
          display:inline-flex;align-items:center;justify-content:center;font-family:Georgia,serif;}
-  .btns{display:flex;gap:6px;}
 
-  .jobhead{margin-top:12px;padding:9px 10px;background:#fdf7ea;border-radius:2px;font-size:12.5px;line-height:1.9;}
+  .jobhead{margin-top:12px;padding:9px 10px;background:#fdf7ea;border-radius:2px;font-size:12.5px;line-height:1.9;position:relative;}
   .jobhead .n{color:#1a5fb4;font-weight:bold;}
   .jobhead .o{color:#d05a1e;}
+  .jobhead .keepBtns{position:absolute;right:10px;top:8px;display:flex;gap:6px;}
   table{width:100%;border-collapse:collapse;margin-top:8px;font-size:12.5px;}
   th,td{border:1px solid #e2e5ea;padding:6px;text-align:center;}
   th{background:#eaf3fb;font-weight:normal;color:#555;}
   td.h{text-align:left;color:#444;}
 
-  /* ---- 標註 ---- */
   .tag{position:absolute;background:#e8380d;color:#fff;font-size:11.5px;font-weight:bold;
        width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;
        box-shadow:0 1px 3px rgba(0,0,0,.3);}
   .guide{position:absolute;border-left:2px dashed #e8380d;}
   .guideLbl{position:absolute;color:#e8380d;font-size:11.5px;background:#fff;padding:0 4px;}
+  .keepBox{position:absolute;border:2px solid #2e9e4f;border-radius:4px;}
+  .keepLbl{position:absolute;color:#2e9e4f;font-size:11.5px;background:#fff;padding:0 4px;font-weight:bold;}
 
   .list{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:1.85;}
   .list li{display:flex;gap:9px;margin-bottom:5px;}
@@ -58,58 +56,48 @@
              font-size:11.5px;font-weight:bold;display:flex;align-items:center;justify-content:center;}
   .list em{font-style:normal;background:#fff3cd;padding:0 3px;}
   code{background:#f2f4f7;border:1px solid #e2e5ea;border-radius:3px;padding:0 5px;font-size:12.5px;}
-
   .two{display:flex;gap:16px;}
   .two > div{flex:1;}
-  .cap{font-size:12.5px;color:#555;margin:6px 0 0;}
-  .tip{position:relative;display:inline-block;margin-left:2px;}
-  .tipbox{white-space:nowrap;border:1px solid #d8dde4;border-radius:3px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.15);
-          padding:7px 10px;font-size:12px;color:#000;display:inline-block;}
-  .before{opacity:.95;}
-  .strike{color:#e8380d;}
+  .tipbox{white-space:nowrap;border:1px solid #d8dde4;border-radius:3px;background:#fff;
+          box-shadow:0 2px 6px rgba(0,0,0,.15);padding:7px 10px;font-size:12px;color:#000;display:inline-block;}
 </style>
 </head>
 <body>
 <div class="page">
 
-  <h1>數據統計查詢 — 職缺篩選功能 版面示意</h1>
+  <h1>數據統計查詢 — 新增「職缺篩選」列 版面示意</h1>
   <p class="sub">頁面：企業會員後台 › 數據統計查詢（本週統計 / 年度統計 / 歷史統計 三個分頁皆同）</p>
 
   <h2>一、修改重點</h2>
   <ul class="list">
-    <li><span class="num">1</span><div>查詢列下方新增一列「<em>篩選：</em>」（<b>「篩選」兩字加粗</b>）＋下拉選單，選項共三項：<code>全部職缺</code>、<code>僅顯示有數據職缺</code>、<code>僅顯示有主投職缺</code>；預設值為 <b>僅顯示有數據職缺</b>。切換選項時重新查詢報表資料。</div></li>
-    <li><span class="num">2</span><div>下拉選單右側加上圓形「i」說明圖示，滑鼠移入（手機為點擊）顯示 tooltip：<em>數據指瀏覽統計、應徵統計、曝光數統計</em>；tooltip 為白底、<b>黑字</b>、細灰框、上方帶小三角。</div></li>
-    <li><span class="num">3</span><div>原本位於「職缺標題列」右側的 <code>匯出報表</code>、<code>列印報表</code> 兩顆按鈕，<b>移到這一列</b>，與下拉選單同一水平線、垂直置中對齊。</div></li>
-    <li><span class="num">4</span><div>此列需在<b>查詢框（灰底區塊）之外、職缺標題之上</b>；查詢框原有樣式（灰底、框線、高度）不得更動，且此列不可與職缺標題／新增日等文字重疊。</div></li>
-    <li><span class="num">5</span><div>左右對齊基準：篩選選單左緣對齊「<b>屬性</b>」、按鈕右緣對齊「<b>查詢</b>」按鈕（見下圖紅色虛線）。</div></li>
+    <li><span class="num">1</span><div>查詢列下方<b>新增一列</b>「<em>篩選：</em>」（<b>「篩選」兩字加粗</b>）＋下拉選單。選項共三項：<code>全部職缺</code>、<code>僅顯示有數據職缺</code>、<code>僅顯示有主投職缺</code>；預設值 <b>僅顯示有數據職缺</b>。切換選項時重新查詢報表資料。</div></li>
+    <li><span class="num">2</span><div>選單右側加圓形「i」說明圖示，滑鼠移入（手機為點擊）顯示 tooltip：<em>數據指瀏覽統計、應徵統計、曝光數統計</em>。tooltip：白底、<b>黑字</b>、細灰框、上方帶小三角。</div></li>
+    <li><span class="num">3</span><div><b>對齊：「篩選：」的左緣需對齊上一列「屬性：」的左緣</b>（見圖中紅色虛線），整列靠左即可，右側不放任何元件。</div></li>
+    <li><span class="num">4</span><div><b>其他一律維持原樣</b>：查詢框（灰底、框線、高度）不更動；<b>匯出報表／列印報表兩顆按鈕維持在職缺標題列右側，位置不變</b>（圖中綠框）。新增的篩選列不得與職缺標題／新增日等文字重疊。</div></li>
   </ul>
 
-  <h2>二、版型A（建議）：篩選靠左、報表按鈕靠右</h2>
-  <div class="screen" id="scA">
+  <h2>二、修改後版面</h2>
+  <div class="screen" id="sc">
     <div class="intro">【說明】本紀錄系統僅保留90天。</div>
-    <div class="searchbar" id="sbA">
-      <span>屬性：</span><span class="fld sel">全職</span>
+    <div class="searchbar" id="sb">
+      <span id="attr">屬性：</span><span class="fld sel">全職</span>
       <span>職缺顯示狀態：</span><span class="fld sel">開啟</span>
       <span>起始日期</span><span class="fld">2026/08/27</span>
       <span class="fld kw">請輸入職缺名稱關鍵字</span>
-      <span class="btn" id="qA">查詢</span>
+      <span class="btn">查詢</span>
     </div>
 
-    <div class="toolbar split" id="tbA">
-      <div class="filter">
-        <b id="lblA">篩選：</b>
-        <span class="selBox">僅顯示有數據職缺<i>▾</i></span>
-        <span class="iIcon" id="iA">i</span>
-      </div>
-      <div class="btns" id="bsA">
-        <span class="btn">匯出報表</span><span class="btn" id="pA">列印報表</span>
-      </div>
+    <div class="filterRow" id="fr">
+      <b id="lbl">篩選：</b>
+      <span class="selBox">僅顯示有數據職缺<i>▾</i></span>
+      <span class="iIcon" id="ic">i</span>
     </div>
 
-    <div class="jobhead" id="jhA">
+    <div class="jobhead" id="jh">
       <div class="n">➜ WONG測試職缺（連江縣南竿鄉）</div>
       <div>➜ 新增日：2026-06-05 15:03　➜ 修改日：2026-09-03 15:18</div>
       <div class="o">➜ 曝光數(主網與app搜尋頁真實數據）僅供內部IP檢視，若廠商有需求，請自行斟酌是否有提供的必要性。</div>
+      <div class="keepBtns" id="kb"><span class="btn">匯出報表</span><span class="btn">列印報表</span></div>
     </div>
     <table>
       <tr><th>當週日期</th><th>08/27</th><th>08/28</th><th>08/29</th><th>08/30</th><th>08/31</th><th>09/01</th><th>09/02</th><th>總和</th></tr>
@@ -118,38 +106,13 @@
       <tr><td class="h">曝光數統計</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
     </table>
   </div>
-  <p class="cap">紅色虛線：左＝對齊「屬性」、右＝對齊「查詢」按鈕右緣。</p>
+  <p class="cap">紅色虛線＝「篩選：」與「屬性：」左緣對齊；綠框＝維持原樣、不要更動的區域。</p>
 
-  <h2>三、版型B：篩選與按鈕整組靠右</h2>
-  <div class="screen" id="scB">
-    <div class="searchbar" id="sbB">
-      <span>屬性：</span><span class="fld sel">全職</span>
-      <span>職缺顯示狀態：</span><span class="fld sel">開啟</span>
-      <span>起始日期</span><span class="fld">2026/08/27</span>
-      <span class="fld kw">請輸入職缺名稱關鍵字</span>
-      <span class="btn" id="qB">查詢</span>
-    </div>
-    <div class="toolbar right" id="tbB">
-      <div class="filter" id="ftB">
-        <b>篩選：</b>
-        <span class="selBox">僅顯示有數據職缺<i>▾</i></span>
-        <span class="iIcon">i</span>
-      </div>
-      <div class="btns">
-        <span class="btn">匯出報表</span><span class="btn" id="pB">列印報表</span>
-      </div>
-    </div>
-    <div class="jobhead">
-      <div class="n">➜ WONG測試職缺（連江縣南竿鄉）</div>
-      <div>➜ 新增日：2026-06-05 15:03　➜ 修改日：2026-09-03 15:18</div>
-    </div>
-  </div>
-
-  <h2>四、下拉選單與 tooltip</h2>
+  <h2>三、下拉選單與 tooltip</h2>
   <div class="two">
     <div>
-      <div class="screen" style="padding:16px;">
-        <div class="filter" style="margin-bottom:6px;">
+      <div class="screen" style="padding:16px 16px 16px 20px;">
+        <div class="filterRow" style="padding:0;margin:0 0 6px;">
           <b>篩選：</b><span class="selBox">僅顯示有數據職缺<i>▾</i></span><span class="iIcon">i</span>
         </div>
         <div style="width:190px;border:1px solid #c2c8d0;border-radius:3px;font-size:12.5px;margin-left:52px;">
@@ -161,8 +124,8 @@
       <p class="cap">選單展開：三個選項，預設「僅顯示有數據職缺」。</p>
     </div>
     <div>
-      <div class="screen" style="padding:16px;">
-        <div class="filter" style="margin-bottom:10px;">
+      <div class="screen" style="padding:16px 16px 16px 20px;">
+        <div class="filterRow" style="padding:0;margin:0 0 10px;">
           <b>篩選：</b><span class="selBox">僅顯示有數據職缺<i>▾</i></span><span class="iIcon">i</span>
         </div>
         <div style="margin-left:236px;">
@@ -174,68 +137,55 @@
     </div>
   </div>
 
-  <h2>五、現況（修改前）對照</h2>
-  <div class="screen before" style="padding:14px;">
+  <h2>四、現況（修改前）</h2>
+  <div class="screen" style="padding:14px 14px 14px 20px;">
     <div class="searchbar">
       <span>屬性：</span><span class="fld sel">全職</span>
       <span>職缺顯示狀態：</span><span class="fld sel">開啟</span>
       <span>起始日期</span><span class="fld">2026/08/27</span>
       <span class="fld kw">請輸入職缺名稱關鍵字</span><span class="btn">查詢</span>
     </div>
-    <div class="jobhead" style="position:relative;">
+    <div class="jobhead">
       <div class="n">➜ WONG測試職缺（連江縣南竿鄉）</div>
       <div>➜ 新增日：2026-06-05 15:03　➜ 修改日：2026-09-03 15:18</div>
-      <div style="position:absolute;right:10px;top:8px;display:flex;gap:6px;">
-        <span class="btn">匯出報表</span><span class="btn">列印報表</span>
-      </div>
+      <div class="keepBtns"><span class="btn">匯出報表</span><span class="btn">列印報表</span></div>
     </div>
-    <p class="cap" style="margin-top:8px;"><span class="strike">■</span> 修改後：職缺標題列右側這兩顆按鈕移除，改放到「篩選」那一列。</p>
+    <p class="cap" style="margin-top:8px;">差異：只在查詢列與職缺標題列之間，多出一列「篩選：＋下拉選單＋(i)」，其餘不變。</p>
   </div>
 
 </div>
 
 <script>
-// 依實際渲染位置畫出標號與對齊輔助線
-function mark(container, target, num, dx, dy){
-  var c=document.getElementById(container).getBoundingClientRect();
-  var t=document.getElementById(target).getBoundingClientRect();
-  var s=document.createElement('div'); s.className='tag'; s.textContent=num;
-  s.style.left=(t.left-c.left+(dx||0))+'px'; s.style.top=(t.top-c.top+(dy||0))+'px';
-  document.getElementById(container).appendChild(s);
-}
-function guide(containerId, x, topEl, botEl, label, labelSide){
-  var c=document.getElementById(containerId), cb=c.getBoundingClientRect();
-  var t=document.getElementById(topEl).getBoundingClientRect();
-  var b=document.getElementById(botEl).getBoundingClientRect();
-  var g=document.createElement('div'); g.className='guide';
-  g.style.left=(x-cb.left)+'px'; g.style.top=(t.top-cb.top-6)+'px';
-  g.style.height=(b.bottom-t.top+12)+'px'; c.appendChild(g);
-  var l=document.createElement('div'); l.className='guideLbl'; l.textContent=label;
-  l.style.top=(t.top-cb.top-20)+'px';
-  l.style.left=((labelSide==='right') ? (x-cb.left-58) : (x-cb.left+4))+'px';
-  c.appendChild(l);
-}
-var sbA=document.getElementById('sbA').getBoundingClientRect();
-var qA=document.getElementById('qA').getBoundingClientRect();
-guide('scA', sbA.left+10, 'sbA','tbA','對齊「屬性」','left');
-guide('scA', qA.right, 'sbA','tbA','對齊「查詢」','right');
+var sc=document.getElementById('sc'), cb=sc.getBoundingClientRect();
+function tagAt(x,y,n){var d=document.createElement('div');d.className='tag';d.textContent=n;
+  d.style.left=(x-cb.left)+'px';d.style.top=(y-cb.top)+'px';sc.appendChild(d);}
 
-function tagAt(containerId, x, y, num){
-  var c=document.getElementById(containerId), cb=c.getBoundingClientRect();
-  var s=document.createElement('div'); s.className='tag'; s.textContent=num;
-  s.style.left=(x-cb.left)+'px'; s.style.top=(y-cb.top)+'px'; c.appendChild(s);
-}
-function above(containerId, id, num, dx){
-  var r=document.getElementById(id).getBoundingClientRect();
-  tagAt(containerId, r.left+(dx||0), r.top-24, num);
-}
-above('scA','lblA',1,-4);
-above('scA','iA',2,-2);
-above('scA','bsA',3,0);
-var jh=document.getElementById('jhA').getBoundingClientRect();
-tagAt('scA', jh.right-26, jh.top+6, 4);
-var ftB=document.getElementById('ftB').getBoundingClientRect();
-tagAt('scB', ftB.left-30, ftB.top+4, 5);
+var attr=document.getElementById('attr').getBoundingClientRect();
+var lbl=document.getElementById('lbl').getBoundingClientRect();
+var sb=document.getElementById('sb').getBoundingClientRect();
+var fr=document.getElementById('fr').getBoundingClientRect();
+var jh=document.getElementById('jh').getBoundingClientRect();
+var kb=document.getElementById('kb').getBoundingClientRect();
+
+// 左緣對齊輔助線
+var g=document.createElement('div'); g.className='guide';
+g.style.left=(attr.left-cb.left)+'px'; g.style.top=(sb.top-cb.top-6)+'px';
+g.style.height=(fr.bottom-sb.top+12)+'px'; sc.appendChild(g);
+var l=document.createElement('div'); l.className='guideLbl'; l.textContent='左緣對齊';
+l.style.left=(attr.left-cb.left+6)+'px'; l.style.top=(sb.top-cb.top-22)+'px'; sc.appendChild(l);
+
+// 綠框：維持原樣的按鈕
+var k=document.createElement('div'); k.className='keepBox';
+k.style.left=(kb.left-cb.left-6)+'px'; k.style.top=(kb.top-cb.top-6)+'px';
+k.style.width=(kb.width+12)+'px'; k.style.height=(kb.height+12)+'px'; sc.appendChild(k);
+var kl=document.createElement('div'); kl.className='keepLbl'; kl.textContent='維持原位，不要動';
+kl.style.left=(kb.right-cb.left-104)+'px'; kl.style.top=(kb.top-cb.top-24)+'px'; sc.appendChild(kl);
+
+tagAt(lbl.left-34, fr.top+4, 1);
+tagAt(document.getElementById('ic').getBoundingClientRect().left-2,
+      document.getElementById('ic').getBoundingClientRect().top-24, 2);
+tagAt(attr.left-34, sb.top+4, 3);
+tagAt(kb.left-32, kb.top+4, 4);
 </script>
 </body>
 </html>
