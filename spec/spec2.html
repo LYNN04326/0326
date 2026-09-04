@@ -55,6 +55,14 @@
   .greenlbl{position:absolute;color:#2e9e4f;font-size:11.5px;font-weight:bold;background:#fff;padding:0 4px;}
   .guide{position:absolute;border-left:2px dashed #e8380d;}
 
+  /* 純 CSS 標註 */
+  .rptRow{padding-left:9px;}          /* 與查詢框內距對齊，使「篩選：」左緣＝「屬性：」左緣 */
+  .newBox{border:2px solid #e8380d;border-radius:3px;padding:4px 8px;margin-left:-10px;} /* 抵銷框線內距，維持文字真正對齊 */
+  .newLbl{color:#e8380d;font-size:12px;font-weight:bold;margin-left:10px;white-space:nowrap;}
+  .keepWrap{display:flex;align-items:center;gap:10px;}
+  .keepLbl{color:#2e9e4f;font-size:12px;font-weight:bold;white-space:nowrap;}
+  .keepBox{border:2px solid #2e9e4f;border-radius:3px;padding:4px 6px;display:flex;gap:6px;}
+  .alignNote{color:#e8380d;font-size:11.5px;margin:2px 0 0 9px;}
   .two{display:flex;gap:16px;align-items:flex-start;}
   .two > div{flex:1;}
   .card{border:1px solid #dfe3e8;border-radius:4px;padding:16px;background:#fff;}
@@ -63,6 +71,13 @@
   .optList{width:186px;border:1px solid #b9c0c9;font-size:12.5px;margin-left:52px;}
   .optList div{padding:6px 9px;}
   .optList .on{background:#1e6fd9;color:#fff;}
+
+  @page{size:A4 landscape;margin:10mm;}
+  @media print{
+    body{padding:0;}
+    .page{width:100%;}
+    h2{page-break-after:avoid;}
+  }
 </style>
 </head>
 <body>
@@ -85,16 +100,23 @@
         <span class="btn">查詢</span>
       </div>
 
-      <div class="rptRow" id="rptRow">
-        <div class="filter" id="filter">
-          <b id="lbl">篩選：</b>
-          <span class="selBox">僅顯示有數據職缺<i>▾</i></span>
-          <span class="iIcon" id="ic">i</span>
+      <div class="rptRow">
+        <div style="display:flex;align-items:center;">
+          <div class="filter newBox">
+            <b>篩選：</b>
+            <span class="selBox">僅顯示有數據職缺<i>▾</i></span>
+            <span class="iIcon">i</span>
+          </div>
+          <span class="newLbl">★ 本次新增</span>
         </div>
-        <div class="btns" id="btns">
-          <span class="btnS">匯出報表</span><span class="btnS">列印報表</span>
+        <div class="keepWrap">
+          <span class="keepLbl">維持原位，不要動 ▸</span>
+          <div class="keepBox">
+            <span class="btnS">匯出報表</span><span class="btnS">列印報表</span>
+          </div>
         </div>
       </div>
+      <div class="alignNote">▲「篩選：」左緣對齊上一列「屬性：」左緣</div>
 
       <div class="jobinfo">
         <div class="n">➜ WONG測試職缺(連江縣南竿鄉)</div>
@@ -103,7 +125,7 @@
       </div>
     </div>
   </div>
-  <p class="cap">紅框＝本次新增；綠框＝原有的匯出／列印報表，位置與樣式維持不變。紅色虛線＝「篩選：」左緣對齊「屬性：」左緣。</p>
+  <p class="cap">紅框＝本次新增的元件；綠框＝原有的匯出／列印報表，位置與樣式維持不變。</p>
 
   <h2 class="sec2">三、下拉選單與 tooltip</h2>
   <div class="two">
@@ -136,32 +158,6 @@
 
 </div>
 
-<script>
-var win=document.getElementById('win'), wb=win.getBoundingClientRect();
-function put(el,cls,x,y,w,h,txt){var d=document.createElement('div');d.className=cls;
-  d.style.left=(x-wb.left)+'px';d.style.top=(y-wb.top)+'px';
-  if(w!=null)d.style.width=w+'px'; if(h!=null)d.style.height=h+'px';
-  if(txt)d.textContent=txt; win.appendChild(d);}
 
-var f=document.getElementById('filter').getBoundingClientRect();
-var b=document.getElementById('btns').getBoundingClientRect();
-var q=document.getElementById('qbar').getBoundingClientRect();
-var lbl=document.getElementById('lbl').getBoundingClientRect();
-var ic=document.getElementById('ic').getBoundingClientRect();
-
-// 紅框：新增的篩選
-put(null,'redbox', f.left-6, f.top-5, f.width+12, f.height+10);
-put(null,'redlbl', f.right+12, f.top+6, null,null,'★ 本次新增');
-// 綠框：原有按鈕
-put(null,'greenbox', b.left-6, b.top-5, b.width+12, b.height+10);
-put(null,'greenlbl', b.right-118, b.top-22, null,null,'維持原位，不要動');
-// 左緣對齊虛線
-var g=document.createElement('div'); g.className='guide';
-g.style.left=(q.left+8-wb.left)+'px'; g.style.top=(q.top-wb.top-4)+'px';
-g.style.height=(f.bottom-q.top+10)+'px'; win.appendChild(g);
-// 標號
-put(null,'tag', lbl.left-30, f.top+3, null,null,'1');
-put(null,'tag', ic.left-1, ic.top-24, null,null,'2');
-</script>
 </body>
 </html>
