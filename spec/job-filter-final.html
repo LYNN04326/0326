@@ -1,16 +1,3 @@
-<!-- ============================================================
-     插入位置（LogCalculateWeek.aspx / Year / History 三頁相同）：
-       <div class="searchmail ">
-         <div class="floatL"> …屬性…查詢… </div>
-         <br>
-     ★ 貼在這裡（<br> 之後、原本的 <div class="floatR"> 之前）★
-         <div class="floatR">…匯出報表／列印報表…</div>
-         <div class="clear"></div>
-       </div>
-
-     注意：.searchmail 為固定高度 43px＋背景圖 se_bg2.gif，請勿更動其樣式；
-           本區塊沿用網站既有的 floatL，與按鈕同列、左緣自動對齊「屬性：」。
-     ============================================================ -->
 <div class="floatL jobFilter">
   <b>篩選：</b>
   <select id="selJobFilter" name="selJobFilter">
@@ -27,30 +14,30 @@
 
 <style>
 /* 篩選區塊：沿用 .floatL，與匯出／列印報表同一列 */
-.searchmail .jobFilter{clear:left;line-height:40px;}
-.searchmail .jobFilter b{font-weight:bold;}
-.searchmail .jobFilter select{vertical-align:middle;}
+.jobFilter{clear:left;line-height:40px;}
+.jobFilter b{font-weight:bold;}
+.jobFilter select{vertical-align:middle;}
 
 /* 說明圖示：藍色圓形問號 */
-.searchmail .jobFilter .jfTip{position:relative;display:inline-block;vertical-align:middle;line-height:normal;}
-.searchmail .jobFilter .jfIcon{display:inline-block;width:16px;height:16px;margin-left:6px;
+.jobFilter .jfTip{position:relative;display:inline-block;vertical-align:middle;line-height:normal;}
+.jobFilter .jfIcon{display:inline-block;width:16px;height:16px;margin-left:6px;
   border-radius:50%;background:#2f86d3;color:#fff;font-size:11px;line-height:16px;font-style:normal;
   font-weight:bold;text-align:center;cursor:pointer;user-select:none;vertical-align:middle;}
-.searchmail .jobFilter .jfIcon:focus{outline:none;box-shadow:0 0 0 2px rgba(47,134,211,.35);}
+.jobFilter .jfIcon:focus{outline:none;box-shadow:0 0 0 2px rgba(47,134,211,.35);}
 
 /* tooltip：以問號為定位基準，箭頭對準問號正下方 */
-.searchmail .jobFilter .jfTipBox{position:absolute;top:26px;left:-4px;z-index:999;display:none;
+.jobFilter .jfTipBox{position:absolute;top:26px;left:-4px;z-index:999;display:none;
   white-space:nowrap;padding:11px 14px;border:1px solid #bcd6ea;border-radius:8px;background:#fff;
   box-shadow:0 2px 8px rgba(0,0,0,.08);color:#000;font-size:12.5px;line-height:1.7;text-align:left;}
-.searchmail .jobFilter .jfTipBox::before,
-.searchmail .jobFilter .jfTipBox::after{content:"";position:absolute;left:14px;border:8px solid transparent;}
-.searchmail .jobFilter .jfTipBox::before{top:-17px;border-bottom-color:#bcd6ea;}
-.searchmail .jobFilter .jfTipBox::after{top:-15px;border-bottom-color:#fff;}
-.searchmail .jobFilter .jfTip:hover .jfTipBox,
-.searchmail .jobFilter .jfIcon:focus + .jfTipBox,
-.searchmail .jobFilter .jfTipBox.is-show{display:block;}
+.jobFilter .jfTipBox::before,
+.jobFilter .jfTipBox::after{content:"";position:absolute;left:14px;border:8px solid transparent;}
+.jobFilter .jfTipBox::before{top:-17px;border-bottom-color:#bcd6ea;}
+.jobFilter .jfTipBox::after{top:-15px;border-bottom-color:#fff;}
+.jobFilter .jfTip:hover .jfTipBox,
+.jobFilter .jfIcon:focus + .jfTipBox,
+.jobFilter .jfTipBox.is-show{display:block;}
 
-@media print{ .searchmail .jobFilter{display:none;} }
+@media print{ .jobFilter{display:none;} }
 </style>
 
 <script>
