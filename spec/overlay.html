@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:#fff;font-family:"WenQuanYi Zen Hei","Microsoft JhengHei",Arial,sans-serif;}
+  .wrap{position:relative;width:732px;height:317px;border:1px solid #e2e5ea;}
+  .wrap img{display:block;width:732px;height:317px;}
+
+  /* 新增元件：與「匯出報表／列印報表」同一列（y 213~234），左緣對齊「屬性」x=18 */
+  .lbl{position:absolute;left:18px;top:213px;height:22px;line-height:22px;
+       font-size:13px;font-weight:bold;color:#222;}
+  .sel{position:absolute;left:66px;top:213px;width:150px;height:22px;
+       border:1px solid #b9c0c9;border-radius:2px;background:#fff;
+       font-size:12px;line-height:20px;color:#222;padding:0 6px;}
+  .sel .arw{position:absolute;right:6px;top:0;color:#555;font-size:9px;line-height:20px;}
+  .ico{position:absolute;left:224px;top:215px;width:16px;height:16px;border:1px solid #9aa3ae;
+       border-radius:50%;background:#fff;color:#6b7480;font-size:11px;line-height:14px;
+       text-align:center;font-family:Georgia,serif;}
+
+  /* 標註 */
+  .redbox{position:absolute;left:13px;top:208px;width:236px;height:32px;
+          border:2px solid #e8380d;border-radius:3px;}
+  .redlbl{position:absolute;left:256px;top:213px;height:22px;line-height:22px;
+          color:#e8380d;font-size:12px;font-weight:bold;}
+  .greenbox{position:absolute;left:601px;top:208px;width:127px;height:32px;
+            border:2px solid #2e9e4f;border-radius:3px;}
+  .greenlbl{position:absolute;left:452px;top:213px;height:22px;line-height:22px;
+            color:#2e9e4f;font-size:12px;font-weight:bold;}
+  /* 左緣對齊輔助線：從查詢列到篩選列 */
+  .guide{position:absolute;left:18px;top:166px;height:76px;border-left:2px dashed #e8380d;}
+  .guidelbl{position:absolute;left:24px;top:196px;color:#e8380d;font-size:11px;background:rgba(255,255,255,.85);padding:0 3px;}
+  .legend{width:732px;margin:10px 0 0;font-size:12.5px;line-height:1.9;color:#333;}
+  .legend .k{font-weight:bold;margin-right:4px;}
+  .legend .red{color:#e8380d;} .legend .green{color:#2e9e4f;} .legend .gray{color:#9aa3ae;}
+  body{padding:12px;}
+  @page{size:A4 landscape;margin:12mm;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img src="page.png" alt="">
+
+  <div class="lbl">篩選：</div>
+  <div class="sel">僅顯示有數據職缺<span class="arw">▼</span></div>
+  <div class="ico">i</div>
+
+  <div class="redbox"></div>
+  <div class="redlbl">★ 本次新增</div>
+  <div class="greenbox"></div>
+  <div class="greenlbl">維持原位，不要動 ▸</div>
+</div>
+<div class="legend">
+  <span class="k red">■</span> 紅框＝本次新增：「<b>篩選：</b>」＋下拉選單（全部職缺／僅顯示有數據職缺／僅顯示有主投職缺，預設「僅顯示有數據職缺」）＋(i) 說明圖示。左緣對齊「屬性：」。<br>
+  <span class="k green">■</span> 綠框＝原有「匯出報表／列印報表」，位置與樣式維持不變。<br>
+  <span class="k gray">■</span> (i) 滑鼠移入顯示：數據指瀏覽統計、應徵統計、曝光數統計（白底黑字、細灰框）。
+</div>
+</body>
+</html>
