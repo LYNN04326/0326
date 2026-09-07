@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>福利制度｜tCodeBenefit 資料流示範</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px;
+    font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+    background: #f4f6f8; color: #222; line-height: 1.6;
+  }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #666; font-size: 13px; margin-bottom: 20px; }
+  .flow {
+    display: grid; grid-template-columns: 1.15fr 0.9fr 1fr;
+    gap: 16px; align-items: start;
+  }
+  @media (max-width: 1100px) { .flow { grid-template-columns: 1fr; } }
+  .panel {
+    background: #fff; border: 1px solid #dde3e9; border-radius: 8px;
+    overflow: hidden;
+  }
+  .panel > h2 {
+    font-size: 14px; margin: 0; padding: 10px 14px;
+    background: #eef2f6; border-bottom: 1px solid #dde3e9; font-weight: 700;
+  }
+  .panel > h2 span { font-weight: 400; color: #6b7783; font-size: 12px; margin-left: 6px; }
+  .panel .body { padding: 12px 14px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid #eef1f4; text-align: left; }
+  th { color: #6b7783; font-weight: 600; background: #fafbfc; white-space: nowrap; }
+  td input[type="text"] {
+    width: 100%; border: 1px solid transparent; background: transparent;
+    padding: 3px 4px; border-radius: 4px; font: inherit; color: inherit;
+  }
+  td input[type="text"]:focus { border-color: #7aa7d9; background: #fff; outline: none; }
+  td input[type="number"] { width: 52px; border: 1px solid #dde3e9; border-radius: 4px; padding: 3px; font: inherit; }
+  td.ctr { text-align: center; }
+  .btns { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-size: 13px; padding: 6px 12px; cursor: pointer;
+    border: 1px solid #c9d3dc; background: #fff; border-radius: 5px; color: #333;
+  }
+  button:hover { background: #f0f4f8; }
+  button.danger { color: #b3261e; border-color: #e6c4c1; }
+
+  pre {
+    margin: 0; padding: 12px 14px; background: #1e2733; color: #d6e2f0;
+    font-family: Consolas, "Courier New", monospace; font-size: 12px;
+    line-height: 1.5; overflow: auto; max-height: 560px;
+  }
+  .k { color: #82aaff; } .s { color: #c3e88d; } .b { color: #f78c6c; } .n { color: #f78c6c; }
+
+  .cat { margin-bottom: 18px; }
+  .cat:last-child { margin-bottom: 0; }
+  .cat-title {
+    font-size: 15px; font-weight: 700; padding-bottom: 6px;
+    border-bottom: 2px solid #2f6fb2; display: flex; align-items: center; gap: 8px;
+  }
+  .cat-title .tag {
+    font-size: 11px; font-weight: 600; color: #fff; background: #d9534f;
+    padding: 1px 6px; border-radius: 3px;
+  }
+  .items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .item {
+    font-size: 13px; padding: 4px 10px; background: #eef4fb;
+    border: 1px solid #d5e3f2; border-radius: 14px; color: #24405c;
+  }
+  .item.legal { background: #fdeeee; border-color: #f3d2d2; color: #8c2b28; }
+  .empty { color: #999; font-size: 13px; }
+  .note {
+    margin-top: 20px; padding: 12px 14px; background: #fffbe6;
+    border: 1px solid #f0e2a8; border-radius: 6px; font-size: 13px; color: #5c4f16;
+  }
+  .note b { color: #3f3608; }
+</style>
+</head>
+<body>
+
+<h1>福利制度：tCodeBenefit 資料流示範</h1>
+<div class="sub">改左邊的代碼表 → 中間 API 回應與右邊畫面即時跟著變。這就是工單做完後的效果：新增福利只要改資料，不用改程式。</div>
+
+<div class="flow">
+
+  <div class="panel">
+    <h2>① 資料庫 tCodeBenefit <span>（可直接編輯）</span></h2>
+    <div class="body">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>代碼</th><th>名稱</th><th>類別</th><th>順序</th>
+            <th class="ctr">法定</th><th class="ctr">啟用</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="btns">
+        <button onclick="addRow()">＋ 新增一筆項目</button>
+        <button onclick="resetRows()">還原預設</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>② 後端 API 回應 <span>GET /api/company/benefit</span></h2>
+    <pre id="json"></pre>
+  </div>
+
+  <div class="panel">
+    <h2>③ 前端畫面 <span>welfare / previewNew 共用</span></h2>
+    <div class="body" id="view"></div>
+  </div>
+
+</div>
+
+<div class="note">
+  <b>重點：</b>右邊畫面沒有任何寫死的分類或項目名稱，全部來自②的 API。
+  而②的「法定項目」這一類，是後端看到代碼表的<b>法定標記</b>後自己歸類出來的 ——
+  試著把「特別休假」的法定勾掉，它就會回到「休假制度」那一類。
+</div>
+
+<script>
+/* ---------- 模擬資料庫 tCodeBenefit ---------- */
+const DEFAULT_ROWS = [
+  { code:'B001', name:'勞工保險',     category:'保險福利', sort:1, statutory:true,  enabled:true },
+  { code:'B002', name:'全民健保',     category:'保險福利', sort:2, statutory:true,  enabled:true },
+  { code:'B003', name:'勞退提撥',     category:'保險福利', sort:3, statutory:true,  enabled:true },
+  { code:'B004', name:'職災保險',     category:'保險福利', sort:4, statutory:true,  enabled:true },
+  { code:'B005', name:'團體意外險',   category:'保險福利', sort:5, statutory:false, enabled:true },
+  { code:'B101', name:'年終獎金',     category:'獎金福利', sort:1, statutory:false, enabled:true },
+  { code:'B102', name:'三節獎金',     category:'獎金福利', sort:2, statutory:false, enabled:true },
+  { code:'B103', name:'生日禮金',     category:'獎金福利', sort:3, statutory:false, enabled:true },
+  { code:'B201', name:'特別休假',     category:'休假制度', sort:1, statutory:true,  enabled:true },
+  { code:'B202', name:'優於勞基法特休', category:'休假制度', sort:2, statutory:false, enabled:true },
+  { code:'B301', name:'員工旅遊',     category:'休閒娛樂', sort:1, statutory:false, enabled:true },
+  { code:'B302', name:'社團活動',     category:'休閒娛樂', sort:2, statutory:false, enabled:false }
+];
+let rows = JSON.parse(JSON.stringify(DEFAULT_ROWS));
+
+const STATUTORY_CATEGORY = '法定項目';
+
+/* ---------- 後端邏輯：把代碼表組成 API 回應 ---------- */
+function buildApiResponse(list) {
+  const groups = new Map();
+
+  list.filter(r => r.enabled).forEach(r => {
+    // 有法定標記 → 一律歸到「法定項目」，否則用代碼表原本的類別
+    const catName = r.statutory ? STATUTORY_CATEGORY : (r.category || '其他');
+    if (!groups.has(catName)) {
+      groups.set(catName, {
+        categoryName: catName,
+        isStatutory: !!r.statutory,
+        items: []
+      });
+    }
+    groups.get(catName).items.push({ code: r.code, name: r.name, sort: Number(r.sort) || 0 });
+  });
+
+  const categories = [...groups.values()];
+  categories.forEach(c => c.items.sort((a, b) => a.sort - b.sort || a.code.localeCompare(b.code)));
+  // 法定項目固定排最前面，其餘依類別內最小 sort
+  categories.sort((a, b) => {
+    if (a.isStatutory !== b.isStatutory) return a.isStatutory ? -1 : 1;
+    return (a.items[0]?.sort ?? 0) - (b.items[0]?.sort ?? 0) ||
+           a.categoryName.localeCompare(b.categoryName, 'zh-Hant');
+  });
+  return { categories };
+}
+
+/* ---------- 前端：只負責照 API 資料畫 ---------- */
+function renderView(data) {
+  const box = document.getElementById('view');
+  if (!data.categories.length) {
+    box.innerHTML = '<div class="empty">尚無福利資料</div>';
+    return;
+  }
+  box.innerHTML = data.categories.map(c => `
+    <div class="cat">
+      <div class="cat-title">
+        ${esc(c.categoryName)}
+        ${c.isStatutory ? '<span class="tag">法定</span>' : ''}
+      </div>
+      <div class="items">
+        ${c.items.map(i => `<span class="item${c.isStatutory ? ' legal' : ''}">${esc(i.name)}</span>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+/* ---------- 畫左邊的代碼表 ---------- */
+function renderTable() {
+  document.getElementById('tbody').innerHTML = rows.map((r, i) => `
+    <tr>
+      <td>${esc(r.code)}</td>
+      <td><input type="text" value="${esc(r.name)}" oninput="upd(${i},'name',this.value)"></td>
+      <td><input type="text" value="${esc(r.category)}" oninput="upd(${i},'category',this.value)"></td>
+      <td><input type="number" value="${r.sort}" oninput="upd(${i},'sort',this.value)"></td>
+      <td class="ctr"><input type="checkbox" ${r.statutory ? 'checked' : ''} onchange="upd(${i},'statutory',this.checked)"></td>
+      <td class="ctr"><input type="checkbox" ${r.enabled ? 'checked' : ''} onchange="upd(${i},'enabled',this.checked)"></td>
+      <td class="ctr"><button class="danger" onclick="delRow(${i})">刪</button></td>
+    </tr>`).join('');
+}
+
+function renderJson(data) {
+  document.getElementById('json').innerHTML = highlight(JSON.stringify(data, null, 2));
+}
+
+function refresh() {
+  const data = buildApiResponse(rows);
+  renderJson(data);
+  renderView(data);
+}
+
+function upd(i, key, val) {
+  rows[i][key] = (key === 'sort') ? Number(val) : val;
+  refresh();
+}
+function addRow() {
+  const n = rows.length + 1;
+  rows.push({ code: 'B9' + String(n).padStart(2, '0'), name: '新福利項目',
+              category: '其他福利', sort: 1, statutory: false, enabled: true });
+  renderTable(); refresh();
+}
+function delRow(i) { rows.splice(i, 1); renderTable(); refresh(); }
+function resetRows() { rows = JSON.parse(JSON.stringify(DEFAULT_ROWS)); renderTable(); refresh(); }
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+}
+function highlight(json) {
+  return esc(json)
+    .replace(/&quot;([^&]*?)&quot;(\s*:)/g, '<span class="k">&quot;$1&quot;</span>$2')
+    .replace(/:\s*&quot;([^&]*?)&quot;/g, ': <span class="s">&quot;$1&quot;</span>')
+    .replace(/:\s*(true|false)/g, ': <span class="b">$1</span>')
+    .replace(/:\s*(\d+)/g, ': <span class="n">$1</span>');
+}
+
+renderTable();
+refresh();
+</script>
+</body>
+</html>
