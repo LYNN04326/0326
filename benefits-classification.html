@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B.1.5 福利制度 － 福利代碼分類規則（後端 API 驅動）</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px; background: #f4f6f8; color: #222;
+         font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif; font-size: 14px; line-height: 1.7; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; padding-left: 10px; border-left: 4px solid #1a73e8; }
+  h3 { font-size: 15px; margin: 18px 0 8px; }
+  .sub { color: #666; margin: 0 0 20px; }
+  .card { background: #fff; border: 1px solid #dfe3e8; border-radius: 8px; padding: 18px 20px; margin-bottom: 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border: 1px solid #dfe3e8; padding: 6px 10px; text-align: left; vertical-align: top; }
+  th { background: #eef2f6; white-space: nowrap; }
+  code { background: #eef2f6; padding: 1px 5px; border-radius: 3px; font-size: 12.5px; }
+  pre { background: #1e2430; color: #e6edf3; padding: 14px 16px; border-radius: 6px; overflow-x: auto; font-size: 12.5px; line-height: 1.6; }
+  .note { background: #fff8e6; border-left: 4px solid #f0a500; padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 12px 0; }
+  .warn { background: #fdecea; border-left: 4px solid #d93025; padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 12px 0; }
+  .ok { background: #e8f5e9; border-left: 4px solid #2e7d32; padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 12px 0; }
+
+  /* ===== Demo ===== */
+  .toolbar { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; padding: 12px 16px;
+             background: #eef2f6; border-radius: 6px; margin-bottom: 16px; }
+  .toolbar label { cursor: pointer; }
+  .group { margin-bottom: 18px; }
+  .group-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .group-title .badge { font-size: 11px; font-weight: 500; color: #fff; background: #d93025; padding: 1px 7px; border-radius: 10px; }
+  .group-title .cnt { font-size: 12px; font-weight: 400; color: #888; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { border: 1px solid #c4cbd4; background: #fff; border-radius: 16px; padding: 5px 14px; cursor: pointer;
+          font-size: 13px; user-select: none; transition: .12s; }
+  .chip:hover { border-color: #1a73e8; background: #f0f6ff; }
+  .chip.selected { border-color: #1a73e8; background: #1a73e8; color: #fff; }
+  .chip.statutory-dup { border-style: dashed; }
+  .btn { border: none; border-radius: 4px; padding: 8px 22px; font-size: 14px; cursor: pointer; }
+  .btn-primary { background: #1a73e8; color: #fff; }
+  .btn-ghost { background: #fff; color: #444; border: 1px solid #c4cbd4; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .actions { display: flex; gap: 10px; margin-top: 8px; }
+
+  .mask { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; padding: 20px; }
+  .mask.show { display: flex; }
+  .modal { background: #fff; border-radius: 8px; max-width: 520px; width: 100%; padding: 24px; }
+  .modal h4 { margin: 0 0 12px; font-size: 16px; }
+  .modal ul { margin: 10px 0; padding-left: 20px; }
+  .modal .foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+  .modal .chk { margin-top: 14px; font-size: 13px; color: #555; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>B.1.5 福利制度 － 福利代碼分類規則</h1>
+  <p class="sub">後端 API 提供「名稱／分類／順序／是否法定」，前端一律照後端顯示；唯一前端特殊規則為法定項目獨立成第一分類。</p>
+
+  <h2>一、需求解讀</h2>
+  <div class="card">
+    <table>
+      <tr><th style="width:110px">現況問題</th><td>
+        <code>tCodeBenefit</code> 表自帶的分類欄位「沒有在用」（見代碼表 §6 開頭註記），前端各專案自己 hardcode 名稱與分類 → 求才、求職、公司頁三邊顯示不一致，改一個字要動三邊程式。
+      </td></tr>
+      <tr><th>後端要做</th><td>
+        福利代碼 API 改為回傳完整顯示資訊：<code>code</code>（代碼）、<code>name</code>（<b>新名稱</b>，以 Google Sheet 版為準）、<code>categoryId / categoryName</code>（分類）、<code>sort</code>（分類順序與項目順序）、<code>isStatutory</code>（是否法定項目）。分類定義由後端維護，新增／異動代碼時一併給定分類與法定旗標。
+      </td></tr>
+      <tr><th>前端要做</th><td>
+        <b>完全不再 hardcode</b>：分類區塊、區塊標題、Chip 文字、排序全部照 API 給的走。<br>
+        <b>唯一的例外規則</b>：<code>isStatutory = true</code> 的代碼，抽出來放在畫面<b>第一個分類「法定項目」</b>。
+      </td></tr>
+    </table>
+    <div class="note">
+      <b>名詞對照：</b>「新名稱」= 代碼表「名稱（新，Google Sheet）」欄；「舊名稱」= 現版文件用字（例：<code>1102</code> 舊「年節獎金」→ 新「年節獎金／禮品」、<code>1303</code> 舊「員工團保」→ 新「員工團體保險」）。API 只給新名稱，舊名稱不再出現在前端。
+    </div>
+  </div>
+
+  <h2>二、法定項目清單（共 17 筆，由代碼表推導）</h2>
+  <div class="card">
+    <table>
+      <tr><th>代碼</th><th>名稱</th><th>代碼表原分類</th><th>送出檢核提示</th></tr>
+      <tr><td>1001</td><td>勞保</td><td>其他類</td><td>必勾（強制）</td></tr>
+      <tr><td>1002</td><td>健保</td><td>其他類</td><td>必勾（強制）</td></tr>
+      <tr><td>1003</td><td>加班費</td><td>其他類</td><td>列入提示</td></tr>
+      <tr><td>1007</td><td>週休二日</td><td>其他類</td><td><b>排除</b></td></tr>
+      <tr><td>1201</td><td>陪產檢及陪產假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1202</td><td>育嬰假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1203</td><td>生理假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1204</td><td>特別休假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1207</td><td>產假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1208</td><td>產檢假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1210</td><td>安胎假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1211</td><td>家庭照顧假</td><td>休假類</td><td>列入提示</td></tr>
+      <tr><td>1304</td><td>員工體檢</td><td>保險類</td><td>列入提示</td></tr>
+      <tr><td>1308</td><td>勞退提繳金</td><td>保險類</td><td>列入提示</td></tr>
+      <tr><td>1309</td><td>職災保險</td><td>保險類</td><td>列入提示</td></tr>
+      <tr><td>1311</td><td>就業保險</td><td>保險類</td><td>列入提示</td></tr>
+      <tr><td>1702</td><td>哺乳室</td><td>設備類</td><td><b>排除</b></td></tr>
+    </table>
+    <div class="ok">
+      <b>交叉驗證通過：</b>17 筆法定項目扣掉「週休二日」「哺乳室」= <b>15 項</b>，正好對上 B.1.5 文件寫的「除週休二日 &amp; 哺乳室外共 15 項，待後端確認規則」。<br>
+      → 建議 API 再給一個 <code>requireCheckAlert</code> 旗標（1007／1702 為 <code>false</code>），<b>不要讓前端 hardcode 排除這兩碼</b>，這樣文件裡「待後端確認規則」就結案了。
+    </div>
+  </div>
+
+  <h2>三、建議的 API 回傳格式</h2>
+  <div class="card">
+<pre>GET /api/company/benefit-codes        // 代碼字典（可全站快取）
+
+{
+  "categories": [
+    { "id": "STATUTORY", "name": "法定項目", "sort": 1 },   // 由 isStatutory 聚合而成的虛擬分類
+    { "id": "BONUS",     "name": "獎金類",   "sort": 2 },
+    { "id": "LEAVE",     "name": "休假類",   "sort": 3 },
+    { "id": "INSURANCE", "name": "保險類",   "sort": 4 },
+    { "id": "MEAL",      "name": "餐飲類",   "sort": 5 },
+    { "id": "HOUSING",   "name": "居住類",   "sort": 6 },
+    { "id": "TRAFFIC",   "name": "交通類",   "sort": 7 },
+    { "id": "FACILITY",  "name": "設備類",   "sort": 8 },
+    { "id": "LEISURE",   "name": "娛樂類",   "sort": 9 },
+    { "id": "SUBSIDY",   "name": "補助類",   "sort": 10 },
+    { "id": "OTHER",     "name": "其他類",   "sort": 11 }
+  ],
+  "benefits": [
+    {
+      "code": 1001,
+      "name": "勞保",                  // 新名稱，前端直接顯示
+      "categoryId": "OTHER",
+      "categoryName": "其他類",
+      "sort": 1,
+      "isStatutory": true,             // 前端唯一特殊規則的依據
+      "requireSubmit": true,           // 送出前強制校驗（勞保、健保）
+      "requireCheckAlert": true        // 未勾選要列入提示 Modal（1007／1702 為 false）
+    }
+  ]
+}
+
+GET /api/company/welfare              // 該廠商已勾選的代碼
+{ "selectedCodes": [1001, 1002, 1105], "memo": "補充說明文字…" }</pre>
+    <div class="note">
+      <b>為什麼「法定項目」要當成 categories 的一員：</b>這樣前端渲染邏輯完全統一 ——「依 <code>sort</code> 跑 categories，每個分類撈屬於它的 benefits」，不需要為法定項目寫第二套排版程式。後端只要把 <code>isStatutory=true</code> 的項目在組裝時歸到 <code>STATUTORY</code> 群即可。<br>
+      這也和 104 的做法一致（104 代碼表本身就把勞保、健保、產假、哺乳室、週休二日…直接歸類為「法定項目」分類）。
+    </div>
+  </div>
+
+  <h2>四、待確認：法定項目要不要在原分類重複出現？</h2>
+  <div class="card">
+    <div class="warn">
+      「<b>額外</b>顯示於第一分類」聽起來是複製一份，「<b>獨立</b>顯示」聽起來是抽出來。兩種解讀畫面差很多，下方 Demo 可切換比較。
+    </div>
+    <table>
+      <tr><th style="width:130px">方案</th><th>畫面</th><th>優缺點</th></tr>
+      <tr>
+        <td><b>A. 抽出（建議）</b></td>
+        <td>法定項目只出現在第一分類；休假類只剩生日假／旅遊假／不用補班，保險類只剩意外險…</td>
+        <td>✅ 同一代碼只有一個 Chip，勾選狀態不會有同步問題<br>✅ 與 104 分類方式一致<br>✅ 與現行 B.1.5 文件章節結構一致（§2 法定項目、§3~11 其他福利代碼）</td>
+      </tr>
+      <tr>
+        <td>B. 重複顯示</td>
+        <td>法定項目同時出現在第一分類與原分類</td>
+        <td>⚠️ 同代碼兩個 Chip，勾其一另一個要連動<br>⚠️ 使用者容易誤以為是兩個不同項目<br>✅ 依分類找項目時不會「找不到特別休假」</td>
+      </tr>
+    </table>
+    <p>建議採 <b>方案 A</b>。若最後採 B，前端須以 <code>code</code> 為唯一 key 共用勾選狀態（Demo 已實作連動）。</p>
+  </div>
+
+  <h2>五、必須保留的既有規則（B.1.5 原文）</h2>
+  <div class="card">
+    <table>
+      <tr><th style="width:120px">時機</th><th>規則</th></tr>
+      <tr><td>初始化</td><td>判斷廠商屬性 <code>organs.confirmed &amp; 131072</code>（不可修改，<b>廠商層級</b>非帳號權限）：外網且有此旗標時顯示 Alert「不好意思，您目前沒有權限使用本功能，請聯繫客服人員。」並將送出按鈕設為 <code>disabled</code>。</td></tr>
+      <tr><td>初始化</td><td>撈取廠商目前福利代碼，有代碼者 Chip 呈現 selected；Chip 需有 hover / selected / hoverselected 樣式。</td></tr>
+      <tr><td>初始化</td><td>若有法定項目未勾選 → 顯示提示 Modal，列出未勾選的 15 項。</td></tr>
+      <tr><td>送出前</td><td><b>強制校驗</b>：勞保（1001）、健保（1002）必須已勾選。</td></tr>
+      <tr><td>送出時</td><td>再檢查一次法定項目未勾選情境；Modal 文案：「刊登職缺須符合個人資料保護法、就業服務法、依法參加社會保險(勞保、職災保險、就保等)及勞退新制與相關法令。您尚未勾選：<i>項目名稱</i>」。確定 → 關 Modal 並送出；取消 → 關 Modal 返回。</td></tr>
+      <tr><td>兩處 Modal</td><td>勾「我已了解相關規範，今日不再顯示」+ 確定 → localStorage 記錄 <b>by 廠商 + by 帳號</b> 的不顯示紀錄，效期一天，登出不清除。</td></tr>
+      <tr><td>補充說明</td><td>資料來源 organs，textarea 上限 5000 字，即時正字與敏感字偵測，違反就服法／性平法字眼與競品字眼各有對應 error message。</td></tr>
+    </table>
+    <div class="note"><b>新舊規則銜接：</b>上面所有「法定項目」判斷，改為讀 API 的 <code>isStatutory</code> / <code>requireSubmit</code> / <code>requireCheckAlert</code>，前端不再維護任何代碼清單。</div>
+  </div>
+
+  <h2>六、互動 Demo</h2>
+  <div class="card">
+    <div class="toolbar">
+      <label><input type="radio" name="mode" value="extract" checked> 方案 A：法定項目抽出（建議）</label>
+      <label><input type="radio" name="mode" value="duplicate"> 方案 B：法定項目重複顯示</label>
+      <label><input type="checkbox" id="noPerm"> 模擬 <code>confirmed&amp;131072</code>（外網不可修改）</label>
+      <span id="stat" style="margin-left:auto;color:#666"></span>
+    </div>
+    <div id="board"></div>
+    <div class="actions">
+      <button class="btn btn-ghost" id="btnPreview">預覽公司頁</button>
+      <button class="btn btn-primary" id="btnSubmit">確定送出</button>
+    </div>
+    <p style="color:#666;font-size:13px;margin-top:10px">※ Demo 的資料等同 API 回傳結果；切換方案時只有渲染方式改變，勾選狀態以 <code>code</code> 為 key 共用。</p>
+  </div>
+
+</div>
+
+<div class="mask" id="mask">
+  <div class="modal">
+    <h4 id="mTitle">提醒</h4>
+    <div id="mBody"></div>
+    <div class="chk" id="mChkWrap"><label><input type="checkbox" id="mChk"> 我已了解相關規範，今日不再顯示</label></div>
+    <div class="foot" id="mFoot"></div>
+  </div>
+</div>
+
+<script>
+/* ===================== 模擬 API 回傳 ===================== */
+var API = {
+  categories: [
+    { id: 'STATUTORY', name: '法定項目', sort: 1 },
+    { id: 'BONUS',     name: '獎金類',   sort: 2 },
+    { id: 'LEAVE',     name: '休假類',   sort: 3 },
+    { id: 'INSURANCE', name: '保險類',   sort: 4 },
+    { id: 'MEAL',      name: '餐飲類',   sort: 5 },
+    { id: 'HOUSING',   name: '居住類',   sort: 6 },
+    { id: 'TRAFFIC',   name: '交通類',   sort: 7 },
+    { id: 'FACILITY',  name: '設備類',   sort: 8 },
+    { id: 'LEISURE',   name: '娛樂類',   sort: 9 },
+    { id: 'SUBSIDY',   name: '補助類',   sort: 10 },
+    { id: 'OTHER',     name: '其他類',   sort: 11 }
+  ],
+  benefits: []
+};
+
+/* [code, name, categoryId, isStatutory, requireSubmit, requireCheckAlert] */
+var RAW = [
+  [1001,'勞保','OTHER',1,1,1],
+  [1002,'健保','OTHER',1,1,1],
+  [1003,'加班費','OTHER',1,0,1],
+  [1007,'週休二日','OTHER',1,0,0],
+  [1201,'陪產檢及陪產假','LEAVE',1,0,1],
+  [1202,'育嬰假','LEAVE',1,0,1],
+  [1203,'生理假','LEAVE',1,0,1],
+  [1204,'特別休假','LEAVE',1,0,1],
+  [1207,'產假','LEAVE',1,0,1],
+  [1208,'產檢假','LEAVE',1,0,1],
+  [1210,'安胎假','LEAVE',1,0,1],
+  [1211,'家庭照顧假','LEAVE',1,0,1],
+  [1304,'員工體檢','INSURANCE',1,0,1],
+  [1308,'勞退提繳金','INSURANCE',1,0,1],
+  [1309,'職災保險','INSURANCE',1,0,1],
+  [1311,'就業保險','INSURANCE',1,0,1],
+  [1702,'哺乳室','FACILITY',1,0,0],
+
+  [1101,'全勤獎金','BONUS',0,0,0],
+  [1102,'年節獎金／禮品','BONUS',0,0,0],
+  [1103,'分紅入股','BONUS',0,0,0],
+  [1104,'生日禮金','BONUS',0,0,0],
+  [1105,'年終獎金','BONUS',0,0,0],
+  [1106,'三節獎金／禮品','BONUS',0,0,0],
+  [1107,'員工禮品','BONUS',0,0,0],
+  [1108,'激勵獎金','BONUS',0,0,0],
+  [1109,'績效獎金','BONUS',0,0,0],
+
+  [1205,'生日假','LEAVE',0,0,0],
+  [1206,'旅遊假','LEAVE',0,0,0],
+  [1209,'不用補班','LEAVE',0,0,0],
+
+  [1301,'意外險','INSURANCE',0,0,0],
+  [1302,'壽險','INSURANCE',0,0,0],
+  [1303,'員工團體保險','INSURANCE',0,0,0],
+  [1305,'員工撫恤','INSURANCE',0,0,0],
+  [1306,'公出特別保險','INSURANCE',0,0,0],
+  [1307,'員工及眷屬住院慰問金','INSURANCE',0,0,0],
+  [1310,'眷屬團體保險','INSURANCE',0,0,0],
+
+  [1401,'誤餐費','MEAL',0,0,0],
+  [1402,'伙食津貼','MEAL',0,0,0],
+  [1403,'免費供餐','MEAL',0,0,0],
+
+  [1501,'員工宿舍','HOUSING',0,0,0],
+  [1502,'購屋低利貸款','HOUSING',0,0,0],
+  [1504,'搬家／安家補助','HOUSING',0,0,0],
+  [1505,'租屋／住房補助','HOUSING',0,0,0],
+
+  [1601,'通勤車資補助','TRAFFIC',0,0,0],
+  [1602,'交通車','TRAFFIC',0,0,0],
+  [1603,'購車低利貸款','TRAFFIC',0,0,0],
+  [1604,'停車位／停車補助','TRAFFIC',0,0,0],
+
+  [1701,'育嬰室','FACILITY',0,0,0],
+  [1703,'健身房','FACILITY',0,0,0],
+  [1704,'附設托兒中心','FACILITY',0,0,0],
+  [1706,'休息寢室','FACILITY',0,0,0],
+  [1707,'員工餐廳','FACILITY',0,0,0],
+  [1708,'按摩室','FACILITY',0,0,0],
+  [1709,'書報室','FACILITY',0,0,0],
+  [1710,'交誼廳','FACILITY',0,0,0],
+
+  [1801,'電影觀賞','LEISURE',0,0,0],
+  [1802,'團隊凝聚活動','LEISURE',0,0,0],
+  [1803,'國內旅遊','LEISURE',0,0,0],
+  [1804,'國外旅遊','LEISURE',0,0,0],
+  [1805,'員工聚餐','LEISURE',0,0,0],
+  [1806,'慶生會','LEISURE',0,0,0],
+  [1807,'尾牙','LEISURE',0,0,0],
+  [1808,'春酒','LEISURE',0,0,0],
+  [1809,'寵物日','LEISURE',0,0,0],
+  [1810,'下午茶','LEISURE',0,0,0],
+  [1811,'家庭日','LEISURE',0,0,0],
+  [1812,'員工運動會','LEISURE',0,0,0],
+
+  [1901,'結婚補助','SUBSIDY',0,0,0],
+  [1902,'生育補助','SUBSIDY',0,0,0],
+  [1903,'子女教育補助','SUBSIDY',0,0,0],
+  [1904,'進修補助','SUBSIDY',0,0,0],
+  [1905,'公務手機／電信補助','SUBSIDY',0,0,0],
+  [1906,'電腦／設備購置補助或貸款','SUBSIDY',0,0,0],
+  [1907,'退休金／退休福利','SUBSIDY',0,0,0],
+  [1908,'員工及眷屬喪葬補助','SUBSIDY',0,0,0],
+  [1909,'員工購物優惠','SUBSIDY',0,0,0],
+  [1910,'員工低利貸款','SUBSIDY',0,0,0],
+  [1911,'治裝補助／兌換券','SUBSIDY',0,0,0],
+  [1912,'旅遊補助','SUBSIDY',0,0,0],
+  [1913,'社團補助／活動','SUBSIDY',0,0,0],
+  [1914,'合作托兒中心','SUBSIDY',0,0,0],
+
+  [1004,'員工制服','OTHER',0,0,0],
+  [1005,'在職教育訓練','OTHER',0,0,0],
+  [1006,'良好升遷制度','OTHER',0,0,0],
+  [1008,'定期調薪','OTHER',0,0,0]
+];
+
+var CAT_NAME = {};
+API.categories.forEach(function (c) { CAT_NAME[c.id] = c.name; });
+RAW.forEach(function (r, i) {
+  API.benefits.push({
+    code: r[0], name: r[1], categoryId: r[2], categoryName: CAT_NAME[r[2]],
+    sort: i + 1, isStatutory: !!r[3], requireSubmit: !!r[4], requireCheckAlert: !!r[5]
+  });
+});
+
+/* ===================== 狀態 ===================== */
+var ORGAN_ID = 'ORG123';           // 廠商
+var ACCOUNT_ID = 'ACC456';         // 帳號
+var selected = { 1001: true, 1002: true, 1105: true, 1204: true };   // 模擬既有勾選
+var mode = 'extract';
+var board = document.getElementById('board');
+
+/* ===================== 渲染（完全依 API） ===================== */
+function render() {
+  var noPerm = document.getElementById('noPerm').checked;
+  var html = '';
+
+  API.categories.slice().sort(function (a, b) { return a.sort - b.sort; }).forEach(function (cat) {
+    var list = API.benefits.filter(function (b) {
+      if (cat.id === 'STATUTORY') return b.isStatutory;                       // 前端唯一特殊規則
+      if (b.isStatutory && mode === 'extract') return false;                  // 方案 A：抽出
+      return b.categoryId === cat.id;
+    }).sort(function (a, b) { return a.sort - b.sort; });
+
+    if (!list.length) return;
+
+    html += '<div class="group"><div class="group-title">' + cat.name +
+            (cat.id === 'STATUTORY' ? '<span class="badge">法定</span>' : '') +
+            '<span class="cnt">（' + list.length + '）</span></div><div class="chips">';
+    list.forEach(function (b) {
+      var dup = b.isStatutory && cat.id !== 'STATUTORY' ? ' statutory-dup' : '';
+      html += '<span class="chip' + (selected[b.code] ? ' selected' : '') + dup +
+              '" data-code="' + b.code + '" title="代碼 ' + b.code + '｜' + b.categoryName + '">' +
+              b.name + '</span>';
+    });
+    html += '</div></div>';
+  });
+
+  board.innerHTML = html;
+  board.style.pointerEvents = noPerm ? 'none' : '';
+  board.style.opacity = noPerm ? .55 : 1;
+  document.getElementById('btnSubmit').disabled = noPerm;
+  updateStat();
+}
+
+function updateStat() {
+  var total = API.benefits.filter(function (b) { return selected[b.code]; }).length;
+  var st = API.benefits.filter(function (b) { return b.isStatutory && selected[b.code]; }).length;
+  document.getElementById('stat').textContent = '已勾選 ' + total + ' 項（法定 ' + st + '／17）';
+}
+
+board.addEventListener('click', function (e) {
+  var chip = e.target.closest('.chip');
+  if (!chip) return;
+  var code = +chip.dataset.code;
+  selected[code] = !selected[code];
+  render();                                    // 重畫，方案 B 的兩個 Chip 自動連動
+});
+
+document.querySelectorAll('input[name=mode]').forEach(function (r) {
+  r.addEventListener('change', function () { mode = this.value; render(); });
+});
+document.getElementById('noPerm').addEventListener('change', function () {
+  if (this.checked) alert('不好意思，您目前沒有權限使用本功能，請聯繫客服人員。');
+  render();
+});
+
+/* ===================== 法定項目未勾選 Modal ===================== */
+function missingStatutory() {
+  return API.benefits.filter(function (b) { return b.requireCheckAlert && !selected[b.code]; });
+}
+function muteKey() { return 'welfareStatutoryMute_' + ORGAN_ID + '_' + ACCOUNT_ID; }
+function isMuted() {
+  try {
+    var v = localStorage.getItem(muteKey());
+    return !!v && Date.now() < +v;
+  } catch (err) { return false; }
+}
+function mute() {
+  try { localStorage.setItem(muteKey(), String(Date.now() + 86400000)); } catch (err) {}
+}
+
+var mask = document.getElementById('mask');
+function openStatutoryModal(withCancel, onConfirm) {
+  var miss = missingStatutory();
+  document.getElementById('mTitle').textContent = '提醒';
+  document.getElementById('mBody').innerHTML =
+    '<p>刊登職缺須符合個人資料保護法、就業服務法、依法參加社會保險(勞保、職災保險、就保等)及勞退新制與相關法令。您尚未勾選：</p><ul>' +
+    miss.map(function (b) { return '<li>' + b.name + '</li>'; }).join('') + '</ul>';
+  document.getElementById('mChkWrap').style.display = '';
+  document.getElementById('mChk').checked = false;
+
+  var foot = document.getElementById('mFoot');
+  foot.innerHTML = '';
+  if (withCancel) {
+    var c = document.createElement('button');
+    c.className = 'btn btn-ghost'; c.textContent = '取消';
+    c.onclick = function () { mask.classList.remove('show'); };
+    foot.appendChild(c);
+  }
+  var ok = document.createElement('button');
+  ok.className = 'btn btn-primary'; ok.textContent = '確定';
+  ok.onclick = function () {
+    if (document.getElementById('mChk').checked) mute();
+    mask.classList.remove('show');
+    if (onConfirm) onConfirm();
+  };
+  foot.appendChild(ok);
+  mask.classList.add('show');
+}
+function openInfoModal(title, msg) {
+  document.getElementById('mTitle').textContent = title;
+  document.getElementById('mBody').innerHTML = '<p>' + msg + '</p>';
+  document.getElementById('mChkWrap').style.display = 'none';
+  var foot = document.getElementById('mFoot');
+  foot.innerHTML = '';
+  var ok = document.createElement('button');
+  ok.className = 'btn btn-primary'; ok.textContent = '確定';
+  ok.onclick = function () { mask.classList.remove('show'); };
+  foot.appendChild(ok);
+  mask.classList.add('show');
+}
+
+/* ===================== 送出 ===================== */
+document.getElementById('btnSubmit').addEventListener('click', function () {
+  var needSubmit = API.benefits.filter(function (b) { return b.requireSubmit && !selected[b.code]; });
+  if (needSubmit.length) {                       // 強制校驗：勞保、健保
+    openInfoModal('無法送出', '請先勾選：' + needSubmit.map(function (b) { return b.name; }).join('、'));
+    return;
+  }
+  if (missingStatutory().length && !isMuted()) {
+    openStatutoryModal(true, function () { openInfoModal('送出成功', '已送出福利制度設定。'); });
+    return;
+  }
+  openInfoModal('送出成功', '已送出福利制度設定。');
+});
+document.getElementById('btnPreview').addEventListener('click', function () {
+  openInfoModal('預覽公司頁', '導向公司資料預覽頁（B.1 公司資料預覽）。');
+});
+
+/* ===================== 初始化 ===================== */
+render();
+if (missingStatutory().length && !isMuted()) openStatutoryModal(false, null);
+</script>
+</body>
+</html>
