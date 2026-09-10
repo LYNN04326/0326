@@ -31,6 +31,7 @@
   .group-title { font-weight: 700; font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
   .group-title .badge { font-size: 11px; font-weight: 500; color: #fff; background: #d93025; padding: 1px 7px; border-radius: 10px; }
   .group-title .cnt { font-size: 12px; font-weight: 400; color: #888; }
+  .group-hint { color: #555; font-size: 13px; margin: -2px 0 8px; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip { border: 1px solid #c4cbd4; background: #fff; border-radius: 16px; padding: 5px 14px; cursor: pointer;
           font-size: 13px; user-select: none; transition: .12s; }
@@ -143,12 +144,25 @@ GET /api/company/welfare              // 該廠商已勾選的代碼
       <b>為什麼「法定項目」要當成 categories 的一員：</b>這樣前端渲染邏輯完全統一 ——「依 <code>sort</code> 跑 categories，每個分類撈屬於它的 benefits」，不需要為法定項目寫第二套排版程式。後端只要把 <code>isStatutory=true</code> 的項目在組裝時歸到 <code>STATUTORY</code> 群即可。<br>
       這也和 104 的做法一致（104 代碼表本身就把勞保、健保、產假、哺乳室、週休二日…直接歸類為「法定項目」分類）。
     </div>
+    <h3>與「求才新版文件：福利制度代碼」Sheet 的欄位對照</h3>
+    <p>Axure 頁面右下已附上該 Sheet，欄位與本 API 一一對應，後端可直接照 Sheet 出資料：</p>
+    <table>
+      <tr><th style="width:200px">Sheet 欄位</th><th style="width:190px">API 欄位</th><th>說明</th></tr>
+      <tr><td><code>tCode</code></td><td><code>code</code></td><td>福利代碼</td></tr>
+      <tr><td><code>Group No.</code> / <code>Group Name</code></td><td><code>categoryId</code> / <code>categoryName</code></td><td>分類編號與分類名稱（1100／1200…為大類）</td></tr>
+      <tr><td><code>屬性</code></td><td>—</td><td>大類／子項，用於 Sheet 內階層，API 不需回傳</td></tr>
+      <tr><td><code>法定項目</code> ☑</td><td><code>isStatutory</code></td><td>前端唯一特殊規則的依據</td></tr>
+      <tr><td><code>未勾選提示</code> ☑</td><td><code>requireCheckAlert</code></td><td>未勾選時要列入提示 Modal</td></tr>
+    </table>
+    <div class="ok">
+      <b>「待後端確認規則」可結案：</b>提示清單不是前端 hardcode 排除週休二日與哺乳室，而是由 Sheet 的 <code>未勾選提示</code> 欄位決定；週休二日（1007）、哺乳室（1702）兩碼不勾即可。
+    </div>
   </div>
 
-  <h2>四、待確認：法定項目要不要在原分類重複出現？</h2>
+  <h2>四、法定項目顯示方式：<span style="color:#2e7d32">確認採方案 A（抽出）</span></h2>
   <div class="card">
-    <div class="warn">
-      「<b>額外</b>顯示於第一分類」聽起來是複製一份，「<b>獨立</b>顯示」聽起來是抽出來。兩種解讀畫面差很多，下方 Demo 可切換比較。
+    <div class="ok">
+      <b>已由 Axure 原型定案，不需再討論。</b>證據：Axure B.1.5 畫面中「1.1 法定項目」列出全部 17 個 chip，而「1.3 休假類」只剩生日假／旅遊假／不用補班，「1.4 保險類」只剩意外險／壽險／員工團保／員工撫卹／員工公出特別保險／員工及眷屬住院慰問金／眷屬團保 —— 法定項目<b>沒有</b>在原分類重複出現。
     </div>
     <table>
       <tr><th style="width:130px">方案</th><th>畫面</th><th>優缺點</th></tr>
@@ -163,7 +177,7 @@ GET /api/company/welfare              // 該廠商已勾選的代碼
         <td>⚠️ 同代碼兩個 Chip，勾其一另一個要連動<br>⚠️ 使用者容易誤以為是兩個不同項目<br>✅ 依分類找項目時不會「找不到特別休假」</td>
       </tr>
     </table>
-    <p>建議採 <b>方案 A</b>。若最後採 B，前端須以 <code>code</code> 為唯一 key 共用勾選狀態（Demo 已實作連動）。</p>
+    <p>方案 B 保留在 Demo 中僅供比對，<b>實作一律採方案 A</b>。</p>
   </div>
 
   <h2>五、必須保留的既有規則（B.1.5 原文）</h2>
@@ -181,12 +195,55 @@ GET /api/company/welfare              // 該廠商已勾選的代碼
     <div class="note"><b>新舊規則銜接：</b>上面所有「法定項目」判斷，改為讀 API 的 <code>isStatutory</code> / <code>requireSubmit</code> / <code>requireCheckAlert</code>，前端不再維護任何代碼清單。</div>
   </div>
 
-  <h2>六、互動 Demo</h2>
+  <h2>六、Axure 補充規則（原型有、HackMD 尚未收錄）</h2>
+  <div class="card">
+    <p style="color:#666;margin-top:0">來源：Axure 求才新版規格文件 › B.1.5 福利制度（v0.1.5，2025/9/17 by 育）。以下五條建議補回 HackMD B.1.5。</p>
+    <table>
+      <tr><th style="width:40px">#</th><th style="width:150px">項目</th><th>規則</th></tr>
+      <tr>
+        <td>1</td><td><b>離開頁面攔截</b></td>
+        <td>當頁面編輯後，廠商嘗試關閉分頁或回到上一頁時，顯示瀏覽器系統 alert。<br>
+        → 實作：內容有異動時設 dirty flag，掛 <code>beforeunload</code>；送出成功後清除。<b>HackMD 完全沒有此條。</b></td>
+      </tr>
+      <tr>
+        <td>2</td><td><b>內外網 IP 三分支</b></td>
+        <td>Axure 把權限判斷寫得比 HackMD 完整：<br>
+        ・外網 IP <b>且</b>有 <code>organs.confirmed:131072</code> → 顯示 Alert「不好意思，您目前沒有權限使用本功能，請聯繫客服人員。」，送出按鈕 <code>disabled</code><br>
+        ・外網 IP <b>無</b>此代碼 → 送出按鈕可正常送出<br>
+        ・<b>內網 IP</b> → 不顯示 Alert，按鈕可正常送出（不受 131072 影響）<br>
+        → HackMD 只寫「外網且有此旗標」，內網分支未明寫，建議照此補齊。</td>
+      </tr>
+      <tr>
+        <td>3</td><td><b>法定項目引導文案</b></td>
+        <td>「1.1 法定項目」區塊標題下方固定顯示：<br>
+        <i>請勾選勞健保、職災保險、就保、特別休假，並確認制度符合勞退新制規定，即可刊登職缺。</i></td>
+      </tr>
+      <tr>
+        <td>4</td><td><b>調整項目順序</b></td>
+        <td>原型上以紅圈標註「調整項目順序」，框住<b>就業保險、職災保險、勞退提繳金、加班費</b>四項。<br>
+        → 正好對應本次需求：<b>順序改由後端 <code>sort</code> 決定</b>，前端不再自行排列，此標註即可落地。</td>
+      </tr>
+      <tr>
+        <td>5</td><td><b>初始化 Modal 樣式</b></td>
+        <td>標題為「<b>重要提醒</b>」；內容動態列出<b>未勾選</b>的項目（原型範例只列「就業保險」一項，非固定 15 項）；<b>只有「確定」一顆按鈕</b>。</td>
+      </tr>
+    </table>
+    <div class="warn">
+      <b>⚠️ 與 HackMD 衝突，需確認：</b>HackMD B.1.5 寫「兩處 Modal」都有「我已了解相關規範，今日不再顯示」checkbox + localStorage 一天效期，但 Axure 的<b>初始化 Modal 沒有這個 checkbox，也沒有取消按鈕</b>。<br>
+      本文件與 Demo 暫採：<b>初始化 Modal = 標題「重要提醒」＋單顆確定，無 checkbox；送出時 Modal = 確定／取消＋今日不再顯示 checkbox</b>。請確認是原型未畫到，還是 HackMD 寫過頭。
+    </div>
+    <div class="note">
+      <b>名稱提醒：</b>Axure 畫面上的 chip 目前仍是<b>舊名稱</b>（勞保（5人以上強制納保）、員工生日禮金、三節獎金、禮品、員工團保、眷屬團保、哺乳室（100人以上）…）。本次改版後一律改用代碼表的<b>新名稱</b>，原型文字不需再跟進。
+    </div>
+  </div>
+
+  <h2>七、互動 Demo</h2>
   <div class="card">
     <div class="toolbar">
       <label><input type="radio" name="mode" value="extract" checked> 方案 A：法定項目抽出（建議）</label>
-      <label><input type="radio" name="mode" value="duplicate"> 方案 B：法定項目重複顯示</label>
-      <label><input type="checkbox" id="noPerm"> 模擬 <code>confirmed&amp;131072</code>（外網不可修改）</label>
+      <label><input type="radio" name="mode" value="duplicate"> 方案 B：法定項目重複顯示（僅供比對，不採用）</label>
+      <label><input type="checkbox" id="noPerm"> 模擬外網 IP + <code>confirmed&amp;131072</code></label>
+      <label><input type="checkbox" id="intranet"> 模擬內網 IP（不受 131072 限制）</label>
       <span id="stat" style="margin-left:auto;color:#666"></span>
     </div>
     <div id="board"></div>
@@ -340,11 +397,14 @@ var ORGAN_ID = 'ORG123';           // 廠商
 var ACCOUNT_ID = 'ACC456';         // 帳號
 var selected = { 1001: true, 1002: true, 1105: true, 1204: true };   // 模擬既有勾選
 var mode = 'extract';
+var dirty = false;                 // Axure 補充規則 1：頁面是否已編輯
 var board = document.getElementById('board');
 
 /* ===================== 渲染（完全依 API） ===================== */
 function render() {
-  var noPerm = document.getElementById('noPerm').checked;
+  // Axure 補充規則 2：內網 IP 不受 confirmed&131072 限制
+  var intranet = document.getElementById('intranet').checked;
+  var noPerm = document.getElementById('noPerm').checked && !intranet;
   var html = '';
 
   API.categories.slice().sort(function (a, b) { return a.sort - b.sort; }).forEach(function (cat) {
@@ -358,7 +418,11 @@ function render() {
 
     html += '<div class="group"><div class="group-title">' + cat.name +
             (cat.id === 'STATUTORY' ? '<span class="badge">法定</span>' : '') +
-            '<span class="cnt">（' + list.length + '）</span></div><div class="chips">';
+            '<span class="cnt">（' + list.length + '）</span></div>';
+    if (cat.id === 'STATUTORY') {                // Axure 補充規則 3：引導文案
+      html += '<p class="group-hint">請勾選勞健保、職災保險、就保、特別休假，並確認制度符合勞退新制規定，即可刊登職缺。</p>';
+    }
+    html += '<div class="chips">';
     list.forEach(function (b) {
       var dup = b.isStatutory && cat.id !== 'STATUTORY' ? ' statutory-dup' : '';
       html += '<span class="chip' + (selected[b.code] ? ' selected' : '') + dup +
@@ -386,16 +450,27 @@ board.addEventListener('click', function (e) {
   if (!chip) return;
   var code = +chip.dataset.code;
   selected[code] = !selected[code];
+  dirty = true;
   render();                                    // 重畫，方案 B 的兩個 Chip 自動連動
+});
+
+/* Axure 補充規則 1：編輯後關閉分頁／上一頁 → 瀏覽器系統 alert */
+window.addEventListener('beforeunload', function (e) {
+  if (!dirty) return;
+  e.preventDefault();
+  e.returnValue = '';
 });
 
 document.querySelectorAll('input[name=mode]').forEach(function (r) {
   r.addEventListener('change', function () { mode = this.value; render(); });
 });
-document.getElementById('noPerm').addEventListener('change', function () {
-  if (this.checked) alert('不好意思，您目前沒有權限使用本功能，請聯繫客服人員。');
+function checkPermAlert() {
+  var noPerm = document.getElementById('noPerm').checked && !document.getElementById('intranet').checked;
+  if (noPerm) alert('不好意思，您目前沒有權限使用本功能，請聯繫客服人員。');
   render();
-});
+}
+document.getElementById('noPerm').addEventListener('change', checkPermAlert);
+document.getElementById('intranet').addEventListener('change', checkPermAlert);
 
 /* ===================== 法定項目未勾選 Modal ===================== */
 function missingStatutory() {
@@ -413,13 +488,16 @@ function mute() {
 }
 
 var mask = document.getElementById('mask');
-function openStatutoryModal(withCancel, onConfirm) {
+/* withCancel／withMute 依 Axure 補充規則 5：
+   初始化 → 標題「重要提醒」、單顆確定、無 checkbox
+   送出時 → 確定／取消 ＋ 今日不再顯示 checkbox                       */
+function openStatutoryModal(withCancel, withMute, onConfirm) {
   var miss = missingStatutory();
-  document.getElementById('mTitle').textContent = '提醒';
+  document.getElementById('mTitle').textContent = '重要提醒';
   document.getElementById('mBody').innerHTML =
     '<p>刊登職缺須符合個人資料保護法、就業服務法、依法參加社會保險(勞保、職災保險、就保等)及勞退新制與相關法令。您尚未勾選：</p><ul>' +
-    miss.map(function (b) { return '<li>' + b.name + '</li>'; }).join('') + '</ul>';
-  document.getElementById('mChkWrap').style.display = '';
+    miss.map(function (b) { return '<li style="color:#d93025">' + b.name + '</li>'; }).join('') + '</ul>';
+  document.getElementById('mChkWrap').style.display = withMute ? '' : 'none';
   document.getElementById('mChk').checked = false;
 
   var foot = document.getElementById('mFoot');
@@ -433,7 +511,7 @@ function openStatutoryModal(withCancel, onConfirm) {
   var ok = document.createElement('button');
   ok.className = 'btn btn-primary'; ok.textContent = '確定';
   ok.onclick = function () {
-    if (document.getElementById('mChk').checked) mute();
+    if (withMute && document.getElementById('mChk').checked) mute();
     mask.classList.remove('show');
     if (onConfirm) onConfirm();
   };
@@ -461,18 +539,23 @@ document.getElementById('btnSubmit').addEventListener('click', function () {
     return;
   }
   if (missingStatutory().length && !isMuted()) {
-    openStatutoryModal(true, function () { openInfoModal('送出成功', '已送出福利制度設定。'); });
+    openStatutoryModal(true, true, submitDone);   // 送出時：確定／取消 ＋ checkbox
     return;
   }
-  openInfoModal('送出成功', '已送出福利制度設定。');
+  submitDone();
 });
+function submitDone() {
+  dirty = false;                                 // 送出成功後解除離開攔截
+  openInfoModal('送出成功', '已送出福利制度設定。');
+}
 document.getElementById('btnPreview').addEventListener('click', function () {
   openInfoModal('預覽公司頁', '導向公司資料預覽頁（B.1 公司資料預覽）。');
 });
 
 /* ===================== 初始化 ===================== */
 render();
-if (missingStatutory().length && !isMuted()) openStatutoryModal(false, null);
+// 初始化：單顆確定、無 checkbox（Axure 補充規則 5）
+if (missingStatutory().length && !isMuted()) openStatutoryModal(false, false, null);
 </script>
 </body>
 </html>
