@@ -1,0 +1,304 @@
+<meta charset="utf-8">
+<title>年資整理工具</title>
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --text:#1c2024; --muted:#6b7280; --line:#e3e6ea;
+    --accent:#1f6feb; --accent-soft:#e8f0fe; --warn:#b45309; --warn-soft:#fef3c7;
+    --ok:#0f7b55; --ok-soft:#e3f5ed;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{--bg:#14161a;--card:#1c1f24;--text:#e8eaed;--muted:#9aa3ad;--line:#2c3139;
+          --accent:#5b9dff;--accent-soft:#1b2942;--warn:#f0b429;--warn-soft:#3a2f12;
+          --ok:#4ec9a0;--ok-soft:#123027;}
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+       font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.6}
+  .wrap{max-width:1100px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:24px;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 24px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:18px}
+  .card h2{font-size:16px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  #drop{border:2px dashed var(--line);border-radius:12px;padding:36px 20px;text-align:center;
+        cursor:pointer;transition:.15s;color:var(--muted)}
+  #drop:hover,#drop.over{border-color:var(--accent);background:var(--accent-soft);color:var(--text)}
+  #drop b{color:var(--accent)}
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+  input[type=date],input[type=number],select{width:100%;padding:8px 10px;border:1px solid var(--line);
+        border-radius:8px;background:var(--bg);color:var(--text);font-size:14px;font-family:inherit}
+  .chk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);margin-top:22px}
+  .chk input{width:16px;height:16px;accent-color:var(--accent)}
+  button{font-family:inherit;font-size:14px;padding:10px 18px;border-radius:8px;border:1px solid var(--line);
+         background:var(--card);color:var(--text);cursor:pointer}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.primary:hover{opacity:.88;color:#fff}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .stat .n{font-size:22px;font-weight:700}
+  .stat .l{font-size:12px;color:var(--muted)}
+  .bars{display:flex;flex-direction:column;gap:3px;font-size:12px}
+  .bar{display:grid;grid-template-columns:140px 1fr 58px;align-items:center;gap:8px}
+  .bar i{display:block;height:14px;background:var(--accent);border-radius:3px;min-width:2px}
+  .bar span:first-child{color:var(--muted);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+  .tblbox{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+  table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+  th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:var(--bg);position:sticky;top:0;font-weight:600}
+  tr:last-child td{border-bottom:none}
+  td.note{color:var(--warn);white-space:normal;min-width:200px}
+  .tag{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12px}
+  .tag.y{background:var(--ok-soft);color:var(--ok)}
+  .tag.n{background:var(--bg);color:var(--muted)}
+  .hint{font-size:13px;color:var(--muted);margin-top:10px}
+  .rules{font-size:13px;color:var(--muted);margin:0;padding-left:20px}
+  .rules li{margin:3px 0}
+  .hidden{display:none}
+  @media(max-width:520px){.bar{grid-template-columns:100px 1fr 48px}}
+</style>
+
+<div class="wrap">
+  <h1>年資整理工具</h1>
+  <p class="sub">讀取履歷工作經歷 CSV，重新計算 experience 年資代號。所有運算都在瀏覽器本機完成，資料不會上傳。</p>
+
+  <div class="card">
+    <h2>1. 選擇檔案</h2>
+    <div id="drop">把 CSV 檔拖到這裡，或<b>點此選擇檔案</b><br><small>欄位順序：talentNo、resumeGuid、experience，之後每兩欄為一組（起日、迄日）</small></div>
+    <input type="file" id="file" accept=".csv,text/csv" class="hidden">
+    <p class="hint" id="fileinfo"></p>
+  </div>
+
+  <div class="card">
+    <h2>2. 計算設定</h2>
+    <div class="opts">
+      <div>
+        <label for="base">資料基準日（在職中算到這天）</label>
+        <input type="date" id="base">
+      </div>
+      <div>
+        <label for="minyear">最早有效年份（早於此年一律視為空值）</label>
+        <input type="number" id="minyear" value="1940" min="1900" max="2100">
+      </div>
+      <div>
+        <label class="chk"><input type="checkbox" id="merge" checked> 合併重疊期間（避免兼職重複計算）</label>
+        <label class="chk"><input type="checkbox" id="swap" checked> 起迄顛倒時自動對調</label>
+      </div>
+    </div>
+    <ul class="rules" style="margin-top:14px">
+      <li>第 1 段起日為空值（1911/1/1 等） → 無工作經驗（代號 1）</li>
+      <li>迄日為空值 → 視為在職中，年資算到基準日</li>
+      <li>非第 1 段的起日為空值 → 該段資料不完整，略過不計</li>
+      <li>年資換算：0~1 年 → 代號 2，1~2 年 → 代號 3 …… 30 年以上 → 代號 32</li>
+    </ul>
+    <div class="btns">
+      <button class="primary" id="run" disabled>開始計算</button>
+      <button id="dlAll" disabled>下載完整結果 CSV</button>
+      <button id="dlIssue" disabled>下載需人工確認 CSV</button>
+    </div>
+  </div>
+
+  <div id="result" class="hidden">
+    <div class="card">
+      <h2>3. 統計摘要</h2>
+      <div class="stats" id="stats"></div>
+    </div>
+    <div class="card">
+      <h2>4. 年資分布</h2>
+      <div class="bars" id="bars"></div>
+    </div>
+    <div class="card">
+      <h2>5. 結果預覽<small style="font-weight:400;color:var(--muted)">（前 200 筆）</small></h2>
+      <div style="margin-bottom:12px">
+        <select id="filter" style="width:auto">
+          <option value="all">全部資料</option>
+          <option value="changed">僅顯示年資有更正</option>
+          <option value="issue">僅顯示需人工確認</option>
+        </select>
+      </div>
+      <div class="tblbox"><table id="tbl"></table></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const EXPERIENCE = ["1_無工作經驗","2_0~1年工作經驗","3_1~2年工作經驗","4_2~3年工作經驗","5_3~4年工作經驗",
+"6_4~5年工作經驗","7_5~6年工作經驗","8_6~7年工作經驗","9_7~8年工作經驗","10_8~9年工作經驗","11_9~10年工作經驗",
+"12_10~11年工作經驗","13_11~12年工作經驗","14_12~13年工作經驗","15_13~14年工作經驗","16_14~15年工作經驗",
+"17_15~16年工作經驗","18_16~17年工作經驗","19_17~18年工作經驗","20_18~19年工作經驗","21_19~20年工作經驗",
+"22_20~21年工作經驗","23_21~22年工作經驗","24_22~23年工作經驗","25_23~24年工作經驗","26_24~25年工作經驗",
+"27_25~26年工作經驗","28_26~27年工作經驗","29_27~28年工作經驗","30_28~29年工作經驗","31_29~30年工作經驗",
+"32_30年以上工作經驗"];
+const HEAD = ["talentNo","resumeGuid","experience_原值","experience_新值","experience_新值說明","年資_年","年資_月",
+"是否在職中","有效工作段數","最早到職日","最後離職日","年資_未合併重疊_年","資料異常註記"];
+const DAY = 86400000, YEAR = 365.2425;
+
+let rawRows = null, out = [], stat = null;
+
+/* ---------- CSV 解析 ---------- */
+function parseCSV(text){
+  const rows=[]; let row=[], f='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){f+='"';i++;} else q=false; }
+      else f+=c;
+    }else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=''; }
+    else if(c==='\n'){ row.push(f); rows.push(row); row=[]; f=''; }
+    else if(c!=='\r') f+=c;
+  }
+  if(f!==''||row.length){ row.push(f); rows.push(row); }
+  return rows.filter(r=>r.length>1||r[0]!=='');
+}
+function decode(buf){
+  let t=new TextDecoder('utf-8',{fatal:false}).decode(buf);
+  if(t.charCodeAt(0)===0xFEFF) t=t.slice(1);
+  if(t.includes('�')){ try{ t=new TextDecoder('big5').decode(buf); }catch(e){} }
+  return t;
+}
+
+/* ---------- 日期 ---------- */
+function parseDate(v){
+  v=(v||'').trim();
+  if(!v||v.toUpperCase()==='NULL') return null;
+  const m=v.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+  if(!m) return null;
+  const d=new Date(+m[1],+m[2]-1,+m[3]);
+  return isNaN(d)?null:d;
+}
+const fmt = d => d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0');
+
+/* ---------- 主計算 ---------- */
+function calc(){
+  const base=new Date(document.getElementById('base').value+'T00:00:00');
+  const minValid=new Date(+document.getElementById('minyear').value,0,1);
+  const doMerge=document.getElementById('merge').checked;
+  const doSwap=document.getElementById('swap').checked;
+  const empty = d => d===null || d<minValid;     // 空值／哨兵日期
+
+  out=[]; stat={total:0,none:0,working:0,changed:0,issue:0};
+  const dist=new Array(33).fill(0);
+
+  for(const r of rawRows){
+    const cells=r.slice(3).map(parseDate);
+    const notes=[], periods=[];
+    let working=false, rawDays=0;
+
+    for(let i=0;i<cells.length;i+=2){
+      let s=cells[i], e=cells[i+1]===undefined?null:cells[i+1], n=i/2+1;
+      if(s===null&&e===null) continue;
+      if(empty(s)){ if(!empty(e)) notes.push('第'+n+'段缺起日'); continue; }
+      if(s>base){ notes.push('第'+n+'段起日晚於基準日'); s=base; }
+      if(empty(e)){ e=base; working=true; }
+      else if(e<s){
+        if(doSwap){ notes.push('第'+n+'段起迄顛倒已對調'); const t=s; s=e; e=t; }
+        else { notes.push('第'+n+'段起迄顛倒已略過'); continue; }
+      }
+      if(e>base){ notes.push('第'+n+'段迄日晚於基準日'); e=base; }
+      periods.push([s,e]); rawDays+=(e-s)/DAY;
+    }
+
+    periods.sort((a,b)=>a[0]-b[0]);
+    const merged=[];
+    for(const p of periods){
+      const last=merged[merged.length-1];
+      if(doMerge && last && p[0]<=last[1]){ if(p[1]>last[1]) last[1]=p[1]; }
+      else merged.push([p[0],p[1]]);
+    }
+    let days=0; for(const m of merged) days+=(m[1]-m[0])/DAY;
+    if(days<rawDays) notes.push('工作期間有重疊已合併');
+
+    const code = periods.length ? Math.min(Math.floor(days/YEAR)+2,32) : 1;
+    const old=(r[2]||'').trim();
+    if(!/^\d+$/.test(old)||+old<1||+old>32) notes.push('原 experience 值不合法('+old+')');
+    if(periods.length&&code===1) notes.push('有工作期間但年資為 0');
+
+    stat.total++;
+    if(!periods.length) stat.none++;
+    if(working) stat.working++;
+    const changed = /^\d+$/.test(old) && +old!==code;
+    if(changed) stat.changed++;
+    if(notes.length) stat.issue++;
+    dist[code]++;
+
+    let first='',last='';
+    if(merged.length){
+      first=fmt(merged[0][0]);
+      last=working?'在職中':fmt(merged[merged.length-1][1]);
+    }
+    out.push({changed, issue:notes.length>0, row:[r[0],r[1],old,code,EXPERIENCE[code-1],
+      (days/YEAR).toFixed(2), (days/30.4369).toFixed(1), working?'Y':'N', periods.length,
+      first, last, (rawDays/YEAR).toFixed(2), notes.join('；')]});
+  }
+  render(dist);
+}
+
+/* ---------- 畫面 ---------- */
+function render(dist){
+  document.getElementById('result').classList.remove('hidden');
+  const s=[['總筆數',stat.total],['年資有更正',stat.changed],['在職中',stat.working],
+           ['無工作經驗',stat.none],['需人工確認',stat.issue]];
+  document.getElementById('stats').innerHTML=s.map(([l,n])=>
+    `<div class="stat"><div class="n">${n.toLocaleString()}</div><div class="l">${l}</div></div>`).join('');
+
+  const max=Math.max(...dist.slice(1));
+  document.getElementById('bars').innerHTML=EXPERIENCE.map((name,i)=>{
+    const n=dist[i+1];
+    return `<div class="bar"><span>${name}</span><i style="width:${max?n/max*100:0}%"></i><span>${n.toLocaleString()}</span></div>`;
+  }).join('');
+
+  document.getElementById('dlAll').disabled=false;
+  document.getElementById('dlIssue').disabled=stat.issue===0;
+  renderTable();
+}
+function renderTable(){
+  const f=document.getElementById('filter').value;
+  const list=out.filter(o=>f==='all'||(f==='changed'&&o.changed)||(f==='issue'&&o.issue)).slice(0,200);
+  const cols=[0,2,3,4,5,7,8,9,10,12];
+  document.getElementById('tbl').innerHTML=
+    '<thead><tr>'+cols.map(i=>`<th>${HEAD[i]}</th>`).join('')+'</tr></thead><tbody>'+
+    list.map(o=>'<tr>'+cols.map(i=>{
+      const v=o.row[i];
+      if(i===7) return `<td><span class="tag ${v==='Y'?'y':'n'}">${v==='Y'?'在職中':'已離職'}</span></td>`;
+      if(i===12) return `<td class="note">${v||''}</td>`;
+      return `<td>${v}</td>`;
+    }).join('')+'</tr>').join('')+'</tbody>';
+}
+function download(rows,name){
+  const csv=rows.map(r=>r.map(v=>{
+    v=String(v??'');
+    return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
+  }).join(',')).join('\r\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=name; a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ---------- 事件 ---------- */
+const drop=document.getElementById('drop'), fileEl=document.getElementById('file');
+drop.onclick=()=>fileEl.click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('over');};
+drop.ondragleave=()=>drop.classList.remove('over');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files[0])load(e.dataTransfer.files[0]);};
+fileEl.onchange=e=>{if(e.target.files[0])load(e.target.files[0]);};
+function load(file){
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const rows=parseCSV(decode(fr.result));
+    rawRows=rows.slice(1).filter(r=>r.length>=4);
+    document.getElementById('fileinfo').textContent=
+      `已載入「${file.name}」，共 ${rawRows.length.toLocaleString()} 筆資料、${rows[0].length} 個欄位。`;
+    document.getElementById('run').disabled=rawRows.length===0;
+  };
+  fr.readAsArrayBuffer(file);
+}
+document.getElementById('run').onclick=calc;
+document.getElementById('filter').onchange=renderTable;
+document.getElementById('dlAll').onclick=()=>download([HEAD,...out.map(o=>o.row)],'年資整理結果.csv');
+document.getElementById('dlIssue').onclick=()=>download([HEAD,...out.filter(o=>o.issue).map(o=>o.row)],'年資整理結果_需人工確認.csv');
+document.getElementById('base').value=new Date().toISOString().slice(0,10);
+</script>
