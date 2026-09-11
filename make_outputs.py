@@ -10,6 +10,7 @@ SRC = "/root/.claude/uploads/b50c582f-c718-5e95-96c3-aa756b3b5f25/4f245814-7608_
 YEARS = "/home/user/0326/年資整理結果.csv"          # 取其中的「年資_年」
 CSV_OUT = "/home/user/0326/原檔_含年資欄.csv"
 XLSX_OUT = "/home/user/0326/原檔_含年資欄.xlsx"
+BIG5_OUT = "/home/user/0326/原檔_含年資欄_Big5.csv"   # 繁中版 Excel 直接開不會亂碼
 
 # 沿用原檔標題，只在第 3、4 欄之間插入「年資_年」
 _src = list(csv.reader(open(SRC, encoding="utf-8-sig")))
@@ -28,6 +29,10 @@ with open(CSV_OUT, "w", encoding="utf-8-sig", newline="") as f:
     w.writerow(HEADER)
     for y, r in zip(years, rows):
         w.writerow(r[:3] + [y] + r[3:])
+
+# ---- Big5 版（Windows 繁中 Excel 雙擊即開） ----
+with open(CSV_OUT, encoding="utf-8-sig") as f, open(BIG5_OUT, "w", encoding="big5", newline="") as g:
+    g.write(f.read())
 
 # ---- Excel（日期轉成真正的日期值，欄寬與格式都設好） ----
 wb = Workbook(write_only=True)
