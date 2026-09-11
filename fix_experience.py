@@ -54,6 +54,17 @@ def experience_code(days, has_period):
     return min(int(years) + 2, 32)
 
 
+def write_with_years(src, dst, years_by_row, header):
+    """把「年資_年」欄插入原始檔案的 C、D 欄之間，其餘欄位原封不動。"""
+    with open(src, encoding="utf-8", errors="replace", newline="") as f, \
+         open(dst, "w", encoding="utf-8-sig", newline="") as g:
+        r = csv.reader(f); w = csv.writer(g)
+        head = next(r)
+        w.writerow(head[:3] + ["年資_年"] + head[3:])
+        for i, row in enumerate(r):
+            w.writerow(row[:3] + [years_by_row[i]] + row[3:])
+
+
 def main():
     with open(SRC, encoding="utf-8", errors="replace", newline="") as f:
         rows = list(csv.reader(f))
@@ -63,6 +74,7 @@ def main():
             "年資_年", "年資_月", "是否在職中", "有效工作段數", "最早到職日", "最後離職日",
             "年資_未合併重疊_年", "資料異常註記"]]
     stat = collections.Counter()
+    years_by_row = []
     code_dist = collections.Counter()
     issue_rows = []
 
@@ -132,6 +144,7 @@ def main():
                merged[0][0].strftime("%Y/%m/%d") if merged else "",
                "在職中" if working else (merged[-1][1].strftime("%Y/%m/%d") if merged else ""),
                round(raw_days / 365.2425, 2), "；".join(notes)]
+        years_by_row.append(round(days / 365.2425, 2))
         out.append(row)
         if notes:
             issue_rows.append(row)
@@ -140,6 +153,8 @@ def main():
         csv.writer(f).writerows(out)
     with open(DST.replace(".csv", "_需人工確認.csv"), "w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f); w.writerow(out[0]); w.writerows(issue_rows)
+
+    write_with_years(SRC, "/home/user/0326/原檔_含年資欄.csv", years_by_row, header)
 
     print("== 統計 ==")
     for k, v in stat.items():
