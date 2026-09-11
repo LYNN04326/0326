@@ -6,20 +6,20 @@ from openpyxl import Workbook
 from openpyxl.cell import WriteOnlyCell
 from openpyxl.styles import Font, Alignment
 
-SRC = "/root/.claude/uploads/b50c582f-c718-5e95-96c3-aa756b3b5f25/8e33dd6b-7608_________________Sheet1.csv"
+SRC = "/root/.claude/uploads/b50c582f-c718-5e95-96c3-aa756b3b5f25/4f245814-7608_________________Sheet1_1.csv"
 YEARS = "/home/user/0326/年資整理結果.csv"          # 取其中的「年資_年」
 CSV_OUT = "/home/user/0326/原檔_含年資欄.csv"
 XLSX_OUT = "/home/user/0326/原檔_含年資欄.xlsx"
 
-# 原始標題的中文在匯出時已變成 "?"，這裡補回可讀名稱
-HEADER = ["talentNo", "resumeGuid", "experience", "年資_年"]
-for i in range(1, 21):
-    HEADER += [f"工作{i}起日", f"工作{i}迄日"]
+# 沿用原檔標題，只在第 3、4 欄之間插入「年資_年」
+_src = list(csv.reader(open(SRC, encoding="utf-8-sig")))
+SRC_HEADER, SRC_ROWS = _src[0], _src[1:]
+HEADER = SRC_HEADER[:3] + ["年資_年"] + SRC_HEADER[3:]
 
 DATE_RE = re.compile(r"^(\d{4})/(\d{1,2})/(\d{1,2})")
 
 years = [r[5] for r in list(csv.reader(open(YEARS, encoding="utf-8-sig")))[1:]]
-rows = list(csv.reader(open(SRC, encoding="utf-8", errors="replace")))[1:]
+rows = SRC_ROWS
 assert len(years) == len(rows), (len(years), len(rows))
 
 # ---- CSV（保留原始儲存格文字，只插欄＋換標題） ----

@@ -12,7 +12,7 @@
 import csv, datetime, re, sys, collections
 
 SRC = sys.argv[1] if len(sys.argv) > 1 else \
-    "/root/.claude/uploads/b50c582f-c718-5e95-96c3-aa756b3b5f25/8e33dd6b-7608_________________Sheet1.csv"
+    "/root/.claude/uploads/b50c582f-c718-5e95-96c3-aa756b3b5f25/4f245814-7608_________________Sheet1_1.csv"
 DST = sys.argv[2] if len(sys.argv) > 2 else "/home/user/0326/年資整理結果.csv"
 BASE_DATE = datetime.date(2026, 9, 11)          # 資料基準日（在職中算到這天）
 MIN_VALID = datetime.date(1940, 1, 1)           # 早於此日期一律視為哨兵／無效值
@@ -66,7 +66,7 @@ def write_with_years(src, dst, years_by_row, header):
 
 
 def main():
-    with open(SRC, encoding="utf-8", errors="replace", newline="") as f:
+    with open(SRC, encoding="utf-8-sig", newline="") as f:
         rows = list(csv.reader(f))
     header, data = rows[0], rows[1:]
 
