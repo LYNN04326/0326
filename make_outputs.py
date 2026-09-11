@@ -11,6 +11,7 @@ YEARS = "/home/user/0326/年資整理結果.csv"          # 取其中的「年�
 CSV_OUT = "/home/user/0326/原檔_含年資欄.csv"
 XLSX_OUT = "/home/user/0326/原檔_含年資欄.xlsx"
 BIG5_OUT = "/home/user/0326/原檔_含年資欄_Big5.csv"   # 繁中版 Excel 直接開不會亂碼
+FIXED_OUT = "/home/user/0326/原檔_含年資欄_已修正順序.xlsx"  # 起迄填反的自動對調並標黃
 
 # 沿用原檔標題，只在第 3、4 欄之間插入「年資_年」
 _src = list(csv.reader(open(SRC, encoding="utf-8-sig")))
@@ -65,4 +66,64 @@ for y, r in zip(years, rows):
             line.append(v)
     ws.append(line)
 wb.save(XLSX_OUT)
+
+
+# ---- 已修正順序版：起迄填反者自動對調，並把對調過的格子標黃 ----
+from openpyxl.styles import PatternFill
+MIN_VALID = datetime.date(1940, 1, 1)
+YELLOW = PatternFill("solid", fgColor="FFE58F")
+
+def to_date(v):
+    m = DATE_RE.match(v.strip())
+    return datetime.date(*map(int, m.groups())) if m else None
+
+wb2 = Workbook(write_only=True)
+ws2 = wb2.create_sheet("年資")
+ws2.freeze_panes = "E2"
+for col, wd in widths.items():
+    ws2.column_dimensions[col].width = wd
+ws2.column_dimensions["AS"].width = 34
+
+hdr2 = []
+for h in HEADER + ["順序修正註記"]:
+    c = WriteOnlyCell(ws2, value=h)
+    c.font = Font(bold=True); c.alignment = Alignment(horizontal="center")
+    hdr2.append(c)
+ws2.append(hdr2)
+
+fixed_pairs = 0
+fixed_rows = 0
+for y, r in zip(years, rows):
+    cells = list(r[3:])
+    notes = []
+    for i in range(0, len(cells) - 1, 2):
+        s_, e_ = to_date(cells[i]), to_date(cells[i + 1])
+        if s_ and e_ and s_ >= MIN_VALID and e_ >= MIN_VALID and e_ < s_:
+            cells[i], cells[i + 1] = cells[i + 1], cells[i]
+            notes.append(SRC_HEADER[3 + i] + "／" + SRC_HEADER[4 + i])
+            fixed_pairs += 1
+    if notes:
+        fixed_rows += 1
+    swapped = set()
+    for name in notes:
+        j = SRC_HEADER.index(name.split("／")[0]) - 3
+        swapped.update({j, j + 1})
+
+    line = [r[0], r[1], int(r[2]) if r[2].strip().lstrip("-").isdigit() else r[2], float(y)]
+    for idx, v in enumerate(cells):
+        v = v.strip()
+        m = DATE_RE.match(v)
+        if m:
+            c = WriteOnlyCell(ws2, value=datetime.date(*map(int, m.groups())))
+            c.number_format = "yyyy/m/d"
+        else:
+            c = WriteOnlyCell(ws2, value=v)
+        if idx in swapped:
+            c.fill = YELLOW
+        line.append(c)
+    line.append("、".join(notes) + " 已對調" if notes else "")
+    ws2.append(line)
+wb2.save(FIXED_OUT)
+
 print("完成：", CSV_OUT, "/", XLSX_OUT)
+print(f"已修正順序版：{FIXED_OUT}（對調 {fixed_pairs} 組，分布在 {fixed_rows} 列）")
