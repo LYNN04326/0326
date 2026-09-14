@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code 外掛安裝指令</title>
+<style>
+  :root{
+    --bg:#f6f6f4;
+    --card:#ffffff;
+    --line:#e3e1dc;
+    --text:#1f1e1c;
+    --muted:#6f6b64;
+    --code-bg:#f2f1ee;
+    --accent:#c2532b;
+    --ok:#2f7a45;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    padding:32px 16px 64px;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,-apple-system,sans-serif;
+    line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{margin-bottom:28px;}
+  h1{font-size:26px;margin:0 0 8px;letter-spacing:.5px;}
+  header p{margin:0;color:var(--muted);font-size:14px;}
+
+  .item{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:20px 22px 18px;
+    margin-bottom:18px;
+  }
+  .item h2{
+    font-size:17px;
+    margin:0 0 4px;
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .num{
+    color:var(--accent);
+    font-weight:700;
+  }
+  .desc{margin:0 0 14px;color:var(--muted);font-size:14px;}
+
+  .label{
+    font-size:13px;
+    color:var(--muted);
+    margin:0 0 6px;
+  }
+  .code-box{
+    position:relative;
+    background:var(--code-bg);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:14px 16px;
+    overflow-x:auto;
+  }
+  pre{
+    margin:0;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13.5px;
+    line-height:1.9;
+    white-space:pre;
+    color:#33312d;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:10px;
+    flex-wrap:wrap;
+  }
+  button.copy{
+    appearance:none;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--text);
+    font-family:inherit;
+    font-size:13px;
+    padding:6px 14px;
+    border-radius:999px;
+    cursor:pointer;
+    transition:background .15s,border-color .15s,color .15s;
+  }
+  button.copy:hover{background:#f0efec;border-color:#d3d0c9;}
+  button.copy:active{transform:translateY(1px);}
+  button.copy.done{
+    background:#eaf4ec;
+    border-color:#bfdcc6;
+    color:var(--ok);
+  }
+  .src{
+    font-size:13px;
+    color:var(--muted);
+  }
+  .src a{color:var(--accent);text-decoration:none;word-break:break-all;}
+  .src a:hover{text-decoration:underline;}
+  footer{
+    margin-top:26px;
+    font-size:13px;
+    color:var(--muted);
+    text-align:center;
+  }
+  @media (max-width:480px){
+    body{padding:20px 12px 48px;}
+    .item{padding:16px 14px 14px;}
+    pre{font-size:12.5px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Claude Code 外掛安裝指令</h1>
+    <p>在 Claude Code 中直接貼上下列指令即可安裝，一個區塊就是一組完整指令。</p>
+  </header>
+
+  <section class="item">
+    <h2><span class="num">1.</span> superpowers</h2>
+    <p class="desc">測試、除錯、協作一整套。</p>
+    <p class="label">安裝指令</p>
+    <div class="code-box">
+<pre>/plugin marketplace add anthropics/claude-plugins-official
+/plugin install superpowers@claude-plugins-official</pre>
+    </div>
+    <div class="row">
+      <button class="copy" type="button">複製這段</button>
+      <span class="src">原始出處：<a href="https://github.com/anthropics/claude-plugins-official" target="_blank" rel="noopener">github.com/anthropics/claude-plugins-official</a></span>
+    </div>
+  </section>
+
+  <section class="item">
+    <h2><span class="num">2.</span> claude-mem</h2>
+    <p class="desc">關掉重開，記得上次做到哪。</p>
+    <p class="label">安裝指令</p>
+    <div class="code-box">
+<pre>/plugin marketplace add thedotmack/claude-mem
+/plugin install claude-mem@thedotmack</pre>
+    </div>
+    <div class="row">
+      <button class="copy" type="button">複製這段</button>
+      <span class="src">原始出處：<a href="https://github.com/thedotmack/claude-mem" target="_blank" rel="noopener">github.com/thedotmack/claude-mem</a></span>
+    </div>
+  </section>
+
+  <section class="item">
+    <h2><span class="num">3.</span> codex</h2>
+    <p class="desc">叫 OpenAI 的 Codex 來複查。</p>
+    <p class="label">安裝指令</p>
+    <div class="code-box">
+<pre>/plugin marketplace add openai/codex-plugin-cc
+/plugin install codex@openai-codex</pre>
+    </div>
+    <div class="row">
+      <button class="copy" type="button">複製這段</button>
+      <span class="src">原始出處：<a href="https://github.com/openai/codex" target="_blank" rel="noopener">github.com/openai/codex</a></span>
+    </div>
+  </section>
+
+  <footer>安裝後請重新啟動 Claude Code，外掛才會生效。</footer>
+
+</div>
+
+<script>
+(function () {
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy') ? resolve() : reject();
+      } catch (e) {
+        reject(e);
+      }
+      document.body.removeChild(ta);
+    });
+  }
+
+  document.querySelectorAll('button.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var box = btn.closest('.item').querySelector('pre');
+      var text = box ? box.textContent.trim() : '';
+      copyText(text).then(function () {
+        var old = btn.textContent;
+        btn.textContent = '已複製 ✓';
+        btn.classList.add('done');
+        clearTimeout(btn._t);
+        btn._t = setTimeout(function () {
+          btn.textContent = old;
+          btn.classList.remove('done');
+        }, 1600);
+      }).catch(function () {
+        btn.textContent = '複製失敗，請手動選取';
+        setTimeout(function () { btn.textContent = '複製這段'; }, 2000);
+      });
+    });
+  });
+})();
+</script>
+</body>
+</html>
