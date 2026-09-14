@@ -12,5 +12,16 @@
         ]
       }
     ]
+  },
+  "extraKnownMarketplaces": {
+    "hex-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "hex/claude-marketplace"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "claude-council@hex-plugins": true
   }
 }
