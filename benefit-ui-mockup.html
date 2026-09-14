@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>福利制度｜畫面示意圖（附於工單）</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;padding:28px;background:#eef1f4;color:#1f2328;
+       font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;font-size:14px;line-height:1.7}
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:20px;margin:0 0 4px}
+  .sub{color:#667;margin:0 0 24px;font-size:13px}
+  .fig{background:#fff;border:1px solid #d8dde3;border-radius:8px;margin-bottom:26px;overflow:hidden}
+  .fig-hd{background:#2f3b4a;color:#fff;padding:9px 16px;font-weight:700;font-size:14px}
+  .fig-bd{padding:20px}
+  .note{background:#fff8e6;border-left:4px solid #f0a500;padding:9px 13px;margin:14px 0 0;font-size:13px;border-radius:0 4px 4px 0}
+  .api{color:#0a7d3c;font-weight:700}
+
+  /* 區塊 */
+  .grp{margin-bottom:20px}
+  .grp-t{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .badge{font-size:11px;font-weight:500;color:#fff;background:#d93025;padding:1px 8px;border-radius:10px}
+  .grp-hint{color:#555;font-size:12.5px;margin:0 0 9px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid #c4cbd4;background:#fff;border-radius:16px;padding:5px 14px;font-size:13px}
+  .chip.on{border-color:#1a73e8;background:#1a73e8;color:#fff}
+  .chip.hv{border-color:#1a73e8;background:#f0f6ff}
+
+  /* 狀態對照 */
+  .states{display:flex;gap:34px;flex-wrap:wrap;align-items:flex-start}
+  .st{text-align:center}
+  .st .lb{font-size:12px;color:#667;margin-top:7px}
+  .st .lb b{color:#1f2328}
+
+  /* Modal */
+  .mask{background:rgba(0,0,0,.35);padding:26px;border-radius:6px}
+  .modal{background:#fff;border-radius:8px;max-width:470px;margin:0 auto;padding:22px;position:relative;
+         box-shadow:0 6px 24px rgba(0,0,0,.2)}
+  .modal h4{margin:0 0 12px;font-size:16px}
+  .modal p{font-size:13px;margin:0 0 8px;line-height:1.65}
+  .modal ul{margin:6px 0 0;padding-left:22px}
+  .modal li{color:#d93025;font-weight:700;font-size:13px}
+  .dyn{background:#fff3cd;outline:2px dashed #f0a500;outline-offset:3px;border-radius:3px}
+  .foot{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+  .btn{border:none;border-radius:4px;padding:7px 22px;font-size:13.5px}
+  .pri{background:#1a73e8;color:#fff}
+  .gho{background:#fff;color:#444;border:1px solid #c4cbd4}
+  .x{position:absolute;top:11px;right:13px;color:#888;font-size:15px}
+  .chk{margin-top:13px;font-size:12.5px;color:#555}
+  .cap{text-align:center;color:#667;font-size:12px;margin-top:9px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>福利制度｜畫面示意圖</h1>
+  <p class="sub">附於工單。<span class="api">綠字</span>＝由 API 帶出的內容，前端不得寫死。</p>
+
+  <!-- 圖 1 -->
+  <div class="fig">
+    <div class="fig-hd">圖 1｜福利代碼區塊：法定項目置頂，其餘分類依 CodeNo</div>
+    <div class="fig-bd">
+      <div class="grp">
+        <div class="grp-t">法定項目 <span class="badge">BenefitKind = 1</span></div>
+        <p class="grp-hint">請勾選勞健保、職災保險、就保、特別休假，並確認制度符合勞退新制規定，即可刊登職缺。</p>
+        <div class="chips">
+          <span class="chip on">勞保</span><span class="chip on">健保</span>
+          <span class="chip">就業保險</span><span class="chip">職災保險</span>
+          <span class="chip">勞退提繳金</span><span class="chip">加班費</span>
+          <span class="chip on">陪產檢及陪產假</span><span class="chip">育嬰假</span>
+          <span class="chip">生理假</span><span class="chip on">特別休假</span>
+          <span class="chip">產假</span><span class="chip">產檢假</span>
+          <span class="chip">安胎假</span><span class="chip">家庭照顧假</span>
+          <span class="chip">員工體檢</span><span class="chip on">週休二日</span>
+          <span class="chip">哺乳室</span>
+        </div>
+      </div>
+
+      <div class="grp">
+        <div class="grp-t">獎金類 <span style="font-size:12px;font-weight:400;color:#888">CodeNo 1100</span></div>
+        <div class="chips">
+          <span class="chip on">全勤獎金</span><span class="chip">年節獎金／禮品</span>
+          <span class="chip">分紅入股</span><span class="chip">生日禮金</span>
+          <span class="chip on">年終獎金</span><span class="chip">三節獎金／禮品</span>
+          <span class="chip">員工禮品</span><span class="chip">激勵獎金</span><span class="chip">績效獎金</span>
+        </div>
+      </div>
+
+      <div class="grp">
+        <div class="grp-t">休假類 <span style="font-size:12px;font-weight:400;color:#888">CodeNo 1200</span></div>
+        <div class="chips">
+          <span class="chip">生日假</span><span class="chip">旅遊假</span><span class="chip">不用補班</span>
+        </div>
+      </div>
+
+      <div class="grp">
+        <div class="grp-t">保險類 <span style="font-size:12px;font-weight:400;color:#888">CodeNo 1300</span></div>
+        <div class="chips">
+          <span class="chip">意外險</span><span class="chip">壽險</span><span class="chip on">員工團體保險</span>
+          <span class="chip">員工撫恤</span><span class="chip">公出特別保險</span>
+          <span class="chip">員工及眷屬住院慰問金</span><span class="chip">眷屬團體保險</span>
+        </div>
+      </div>
+
+      <p style="color:#888;font-size:12.5px;margin:0">（餐飲類、居住類、交通類、設備類、娛樂類、補助類、其他類 依序接續，此處省略）</p>
+
+      <div class="note">
+        <b>重點：</b>「法定項目」是<b>由 <span class="api">BenefitKind = 1</span> 聚合出來的虛擬分類</b>，DB 沒有這個 CodeNo。<br>
+        17 項法定項目<b>抽出後不在原分類重複出現</b> —— 所以休假類只剩 3 項、保險類只剩 7 項。<br>
+        分類標題與項目名稱皆為 <span class="api">API 回傳的 categoryName / name</span>，順序依 <span class="api">CodeNo</span>。
+      </div>
+    </div>
+  </div>
+
+  <!-- 圖 2 -->
+  <div class="fig">
+    <div class="fig-hd">圖 2｜Chip 狀態：已勾選 / 未勾選</div>
+    <div class="fig-bd">
+      <div class="states">
+        <div class="st"><span class="chip">特別休假</span>
+          <div class="lb"><b>未勾選</b><br>default<br>白底＋灰框</div></div>
+        <div class="st"><span class="chip hv">特別休假</span>
+          <div class="lb"><b>滑鼠移入</b><br>hover<br>淺藍底＋藍框</div></div>
+        <div class="st"><span class="chip on">特別休假</span>
+          <div class="lb"><b>已勾選</b><br>selected<br>藍底＋白字</div></div>
+      </div>
+      <div class="note">
+        進入頁面時，<span class="api">廠商已有的福利代碼</span>一律呈現 <b>selected</b>；其餘為 default。<br>
+        法定項目與非法定項目<b>使用相同的 Chip 樣式</b>，差別只在它被放進「法定項目」區塊。
+      </div>
+    </div>
+  </div>
+
+  <!-- 圖 3 -->
+  <div class="fig">
+    <div class="fig-hd">圖 3｜初始化：法定項目未勾選提示 Modal</div>
+    <div class="fig-bd">
+      <div class="mask">
+        <div class="modal">
+          <h4>重要提醒</h4>
+          <p>刊登職缺須符合個人資料保護法、就業服務法、依法參加社會保險(勞保、職災保險、就保等)及勞退新制與相關法令。</p>
+          <p>您尚未勾選：</p>
+          <ul class="dyn">
+            <li>就業保險</li><li>職災保險</li><li>勞退提繳金</li><li>加班費</li>
+          </ul>
+          <div class="chk"><label><input type="checkbox"> 我已了解相關規範，今日不再顯示</label></div>
+          <div class="foot"><button class="btn pri">確定</button></div>
+        </div>
+      </div>
+      <p class="cap">黃色虛線框處為動態內容</p>
+      <div class="note">
+        <b>⚠️ 本次一併調整：</b>虛線框內的<b>項目名稱需由 <span class="api">API 帶出</span></b>（tCodeBenefit 的 <span class="api">CodeNameA</span>），
+        <b>不得於程式內寫死文案</b>。<br>
+        只列出<b>該廠商實際未勾選</b>的項目，不是固定列出全部；上例代表這家廠商只缺這 4 項。<br>
+        初始化 Modal 僅有「確定」一顆按鈕（無取消）。
+      </div>
+    </div>
+  </div>
+
+  <!-- 圖 4 -->
+  <div class="fig">
+    <div class="fig-hd">圖 4｜送出時：確認 Modal</div>
+    <div class="fig-bd">
+      <div class="mask">
+        <div class="modal">
+          <span class="x">✕</span>
+          <h4>是否確認送出？</h4>
+          <p>刊登職缺須符合個人資料保護法、就業服務法、依法參加社會保險(勞保、職災保險、就保等)及勞退新制與相關法令。</p>
+          <p>您尚未勾選：</p>
+          <ul class="dyn"><li>就業保險</li></ul>
+          <div class="chk"><label><input type="checkbox"> 我已了解相關規範，今日不再顯示</label></div>
+          <div class="foot"><button class="btn gho">取消</button><button class="btn pri">確定</button></div>
+        </div>
+      </div>
+      <p class="cap">黃色虛線框處為動態內容</p>
+      <div class="note">
+        同樣<b>由 <span class="api">API 帶出</span>項目名稱</b>。與圖 3 的差異：標題為「是否確認送出？」、右上有 <b>✕</b>、按鈕為<b>取消／確定</b>。<br>
+        點「取消」關閉 Modal 返回本頁，<b>不重整頁面</b>；法定項目全部勾選時不顯示此 Modal，直接送出。
+      </div>
+    </div>
+  </div>
+
+  <div class="fig">
+    <div class="fig-hd">附註｜前端唯一的特殊規則</div>
+    <div class="fig-bd">
+      <p style="margin:0">除了「<b><span class="api">BenefitKind = 1</span> 的項目抽出放第一個分類</b>」這一條之外，
+      前端<b>不做任何分類判斷</b> —— 分類名稱、分類順序、項目名稱、項目順序全部照 API 回傳值依序呈現。</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
