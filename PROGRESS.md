@@ -41,8 +41,34 @@
 - [x] 建立 `claude-plugins.html`，修好原截圖中失效的複製按鈕
 - [x] 釐清外掛安裝的環境限制（見上）
 - [x] 建立本進度筆記
-- [ ] 評估「48 個外掛」清單中，哪些 skill 可以直接放進本專案使用
+- [x] 評估「48 個外掛」清單，篩選後安裝 2 個可用的 skill
+
+## 已安裝的 skill（`.claude/skills/`）
+
+| skill | 用途 | 怎麼用 |
+|---|---|---|
+| `adversarial-reviewer` | 三個敵意角色複查程式碼，禁止講模糊話 | 說「複查這次的改動」或 `/adversarial-review` |
+| `stop-slop` | 刪掉文字裡的 AI 腔，最後給 5 面向評分 | 說「把這段去掉 AI 味」 |
+
+### 評估過但**不裝**的，不要再試
+
+| skill | 原因 |
+|---|---|
+| `taste` | 需要 Playwright MCP，且本環境對外網路封鎖，抓不到任何網站 |
+| `a11y-audit` | 需要 axe-core / Lighthouse 等 npm 套件 |
+| `design-dna` | 需要 npm install 跑顏色量測腳本（可分析上傳的截圖，但功能不完整） |
+| `prompt-master` | 內容寫死大量未經查證的模型型號與參數，會誤導 |
+| `design-system` | 名不副實，實為 markdown-html Python 工具鏈的設定精靈 |
+
+## 這個環境的對外網路
+
+只放行 GitHub 等少數網域。實測 `curl` 與 `WebFetch` 抓 stripe.com 皆被 egress proxy 擋下。
+
+**因此無法讓 Claude 自己去看任何網站。** 要分析某個網站的設計，唯一方法是使用者自己把網頁存檔上傳：
+
+- Windows Edge：`Ctrl+S` → 存檔類型選「網頁，單一檔案 (*.mhtml)」→ 上傳該檔
+- Mac Safari：選 `Webpage, Complete`（壓成 zip 再傳），**不要**選 `Single File`（`.webarchive` 是蘋果專有二進位格式，讀不了）
 
 ### 下一步
 
-測試 `git clone` 型的 skill 能否裝進 `.claude/skills/`，可行的話挑選需要的項目安裝。
+等使用者上傳想模仿的網站存檔，或繼續既有的 HTML 頁面工作。
