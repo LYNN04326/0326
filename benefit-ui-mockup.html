@@ -63,6 +63,12 @@
   .fm-bt.out{background:#fff;border-color:#cd2742;color:#cd2742}
   .fm-bt.fill{background:#cd2742;color:#fff}
   .dyn{background:#fff3cd;outline:2px dashed #f0a500;outline-offset:3px;border-radius:3px}
+  /* 初始化 Modal：預設（非 warning）樣式 */
+  .fmodal.plain{border-color:#dae1e7}
+  .fmodal.plain .fm-hd{background:#f4f6f7}
+  .fmodal.plain .fm-hd h4{color:#212428}
+  .fm-link{color:#1a66ff;margin-top:10px}
+  .fm-bt.blue{background:#1a66ff;color:#fff;border-color:#1a66ff}
   .cap{text-align:center;color:#667;font-size:12px;margin-top:9px}
   .old{color:#9aa3ad;text-decoration:line-through}
   .new{color:#0a7d3c;font-weight:700}
@@ -229,27 +235,33 @@
 
   <!-- 圖 6 -->
   <div class="fig">
-    <div class="fig-hd">圖 6｜初始化提示 Modal（依規格書重建，非實際擷取）</div>
+    <div class="fig-hd">圖 6｜初始化提示 Modal（依正式站實際樣式）</div>
     <div class="fig-bd">
       <div class="mask">
-        <div class="fmodal">
-          <div class="fm-hd"><h4>重要提醒</h4></div>
+        <div class="fmodal plain">
+          <div class="fm-hd"><h4>重要提醒</h4><span class="fm-x">✕</span></div>
           <div class="fm-bd">
             刊登職缺須符合個人資料保護法、就業服務法、依法參加社會保險(勞保、職災保險、就保等)及勞退新制與相關法令。您尚未勾選：
-            <div class="fm-danger dyn">就業保險、職災保險、勞退提繳金、加班費</div>
+            <div class="fm-link dyn">加班費、陪產檢及陪產假、育嬰假、生理假、特別休假、產假、產檢假、安胎假、家庭照顧假、員工體檢、勞退提繳金</div>
             <div class="fm-chk"><label><input type="checkbox"> 我已了解相關規範，今日不再顯示</label></div>
           </div>
-          <div class="fm-ft"><button class="fm-bt fill">確 定</button></div>
+          <div class="fm-ft"><button class="fm-bt blue">確 定</button></div>
         </div>
       </div>
-      <p class="cap">黃色虛線框處為動態內容</p>
-      <div class="warn">
-        <b>本圖未取得正式站實際畫面</b>（存檔時未觸發此 Modal），版面依 B.1.5 規格書與 Axure 原型重建，
-        樣式沿用圖 5。<b>實際樣式以站上為準。</b>
-      </div>
+      <p class="cap">上圖為實際擷取：該廠商已勾勞保、健保、就業保險、職災保險，故清單為 11 項；黃色虛線框處為動態內容</p>
       <div class="note">
-        進入頁面時若有法定項目未勾選即顯示。與圖 5 的差異：標題「重要提醒」、<b>僅一顆「確定」</b>、無取消與 ✕。<br>
-        項目名稱同樣需由 <span class="api">API 帶出</span>。
+        進入頁面時若有法定項目未勾選即顯示。與圖 5 送出 Modal 的差異：<br>
+        標題列 <b>#f4f6f7 灰底、黑字</b>（送出 Modal 為 #ffeaea 粉底、紅字）；清單為<b>藍色 #1a66ff</b>（送出 Modal 為紅色 #a30021）；
+        <b>只有一顆藍色「確定」</b>，無取消；<b>右上有 ✕</b>。<br>
+        項目名稱同樣需由 <span class="api">API 帶出</span>，版面不動。
+      </div>
+      <div class="ok">
+        <b>本圖同時驗證了 15 項規則：</b>該廠商已勾 4 項（勞保、健保、就業保險、職災保險），
+        15 − 4 ＝ <b>11 項</b>，與畫面完全相符。週休二日、哺乳室一如預期不在清單內。
+      </div>
+      <div class="warn">
+        <b>🔴 順序同樣有問題：</b>本 Modal 也把 <b>勞退提繳金(1308)</b> 排在<b>員工體檢之後</b>，
+        與送出 Modal 是同一套寫死順序。改版後兩個 Modal 一律依 <code>CodeNo</code> 由小到大。
       </div>
     </div>
   </div>
